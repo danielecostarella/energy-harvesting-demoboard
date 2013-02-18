@@ -8,9 +8,9 @@
 #ifndef RFM70_H
 #define	RFM70_H
 
-/** RFM70 SPI commands */
+#include <xc.h>
 
-/// RFM70 SPI read and write commands
+/** RFM70 SPI commands */
 
 /// Read  command and status registers
 #define RFM70_R_REGISTER            0x00
@@ -48,6 +48,24 @@
 /// No Operation
 #define RFM70_NOP                   0xFF
 
+
+#define _XTAL_FREQ 16000000L
+#define RFM70_WAIT_US( x ) _delay( x * ( _XTAL_FREQ / 4000000))
+#define RFM70_WAIT_MS( x ) _delay( x * ( _XTAL_FREQ / 4000))
+
+//#define RFM70_CE PORTCbits.RC3
+
+
+// Register MAP
+#define RFM70_STATUS    0x07
+void rfm70Write(unsigned char reg, unsigned char value);
+unsigned char rfm70Read(unsigned char reg);
+void rfm70ReadBuffer(unsigned char reg, unsigned char *pBuf, unsigned char length);
+void rfm70Bank(unsigned char bank);
+unsigned char rfm70IsPresent(void);
+void test(void);
+unsigned char rfm70_SPI_RW(unsigned char);
+unsigned char SPI_read(unsigned char reg);
 
 #endif	/* RFM70_H */
 

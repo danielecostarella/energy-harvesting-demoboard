@@ -13,6 +13,7 @@ void init(void);
 void serialInit(void);
 void adcInit(void);
 int adcRead(unsigned char);
+void spiInit(void);
 
 
 void putch(unsigned char byte);

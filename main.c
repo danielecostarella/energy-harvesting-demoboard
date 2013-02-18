@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <xc.h>
 #include "main.h"
+#include "rfm70.h"
 
 
 /* CONFIGURAZIONE MICROCONTROLLORE */
@@ -28,29 +29,54 @@
 //#pragma config BORV = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 #pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
 
-#define _XTAL_FREQ 4000000L
+#define _XTAL_FREQ 16000000L
+#define WAIT_us( x ) _delay( x * ( _XTAL_FREQ / 4000000))
+#define WAIT_ms( x ) _delay( x * ( _XTAL_FREQ / 4000))
+
 /*
  * 
  */
 
 void spiInit(void);
 
+unsigned char rfm70id[4];
+
 int main(int argc, char** argv) {
 
     long int i;
     int read = 0;
-
+    unsigned char test;
     init();
 
+    //printf(rfm70IsPresent);
+    //test();
+
+
+    printf("1\r\n");
+    test = SPI_read(1);
+    //test = rfm70Read(1);
+    //rfm70Bank(1);
+    printf("CONFREG = %X\r\n", test);
+    printf("2\r\n");
+    rfm70ReadBuffer(0x08,rfm70id, 4);
+    printf("3\r\n");
+    WAIT_ms(500);
+
+    for (i=0; i<4; i++) {
+        printf("ID[%d] = %X\r\n", i+1, rfm70id[i]);
+    }
     //__delay_ms(100);
     TRISCbits.TRISC0=0;
 
 
     PORTCbits.RC0=1;
     printf(" test ");
+    WAIT_us(5000);
+    printf(" test again ");
 
     putch('Z');
 
+    while(1); //break
     while(1) {
         PORTCbits.RC0=1;
         read = adcRead(2);
@@ -80,20 +106,25 @@ void init(void) {
     TRISBbits.TRISB4=1;     // SDI pin
     TRISCbits.TRISC7=0;     // SDO pin
     TRISBbits.TRISB6=0;     // SCK pin (clock)
+    TRISCbits.TRISC3=0;     // CSN pin (chip select)
+    PORTCbits.RC3=1;        // set CSN pin
+
+    PORTBbits.RB6=0;        // clear clock pin
 
     adcInit();
     serialInit();
+    //spiInit();
 }
 
 
 void spiInit(void) {
     SSP1CON1bits.SSPEN=1;       // 1= Enables SPI
-    SSP1CON1bits.CKP=0; //1 = Idle State for clock is a low level
-    SSP1CON1bits.SSPM=0;    // SPI Master Mode clock=Fosc/4
+    SSP1CON1bits.CKP=0; //1 = Idle State for clock is a low level 
+    SSP1CON1bits.SSPM=2;    // SPI Master Mode clock=Fosc/4
 
-    SSP1STATbits.SMP=1;     // input data sampled at end of data output time
-    SSP1STATbits.CKE=0;     // Trasmit occurs on transition from idle to active clock state
-
+    SSP1STATbits.SMP=0;     // input data sampled at middle of data output time
+    SSP1STATbits.CKE=1;     // Trasmit occurs on transition from idle to active clock state //in origine 0
+    WAIT_ms(50);
 }
 
 void serialInit(void) {
