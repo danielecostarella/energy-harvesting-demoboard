@@ -2543,7 +2543,9 @@ if(TMR1IF)
 tmr1Counter++;
 
 
-TMR1H = 0x60;
+
+TMR1H = 0xF0;
+
 TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
@@ -2593,7 +2595,7 @@ TRISCbits.TRISC4=1;
 TRISDbits.TRISD1=1;
 PORTCbits.RC2=0;
 
-# 132
+# 134
 GIE=1;
 PEIE=1;
 TMR1IE=1;
@@ -2608,7 +2610,7 @@ _delay( 100 * ( 8000000L / 4000));
 
 
 
-TMR1H = 0x60;
+TMR1H = 0x00;
 TMR1L = 0x00;
 
 T1CONbits.TMR1CS=2;
@@ -2619,23 +2621,27 @@ T1CONbits.T1OSCEN=1;
 T1CONbits.TMR1ON=1;
 
 
-uartInit();
 spiInit();
+uartInit();
 adcInit();
+
+rfm70setPowerdownMode(0);
+
+
+
 adcRead();
 
 
 
 printf("ADC value: %d\r\n", adcRead());
 
-
-rfm70setPowerdownMode(0);
+# 179
 RFM70_Initialize();
 
-# 223
+# 235
 while(1) {
 
-# 229
+# 241
 _delay( 100 * ( 8000000L / 4000));
 for (i=0;i<1;i++) {
 temp_tx_buf[i]=tx_buf[i];
@@ -2652,10 +2658,11 @@ tx_buf[0]++;
 
 PORTCbits.RC2=0;
 T1CONbits.TMR1ON=0;
-TMR1H = 0x5F;
-TMR1L = 0xE9;
+TMR1H = 0xF0;
+
+TMR1L = 0x00;
 T1CONbits.TMR1ON=1;
-_delay( 100 * ( 8000000L / 4000));
+
 asm("sleep");
 }
 return (0);
@@ -2679,7 +2686,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 276
+# 289
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2729,13 +2736,13 @@ putch(c = getch());
 return c;
 }
 
-# 331
+# 344
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 347
+# 360
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2761,7 +2768,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 376
+# 389
 while(!PORTDbits.RD1) {
 
 
@@ -2790,7 +2797,7 @@ _delay( 100 * ( 8000000L / 4000));
 }
 }
 
-# 413
+# 426
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2836,7 +2843,7 @@ PORTDbits.RD0=1;
 _delay( 100 * ( 8000000L / 4000));
 PORTDbits.RD0=0;
 
-# 462
+# 475
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

@@ -74,7 +74,9 @@ void interrupt ISR(void)
       tmr1Counter++;
       //TMR1H=0x00;
       //TMR1L=0x00;
-      TMR1H = 0x60; // 10s @ 32KHz
+
+      TMR1H = 0xF0;
+      //TMR1H = 0x60; // 10s @ 32KHz questo è quello giusto
       TMR1L = 0x00;
 
       if(tmr1Counter == tmr1Target){
@@ -143,7 +145,7 @@ int main(int argc, char** argv) {
     //TMR1H=0x00;
     //TMR1L=0x00;
 
-    TMR1H = 0x60;
+    TMR1H = 0x00;
     TMR1L = 0x00;
     
     T1CONbits.TMR1CS=2; //0 for instruction clock
@@ -152,21 +154,31 @@ int main(int argc, char** argv) {
     T1CONbits.nT1SYNC=1;
     T1CONbits.T1OSCEN=1;    //era 0 for disabled
     T1CONbits.TMR1ON=1;
-    
 
-    uartInit();
+
     spiInit();
+    uartInit();
     adcInit();
+
+    rfm70setPowerdownMode(0); //?
+
+    //SLEEP(); <-- per farlo consumare poco
+    
     adcRead(); // read dummy data (?)
     //SLEEP();
     //while(1) {
     //    WAIT_MS(500);
-        printf("ADC value: %d\r\n", adcRead());
-    //}
+    printf("ADC value: %d\r\n", adcRead());
+   // }
 
-    rfm70setPowerdownMode(0); //?
+    
+
+    
+
+    
     RFM70_Initialize();
 
+ 
     //while(1) {
     
     //    WAIT_MS(1000);
@@ -242,10 +254,11 @@ int main(int argc, char** argv) {
         //SwitchToRxMode();  	// switch to Rx mode - TX VERSION
         CE=0;
         T1CONbits.TMR1ON=0;
-        TMR1H = 0x5F;
-        TMR1L = 0xE9;
+        TMR1H = 0xF0;
+        //TMR1H = 0x60;
+        TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
-        WAIT_MS(100);
+        //WAIT_MS(100);
         SLEEP();
     }
     return (EXIT_SUCCESS);
