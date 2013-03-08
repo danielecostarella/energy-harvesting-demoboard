@@ -2510,7 +2510,7 @@ void rfm70setPowerdownMode(uint8_t value);
 
 #pragma config VCAPEN=0;
 
-# 42
+# 44
 void power_on_delay(void);
 void spiInit(void);
 void uartInit(void);
@@ -2521,13 +2521,15 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len);
 void Receive_Packet(void);
 uint8_t adcRead(uint8_t ch, uint8_t range);
 void adcInit(void);
+uint8_t adcReadTemp(void);
+uint8_t adcReadVcap(void);
 
 extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
 extern void SwitchToRxMode(void);
 
-# 61
-uint8_t tx_buf[1]={0x00};
+# 65
+uint8_t tx_buf[2]={0x00, 0x00};
 uint8_t rx_buf[32];
 
 extern const uint8_t RX0_Address[];
@@ -2543,7 +2545,7 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-# 81
+# 85
 TMR1H = 0x00;
 TMR1L = 0x00;
 
@@ -2595,7 +2597,7 @@ TRISCbits.TRISC4=1;
 TRISDbits.TRISD1=1;
 PORTCbits.RC2=0;
 
-# 137
+# 141
 TRISEbits.TRISE1=0;
 ANSELEbits.ANSE1=0;
 TRISEbits.TRISE2=1;
@@ -2616,7 +2618,7 @@ GIE=1;
 PEIE=1;
 TMR1IE=1;
 
-# 167
+# 171
 TMR1H = 0x00;
 TMR1L = 0x00;
 
@@ -2635,45 +2637,54 @@ adcInit();
 rfm70setPowerdownMode(0);
 
 
+
 asm("sleep");
 asm("sleep");
-asm("sleep");
-
-
-adcRead(7,0);
 
 
 
-value = (4*adcRead(7,0)-500);
+PORTEbits.RE1=1;
+
+
+
+
+value = adcReadTemp();
+
 printf("TEMP value: %X => %d\r\n", value, value);
-value = adcRead(5,1);
-printf("Vstorage value: %d\r\n", value);
-printf("\r\n");
+value = adcReadVcap();
 
-# 204
+printf("Vstorage value: %d\r\n", value);
+
+# 212
 RFM70_Initialize();
 
-# 211
+rfm70setPowerdownMode(0);
+
+# 221
 asm("sleep");
 
-# 260
+# 269
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 268
-for (i=0;i<1;i++) {
+# 277
+for (i=0;i<2;i++) {
 temp_tx_buf[i]=tx_buf[i];
 }
 
 
 
-Send_Packet(0xB0,tx_buf,1);
-
-tx_buf[0]++;
-
+tx_buf[0] = adcReadTemp();
+tx_buf[1] = adcReadVcap();
 
 
 
+if (tx_buf[1]> 120) {
+
+Send_Packet(0xB0,tx_buf,2);
+}
+
+# 299
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2689,27 +2700,70 @@ asm("sleep");
 return (0);
 }
 
-# 301
+
+
+
+uint8_t adcReadTemp(void) {
+uint8_t value;
+ADCON0bits.CHS=7;
+FVRCONbits.ADFVR=1;
+ADCON0bits.ADON=1;
+PORTEbits.RE1=1;
+_delay( 5 * ( 8000000L / 4000));
+ADCON0bits.GO_nDONE=1;
+while(ADCON0bits.GO_nDONE);
+value = ADRES;
+ADCON0bits.ADON=0;
+PORTEbits.RE1=0;
+return value;
+}
+
+uint8_t adcReadVcap(void) {
+uint8_t value;
+ADCON0bits.CHS=5;
+FVRCONbits.ADFVR=2;
+ADCON0bits.ADON=1;
+PORTDbits.RD3=1;
+_delay( 1 * ( 8000000L / 4000));
+ADCON0bits.GO_nDONE=1;
+while(ADCON0bits.GO_nDONE);
+value = ADRES;
+ADCON0bits.ADON=0;
+PORTDbits.RD3=0;
+return value;
+}
+
+# 351
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
-ADCON0bits.ADON=1;
+
 
 if (range == 0) {
+
 FVRCONbits.ADFVR=1;
+ADCON0bits.ADON=1;
+
+
 PORTEbits.RE1=1;
-_delay( 1 * ( 8000000L / 4000));
+_delay( 20 * ( 8000000L / 4000));
 }
 else
+PORTDbits.RD3=1;
 FVRCONbits.ADFVR=2;
+ADCON0bits.ADON=1;
+_delay( 1 * ( 8000000L / 4000));
 
 while(!FVRCONbits.FVRRDY);
+
 
 ADCON0bits.GO_nDONE=1;
 while(ADCON0bits.GO_nDONE);
 
 value = ADRES;
-PORTEbits.RE1=0;
+ADCON0bits.ADON=0;
+
+PORTDbits.RD3=0;
 return value;
 }
 
@@ -2721,7 +2775,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 336
+# 396
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2747,7 +2801,8 @@ _delay( 50 * ( 8000000L / 4000));
 
 void adcInit(void) {
 
-ADCON1bits.ADCS=0x00;
+
+ADCON1bits.ADCS=1;
 
 ADCON1bits.ADREF=3;
 FVRCONbits.FVREN=1;
@@ -2773,13 +2828,13 @@ putch(c = getch());
 return c;
 }
 
-# 393
+# 454
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 409
+# 470
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2805,7 +2860,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 438
+# 499
 while(!PORTDbits.RD1) {
 
 
@@ -2834,7 +2889,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 475
+# 536
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2880,7 +2935,7 @@ PORTDbits.RD0=1;
 _delay( 100 * ( 8000000L / 4000));
 PORTDbits.RD0=0;
 
-# 524
+# 585
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

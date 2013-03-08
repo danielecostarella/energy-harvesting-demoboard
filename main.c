@@ -32,6 +32,8 @@
 //#pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
 
 
+#define vmin        120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
+
 //#define _XTAL_FREQ 16000000L
 //#define WAIT_US( x ) _delay( x * ( _XTAL_FREQ / 4000000))
 //#define WAIT_MS( x ) _delay( x * ( _XTAL_FREQ / 4000))
@@ -49,6 +51,8 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len);
 void Receive_Packet(void);
 uint8_t adcRead(uint8_t ch, uint8_t range);
 void adcInit(void);
+uint8_t adcReadTemp(void);
+uint8_t adcReadVcap(void);
 
 extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
@@ -58,7 +62,7 @@ extern void SwitchToRxMode(void);
 //uint8_t tx_buf[17]={0x00,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
           //          0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x79};
 //uint8_t tx_buf[MAX_PACKET_LEN];
-uint8_t tx_buf[1]={0x00};
+uint8_t tx_buf[2]={0x00, 0x00};
 uint8_t rx_buf[MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
@@ -181,21 +185,25 @@ int main(int argc, char** argv) {
 
     rfm70setPowerdownMode(0); //?
 
-
-    SLEEP(); //<-- per farlo consumare poco
+    // rimettere sleep
+    //SLEEP(); //<-- per farlo consumare poco
     SLEEP();
     SLEEP();
+    // rimettere sleep
 
-    //PORTEbits.RE1=1; //mcp9700 power up
-    adcRead(7,0); // read dummy data (?)
+
+    PORTEbits.RE1=1; //mcp9700 power up
+    //adcRead(7,0); // read dummy data (?)
     //SLEEP();
     //while(1) {
         //WAIT_MS(500);
-        value = (4*adcRead(7,0)-500);
+        value = adcReadTemp();
+        ////value = adcRead(7,0); //(4*adcRead(7,0)-500);
         printf("TEMP value: %X => %d\r\n", value, value);
-        value = adcRead(5,1);
+        value = adcReadVcap();
+        ////value = adcRead(5,1); //era 1
         printf("Vstorage value: %d\r\n", value);
-        printf("\r\n");
+        //printf("\r\n");
     //}
 
     
@@ -203,13 +211,14 @@ int main(int argc, char** argv) {
     
     RFM70_Initialize();
 
- 
+    rfm70setPowerdownMode(0);
     //while(1) {
     
     //    WAIT_MS(1000);
     //}
-    SLEEP();
+
     //SLEEP();
+    SLEEP();
 
     //WAIT_MS(50);
     //tx_buf[0] = '\0';	// initialize tx buffer
@@ -265,15 +274,24 @@ int main(int argc, char** argv) {
         //}
         //PORTCbits.RC0=0;
         //WAIT_MS(100);
-        for (i=0;i<1;i++) {
+        for (i=0;i<2;i++) {
             temp_tx_buf[i]=tx_buf[i];
         }
+        //tx_buf[0] = adcRead(5,1);
 
+        //value = adcReadTemp();
+        tx_buf[0] = adcReadTemp();
+        tx_buf[1] = adcReadVcap();
+        
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
-        Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,1);	// transmit
+        if (tx_buf[1]> vmin) {
+            //rfm70setPowerdownMode(1);
+            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,2);	// transmit
+        }
         //tx_buf[0] = '\0';	// clear tx_buf
-        tx_buf[0]++;
+        //tx_buf[0]++;
+
         //tx_buf[1]++;
         //tx_buf[2]++;
         //tx_buf[3]++;
@@ -294,30 +312,72 @@ int main(int argc, char** argv) {
 }
 
 
+
+
+uint8_t adcReadTemp(void) {
+    uint8_t value;
+    ADCON0bits.CHS=7;
+    FVRCONbits.ADFVR=1;
+    ADCON0bits.ADON=1;
+    PORTEbits.RE1=1;     // mcp9700a power up
+    WAIT_MS(5);
+    ADCON0bits.GO_nDONE=1;
+    while(ADCON0bits.GO_nDONE);
+    value = ADRES;
+    ADCON0bits.ADON=0;
+    PORTEbits.RE1=0;     // turn off mcp9700a
+    return value;
+}
+
+uint8_t adcReadVcap(void) {
+    uint8_t value;
+    ADCON0bits.CHS=5;
+    FVRCONbits.ADFVR=2;
+    ADCON0bits.ADON=1;
+    PORTDbits.RD3=1;        // Select Vstorage measurement
+    WAIT_MS(1);
+    ADCON0bits.GO_nDONE=1;
+    while(ADCON0bits.GO_nDONE);
+    value = ADRES;
+    ADCON0bits.ADON=0;
+    PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
+    return value;
+}
+
 // range 0: Vref_int = 1.024
 // range 1: Vref_int = 2.048
 // ch = 7 => mpc9700a read
-// ch = ? => Vstorage read
+// ch = 5 => Vstorage read
 uint8_t adcRead(uint8_t ch, uint8_t range) {
     uint8_t value;
     ADCON0bits.CHS=ch;          // read from channel 'ch'
-    ADCON0bits.ADON=1;
+    //ADCON0bits.ADON=1;
     
     if (range == 0) {              // read from MCP9700A
+        //FVRCONbits.FVREN=0;     //FVR disabled
         FVRCONbits.ADFVR=1;     // 1.024 as reference
+        ADCON0bits.ADON=1;
+        //WAIT_MS(1);
+        //FVRCONbits.FVREN=1;
         PORTEbits.RE1=1;     // mcp9700a power up
-        WAIT_MS(1);             // mcp9700 Turn-on Time
+        WAIT_MS(20);             // mcp9700 Turn-on Time
     }
     else
+        PORTDbits.RD3=1;        // Select Vstorage measurement
         FVRCONbits.ADFVR=2;  // read from Vstorage
+        ADCON0bits.ADON=1;
+        WAIT_MS(1);         // serve??????
     
     while(!FVRCONbits.FVRRDY);  // 1 = Fixed Voltage Reference output is ready for use
+    // Note: FVRRDY is always ?1? on PIC16F707 devices.
 
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
     //while(!PIR1bits.ADIF);
     value = ADRES;
-    PORTEbits.RE1=0;            // Turn off mcp9700a
+    ADCON0bits.ADON=0;       //ADC is disabled and consumes no operating current
+    //PORTEbits.RE1=0;            // Turn off mcp9700a
+    PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
     return value;
 }
 
@@ -358,7 +418,8 @@ void spiInit(void) {
 
 void adcInit(void) {
     //ADCON0bits.CHS=0x07;
-    ADCON1bits.ADCS=0x00;
+    //ADCON1bits.ADCS=0x00;
+    ADCON1bits.ADCS=1;      // convert @ fosc/8
     //ADCON1bits.ADREF=0;
     ADCON1bits.ADREF=3;  // 11 = VREF is connected to internal Fixed Voltage Reference
     FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
