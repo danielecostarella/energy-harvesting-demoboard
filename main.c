@@ -47,7 +47,7 @@ unsigned char getche(void);
 
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len);
 void Receive_Packet(void);
-uint8_t adcRead(void);
+uint8_t adcRead(uint8_t ch, uint8_t range);
 void adcInit(void);
 
 extern void RFM70_Initialize(void);
@@ -67,6 +67,7 @@ uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
 
+
 void interrupt ISR(void)
    {
    if(TMR1IF) // interrupt su overflow timer1: è passato un secondo
@@ -75,8 +76,9 @@ void interrupt ISR(void)
       //TMR1H=0x00;
       //TMR1L=0x00;
 
-      TMR1H = 0xF0;
+      //TMR1H = 0xF0; //ritardo breve
       //TMR1H = 0x60; // 10s @ 32KHz questo è quello giusto
+      TMR1H = 0x00;
       TMR1L = 0x00;
 
       if(tmr1Counter == tmr1Target){
@@ -92,6 +94,7 @@ void interrupt ISR(void)
 
 int main(int argc, char** argv) {
     long int i=0;
+    int16_t value;
     uint8_t buffer[5];
     uint8_t temp_tx_buf[32];
 
@@ -130,17 +133,33 @@ int main(int argc, char** argv) {
     //OPTION_REGbits.PSA=1;
     //OPTION_REGbits.PS=0x07;
 
+    // MCP9700A
+    TRISEbits.TRISE1=0;     // MCP9700A power
+    ANSELEbits.ANSE1=0;     // pin RE1 as digital
+    TRISEbits.TRISE2=1;     // MCP9700A Vout
+    ANSELEbits.ANSE2=1;     // set RE2 pin as analog
+
+    TRISEbits.TRISE0=1;     // RE0 as input
+    ANSELEbits.ANSE0=0;     // set RE0 pin as analog (Vstorage)
+
+    // Vstorage monitor
+    TRISEbits.TRISE0=1;     // for Vstorage measuring
+    ANSELEbits.ANSE0=1;     // pin RE0 as analog
+    TRISDbits.TRISD3=0;     // enable Vstorage measure
+    PORTDbits.RD3=0;        // set to low
+
+
 
     GIE=1; // gestione globale interrupt attiva
     PEIE=1; // interrupt di periferica abilitati
     TMR1IE=1; // interrupt su overflow timer1 abilitato
 
 
-    
-        LED=1;
-        WAIT_MS(100);
-        LED=0;
-        WAIT_MS(100);
+        // LED blinking
+        //LED=1;
+        //WAIT_MS(100);
+        //LED=0;
+        //WAIT_MS(100);
     
     //TMR1H=0x00;
     //TMR1L=0x00;
@@ -162,19 +181,25 @@ int main(int argc, char** argv) {
 
     rfm70setPowerdownMode(0); //?
 
-    //SLEEP(); <-- per farlo consumare poco
-    
-    adcRead(); // read dummy data (?)
+
+    SLEEP(); //<-- per farlo consumare poco
+    SLEEP();
+    SLEEP();
+
+    //PORTEbits.RE1=1; //mcp9700 power up
+    adcRead(7,0); // read dummy data (?)
     //SLEEP();
     //while(1) {
-    //    WAIT_MS(500);
-    printf("ADC value: %d\r\n", adcRead());
-   // }
+        //WAIT_MS(500);
+        value = (4*adcRead(7,0)-500);
+        printf("TEMP value: %X => %d\r\n", value, value);
+        value = adcRead(5,1);
+        printf("Vstorage value: %d\r\n", value);
+        printf("\r\n");
+    //}
 
     
-
-    
-
+    //printf("ADC value: %d\r\n", adcRead(7));
     
     RFM70_Initialize();
 
@@ -183,7 +208,7 @@ int main(int argc, char** argv) {
     
     //    WAIT_MS(1000);
     //}
-    //SLEEP();
+    SLEEP();
     //SLEEP();
 
     //WAIT_MS(50);
@@ -233,12 +258,13 @@ int main(int argc, char** argv) {
     //LED=0;
 
     while(1) {
+        rfm70setPowerdownMode(1);
         //if(flag == 1){
         //    flag = 0;
         //    SLEEP();
         //}
         //PORTCbits.RC0=0;
-        WAIT_MS(100);
+        //WAIT_MS(100);
         for (i=0;i<1;i++) {
             temp_tx_buf[i]=tx_buf[i];
         }
@@ -253,31 +279,52 @@ int main(int argc, char** argv) {
         //tx_buf[3]++;
         //SwitchToRxMode();  	// switch to Rx mode - TX VERSION
         CE=0;
+        rfm70setPowerdownMode(0);
         T1CONbits.TMR1ON=0;
-        TMR1H = 0xF0;
+        //TMR1H = 0xF0; //ritardo  breve
         //TMR1H = 0x60;
+        TMR1H = 0x00;
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         //WAIT_MS(100);
+        SLEEP();
         SLEEP();
     }
     return (EXIT_SUCCESS);
 }
 
-uint8_t adcRead(void) {
+
+// range 0: Vref_int = 1.024
+// range 1: Vref_int = 2.048
+// ch = 7 => mpc9700a read
+// ch = ? => Vstorage read
+uint8_t adcRead(uint8_t ch, uint8_t range) {
     uint8_t value;
+    ADCON0bits.CHS=ch;          // read from channel 'ch'
     ADCON0bits.ADON=1;
+    
+    if (range == 0) {              // read from MCP9700A
+        FVRCONbits.ADFVR=1;     // 1.024 as reference
+        PORTEbits.RE1=1;     // mcp9700a power up
+        WAIT_MS(1);             // mcp9700 Turn-on Time
+    }
+    else
+        FVRCONbits.ADFVR=2;  // read from Vstorage
+    
+    while(!FVRCONbits.FVRRDY);  // 1 = Fixed Voltage Reference output is ready for use
+
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
     //while(!PIR1bits.ADIF);
     value = ADRES;
+    PORTEbits.RE1=0;            // Turn off mcp9700a
     return value;
 }
 
 
 void uartInit(void) {
-    TRISCbits.TRISC7=1;     // RC7 as UART RX pin input
-    TRISCbits.TRISC6=0;     // RC6 as UART TX pin input
+    TRISCbits.TRISC7=1;             // RC7 as UART RX pin input
+    TRISCbits.TRISC6=0;             // RC6 as UART TX pin input
 
     TXSTA=0x02;             // High speed
     RCSTA=0x00;
@@ -310,9 +357,11 @@ void spiInit(void) {
 
 
 void adcInit(void) {
-    ADCON0bits.CHS=0x07;
+    //ADCON0bits.CHS=0x07;
     ADCON1bits.ADCS=0x00;
-    ADCON1bits.ADREF=0;
+    //ADCON1bits.ADREF=0;
+    ADCON1bits.ADREF=3;  // 11 = VREF is connected to internal Fixed Voltage Reference
+    FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
 }
 
 //You must write putch() else printf will complain
@@ -408,7 +457,7 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 		
 		printf("\n\r\n\r");
 
-		WAIT_MS(100);
+		//WAIT_MS(100);
 		//LED=0; //per risparmiare
 		//WAIT_MS(50);
 	}
