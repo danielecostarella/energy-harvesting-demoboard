@@ -2501,16 +2501,14 @@ void rfm70setPowerdownMode(uint8_t value);
 #pragma config MCLRE = ON
 #pragma config CP = OFF
 
-#pragma config BOREN = 0
 
-
-
+# 34
 #pragma config PLLEN = ON
 
 
 #pragma config VCAPEN=0;
 
-# 44
+# 51
 void power_on_delay(void);
 void spiInit(void);
 void uartInit(void);
@@ -2528,7 +2526,7 @@ extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
 extern void SwitchToRxMode(void);
 
-# 65
+# 72
 uint8_t tx_buf[2]={0x00, 0x00};
 uint8_t rx_buf[32];
 
@@ -2545,7 +2543,7 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-# 85
+# 92
 TMR1H = 0x00;
 TMR1L = 0x00;
 
@@ -2596,8 +2594,11 @@ TRISCbits.TRISC5=0;
 TRISCbits.TRISC4=1;
 TRISDbits.TRISD1=1;
 PORTCbits.RC2=0;
+PORTDbits.RD2=1;
+PORTCbits.RC3=0;
+PORTCbits.RC5=0;
 
-# 141
+# 151
 TRISEbits.TRISE1=0;
 ANSELEbits.ANSE1=0;
 TRISEbits.TRISE2=1;
@@ -2618,7 +2619,7 @@ GIE=1;
 PEIE=1;
 TMR1IE=1;
 
-# 171
+# 181
 TMR1H = 0x00;
 TMR1L = 0x00;
 
@@ -2634,18 +2635,17 @@ spiInit();
 uartInit();
 adcInit();
 
+
+
 rfm70setPowerdownMode(0);
 
 
 
+
 asm("sleep");
 asm("sleep");
 
-
-
-PORTEbits.RE1=1;
-
-# 212
+# 225
 value = adcReadVcap();
 while (value < 120) {
 asm("sleep");
@@ -2658,14 +2658,14 @@ RFM70_Initialize();
 
 rfm70setPowerdownMode(0);
 
-# 229
+# 242
 asm("sleep");
 
-# 277
+# 290
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 285
+# 298
 for (i=0;i<2;i++) {
 temp_tx_buf[i]=tx_buf[i];
 }
@@ -2682,7 +2682,7 @@ if (tx_buf[1]> 120) {
 Send_Packet(0xB0,tx_buf,2);
 }
 
-# 307
+# 320
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2731,7 +2731,7 @@ PORTDbits.RD3=0;
 return value;
 }
 
-# 359
+# 372
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2773,7 +2773,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 404
+# 417
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2826,13 +2826,13 @@ putch(c = getch());
 return c;
 }
 
-# 462
+# 475
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 478
+# 491
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2858,7 +2858,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 507
+# 520
 while(!PORTDbits.RD1) {
 
 
@@ -2887,7 +2887,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 544
+# 557
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2933,7 +2933,7 @@ PORTDbits.RD0=1;
 _delay( 100 * ( 8000000L / 4000));
 PORTDbits.RD0=0;
 
-# 593
+# 606
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

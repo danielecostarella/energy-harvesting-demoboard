@@ -2759,9 +2759,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 "407
 [e $ ! == -> _value `i -> 0 `i 232  ]
 {
-[; ;rfm70.c: 408: reg ^= 0x02;
+[; ;rfm70.c: 408: reg &= 0xFD;
 "408
-[e =^ _reg -> -> 2 `i `uc ]
+[e =& _reg -> -> 253 `i `uc ]
 "409
 }
 [; ;rfm70.c: 409: }

@@ -405,7 +405,7 @@ void rfm70setPowerdownMode(uint8_t value)
                                                 //interrupt flag
 
         if (value==0) {
-            reg ^= 0x02; // clear bit 1
+            reg &= 0xFD; // clear bit 1
         }
         else {
             reg |= 0x02; //set bit 1

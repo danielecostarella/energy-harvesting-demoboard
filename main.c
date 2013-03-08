@@ -20,7 +20,14 @@
 #pragma config MCLRE = ON       // RE3/MCLR pin function select bit (RE3/MCLR pin function is MCLR)
 #pragma config CP = OFF         // Code Protection bit (Program memory code protection is disabled)
 //#pragma config CP = OFF        // Data Code Protection bit (Data memory code protection is disabled)
-#pragma config BOREN = 0//SBODEN   // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
+//#pragma config BOREN = 0//SBODEN   // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
+
+//new
+//#pragma config BOREN = 2    // 10 = BOR enabled during operation and disabled in Sleep
+//#pragma config BORV = 0     // 0 = Brown-out Reset Voltage (VBOR) set to 2.5 V nominal
+//#pragma config PWRTE = ON   // 1 = PWRT disabled
+
+
 //#pragma config IESO = OFF       // Internal External Switchover bit (Internal/External Switchover mode is disabled)
 //#pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enabled bit (Fail-Safe Clock Monitor is disabled)
 //#pragma config LVP = OFF        // Low Voltage Programming Enable bit (RB3 pin has digital I/O, HV on MCLR must be used for programming)
@@ -132,6 +139,9 @@ int main(int argc, char** argv) {
     TRISCbits.TRISC4=1;     // MISO
     TRISDbits.TRISD1=1;     // IRQ
     PORTCbits.RC2=0;
+    PORTDbits.RD2=1; //aggiunto csn
+    PORTCbits.RC3=0; //aggiunto sck
+    PORTCbits.RC5=0; //aggiunto mosi
 
     //WDT
     //OPTION_REGbits.PSA=1;
@@ -182,8 +192,11 @@ int main(int argc, char** argv) {
     spiInit();
     uartInit();
     adcInit();
-
+   
+    //SPI_Write_Reg(WRITE_REG | CONFIG, 0x08);
+    //printf("CONFIG NEW: %X\r\n", SPI_Read_Reg(CONFIG));
     rfm70setPowerdownMode(0); //?
+    //printf("CONFIG INIZIALE: %X\r\n", SPI_Read_Reg(CONFIG));
 
     // rimettere sleep
     //SLEEP(); //<-- per farlo consumare poco
@@ -192,7 +205,7 @@ int main(int argc, char** argv) {
     // rimettere sleep
 
 
-    PORTEbits.RE1=1; //mcp9700 power up
+    //PORTEbits.RE1=1; //mcp9700 power up
     //adcRead(7,0); // read dummy data (?)
     //SLEEP();
     //while(1) {

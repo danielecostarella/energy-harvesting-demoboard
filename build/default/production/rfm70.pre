@@ -2820,7 +2820,7 @@ reg=SPI_Read_Reg(0x00);
 
 
 if (value==0) {
-reg ^= 0x02;
+reg &= 0xFD;
 }
 else {
 reg |= 0x02;
