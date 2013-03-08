@@ -2645,29 +2645,27 @@ asm("sleep");
 
 PORTEbits.RE1=1;
 
-
-
-
-value = adcReadTemp();
-
-printf("TEMP value: %X => %d\r\n", value, value);
-value = adcReadVcap();
-
-printf("Vstorage value: %d\r\n", value);
-
 # 212
+value = adcReadVcap();
+while (value < 120) {
+asm("sleep");
+value = adcReadVcap();
+printf("Vstorage too low: %d\r\n", value);
+}
+printf("Vstorage OK: %d\r\n", value);
 RFM70_Initialize();
+
 
 rfm70setPowerdownMode(0);
 
-# 221
+# 229
 asm("sleep");
 
-# 269
+# 277
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 277
+# 285
 for (i=0;i<2;i++) {
 temp_tx_buf[i]=tx_buf[i];
 }
@@ -2684,7 +2682,7 @@ if (tx_buf[1]> 120) {
 Send_Packet(0xB0,tx_buf,2);
 }
 
-# 299
+# 307
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2733,7 +2731,7 @@ PORTDbits.RD3=0;
 return value;
 }
 
-# 351
+# 359
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2775,7 +2773,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 396
+# 404
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2828,13 +2826,13 @@ putch(c = getch());
 return c;
 }
 
-# 454
+# 462
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 470
+# 478
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2860,7 +2858,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 499
+# 507
 while(!PORTDbits.RD1) {
 
 
@@ -2889,7 +2887,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 536
+# 544
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2935,7 +2933,7 @@ PORTDbits.RD0=1;
 _delay( 100 * ( 8000000L / 4000));
 PORTDbits.RD0=0;
 
-# 585
+# 593
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

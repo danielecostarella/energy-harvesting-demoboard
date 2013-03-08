@@ -197,19 +197,27 @@ int main(int argc, char** argv) {
     //SLEEP();
     //while(1) {
         //WAIT_MS(500);
-        value = adcReadTemp();
+        //value = adcReadTemp();
         ////value = adcRead(7,0); //(4*adcRead(7,0)-500);
-        printf("TEMP value: %X => %d\r\n", value, value);
-        value = adcReadVcap();
+        //printf("TEMP value: %X => %d\r\n", value, value);
+        //value = adcReadVcap();
         ////value = adcRead(5,1); //era 1
-        printf("Vstorage value: %d\r\n", value);
+        //printf("Vstorage value: %d\r\n", value);
         //printf("\r\n");
     //}
 
     
     //printf("ADC value: %d\r\n", adcRead(7));
     
+    value = adcReadVcap();
+    while (value < vmin) {
+        SLEEP();
+        value = adcReadVcap();
+        printf("Vstorage too low: %d\r\n", value);
+    }
+    printf("Vstorage OK: %d\r\n", value);
     RFM70_Initialize();
+
 
     rfm70setPowerdownMode(0);
     //while(1) {

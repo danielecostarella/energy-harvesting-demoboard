@@ -428,31 +428,31 @@
 [v _ISR `II(v  1 e 0 0 ]
 "99
 [v _main `(i  1 e 2 0 ]
-"317
+"325
 [v _adcReadTemp `(uc  1 e 1 0 ]
-"332
+"340
 [v _adcReadVcap `(uc  1 e 1 0 ]
-"351
+"359
 [v _adcRead `(uc  1 e 1 0 ]
-"385
+"393
 [v _uartInit `(v  1 e 0 0 ]
-"407
+"415
 [v _spiInit `(v  1 e 0 0 ]
-"419
+"427
 [v _adcInit `(v  1 e 0 0 ]
-"430
+"438
 [v _putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
-"435
+"443
 [v _getch `(uc  1 e 1 0 ]
-"442
+"450
 [v _getche `(uc  1 e 1 0 ]
-"455
+"463
 [v _power_on_delay `(v  1 e 0 0 ]
-"471
+"479
 [v _Send_Packet `(v  1 e 0 0 ]
-"537
+"545
 [v _Receive_Packet `(v  1 e 0 0 ]
 "78 rfm70.c
 [v _SPI_RW `(uc  1 e 1 0 ]
@@ -796,46 +796,27 @@
 "99
 [v main@argc `i  1 p 2 3 ]
 [v main@argv `**uc  1 p 2 5 ]
-"312
+"320
 } 0
-"407
-[v _spiInit `(v  1 e 0 0 ]
+"479
+[v _Send_Packet `(v  1 e 0 0 ]
 {
-"416
+[v Send_Packet@type `uc  1 a 1 wreg ]
+"480
+[v Send_Packet@i `uc  1 a 1 2 ]
+[v Send_Packet@fifo_sta `uc  1 a 1 1 ]
+"479
+[v Send_Packet@type `uc  1 a 1 wreg ]
+[v Send_Packet@pbuf `*.0uc  1 p 1 49 ]
+[v Send_Packet@len `uc  1 p 1 50 ]
+"533
 } 0
-"385
-[v _uartInit `(v  1 e 0 0 ]
-{
-"405
-} 0
-"419
-[v _adcInit `(v  1 e 0 0 ]
-{
-"426
-} 0
-"400 rfm70.c
-[v _rfm70setPowerdownMode `(v  1 e 0 0 ]
-{
-[v rfm70setPowerdownMode@value `uc  1 a 1 wreg ]
-"401
-[v rfm70setPowerdownMode@reg `uc  1 a 1 27 ]
-"400
-[v rfm70setPowerdownMode@value `uc  1 a 1 wreg ]
-"415
-} 0
-"317 main.c
+"325
 [v _adcReadTemp `(uc  1 e 1 0 ]
 {
-"318
+"326
 [v adcReadTemp@value `uc  1 a 1 21 ]
-"330
-} 0
-"332
-[v _adcReadVcap `(uc  1 e 1 0 ]
-{
-"333
-[v adcReadVcap@value `uc  1 a 1 21 ]
-"345
+"338
 } 0
 "252 rfm70.c
 [v _RFM70_Initialize `(v  1 e 0 0 ]
@@ -847,36 +828,55 @@
 [v RFM70_Initialize@i `uc  1 a 1 47 ]
 "359
 } 0
-"471 main.c
-[v _Send_Packet `(v  1 e 0 0 ]
+"340 main.c
+[v _adcReadVcap `(uc  1 e 1 0 ]
 {
-[v Send_Packet@type `uc  1 a 1 wreg ]
-"472
-[v Send_Packet@i `uc  1 a 1 2 ]
-[v Send_Packet@fifo_sta `uc  1 a 1 1 ]
-"471
-[v Send_Packet@type `uc  1 a 1 wreg ]
-[v Send_Packet@pbuf `*.0uc  1 p 1 51 ]
-[v Send_Packet@len `uc  1 p 1 52 ]
-"525
+"341
+[v adcReadVcap@value `uc  1 a 1 21 ]
+"353
+} 0
+"400 rfm70.c
+[v _rfm70setPowerdownMode `(v  1 e 0 0 ]
+{
+[v rfm70setPowerdownMode@value `uc  1 a 1 wreg ]
+"401
+[v rfm70setPowerdownMode@reg `uc  1 a 1 27 ]
+"400
+[v rfm70setPowerdownMode@value `uc  1 a 1 wreg ]
+"415
+} 0
+"427 main.c
+[v _adcInit `(v  1 e 0 0 ]
+{
+"434
+} 0
+"393
+[v _uartInit `(v  1 e 0 0 ]
+{
+"413
+} 0
+"415
+[v _spiInit `(v  1 e 0 0 ]
+{
+"424
 } 0
 "465 /Applications/microchip/xc8/v1.12/sources/doprnt.c
 [v _printf `(i  1 e 2 0 ]
 {
 "1507
-[v printf@idx `uc  1 a 1 42 ]
+[v printf@idx `uc  1 a 1 40 ]
 [s S978 . 4 `*DCCuc 1 _cp 2 0 `ui 1 _len 2 2 ]
 "533
 [u S981 . 4 `ui 1 _val 2 0 `S978 1 _str 4 0 ]
-[v printf@_val `S981  1 a 4 46 ]
+[v printf@_val `S981  1 a 4 44 ]
 "499
-[v printf@c `c  1 a 1 50 ]
+[v printf@c `c  1 a 1 48 ]
 "508
-[v printf@flag `uc  1 a 1 45 ]
+[v printf@flag `uc  1 a 1 43 ]
 "506
-[v printf@prec `c  1 a 1 44 ]
+[v printf@prec `c  1 a 1 42 ]
 "466
-[v printf@ap `[1]*v  1 a 1 43 ]
+[v printf@ap `[1]*v  1 a 1 41 ]
 "465
 [v printf@f `*.mDCCuc  1 p 2 33 ]
 "1548
@@ -891,12 +891,12 @@
 [v SwitchCFG@_cfg `uc  1 a 1 wreg ]
 "229
 } 0
-"430 main.c
+"438 main.c
 [v _putch `(v  1 e 0 0 ]
 {
 [v putch@c `uc  1 a 1 wreg ]
 [v putch@c `uc  1 a 1 wreg ]
-"433
+"441
 } 0
 "191 rfm70.c
 [v _SwitchToTxMode `(v  1 e 0 0 ]
@@ -959,6 +959,16 @@
 [v SPI_RW@value `uc  1 a 1 wreg ]
 "85
 } 0
+"5 /Applications/microchip/xc8/v1.12/sources/lwmod.c
+[v ___lwmod `(ui  1 e 2 0 ]
+{
+"6
+[v ___lwmod@counter `uc  1 a 1 32 ]
+"5
+[v ___lwmod@divisor `ui  1 p 2 27 ]
+[v ___lwmod@dividend `ui  1 p 2 29 ]
+"21
+} 0
 "5 /Applications/microchip/xc8/v1.12/sources/lwdiv.c
 [v ___lwdiv `(ui  1 e 2 0 ]
 {
@@ -970,16 +980,6 @@
 [v ___lwdiv@divisor `ui  1 p 2 19 ]
 [v ___lwdiv@dividend `ui  1 p 2 21 ]
 "26
-} 0
-"5 /Applications/microchip/xc8/v1.12/sources/lwmod.c
-[v ___lwmod `(ui  1 e 2 0 ]
-{
-"6
-[v ___lwmod@counter `uc  1 a 1 32 ]
-"5
-[v ___lwmod@divisor `ui  1 p 2 27 ]
-[v ___lwmod@dividend `ui  1 p 2 29 ]
-"21
 } 0
 "76 main.c
 [v _ISR `II(v  1 e 0 0 ]
@@ -998,13 +998,12 @@
 [v i1printf@f `*.mDCCuc  1 p 2 0 ]
 "1548
 } 0
-"5 /Applications/microchip/xc8/v1.12/sources/lwmod.c
-[v i1___lwmod `(ui  1 e 2 0 ]
+"438 main.c
+[v i1_putch `(v  1 e 0 0 ]
 {
-[v i1___lwmod@counter `uc  1 a 1 13 ]
-[v i1___lwmod@divisor `ui  1 p 2 8 ]
-[v i1___lwmod@dividend `ui  1 p 2 10 ]
-"21
+[v i1putch@c `uc  1 a 1 wreg ]
+[v i1putch@c `uc  1 a 1 wreg ]
+"441
 } 0
 "5 /Applications/microchip/xc8/v1.12/sources/lwdiv.c
 [v i1___lwdiv `(ui  1 e 2 0 ]
@@ -1015,10 +1014,11 @@
 [v i1___lwdiv@dividend `ui  1 p 2 2 ]
 "26
 } 0
-"430 main.c
-[v i1_putch `(v  1 e 0 0 ]
+"5 /Applications/microchip/xc8/v1.12/sources/lwmod.c
+[v i1___lwmod `(ui  1 e 2 0 ]
 {
-[v i1putch@c `uc  1 a 1 wreg ]
-[v i1putch@c `uc  1 a 1 wreg ]
-"433
+[v i1___lwmod@counter `uc  1 a 1 13 ]
+[v i1___lwmod@divisor `ui  1 p 2 8 ]
+[v i1___lwmod@dividend `ui  1 p 2 10 ]
+"21
 } 0
