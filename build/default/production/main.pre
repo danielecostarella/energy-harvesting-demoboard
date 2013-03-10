@@ -2508,7 +2508,7 @@ void rfm70setPowerdownMode(uint8_t value);
 
 #pragma config VCAPEN=0;
 
-# 51
+# 52
 void power_on_delay(void);
 void spiInit(void);
 void uartInit(void);
@@ -2526,8 +2526,8 @@ extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
 extern void SwitchToRxMode(void);
 
-# 72
-uint8_t tx_buf[2]={0x00, 0x00};
+# 73
+uint8_t tx_buf[4]={0x00, 0x00, 0x00, 0x00};
 uint8_t rx_buf[32];
 
 extern const uint8_t RX0_Address[];
@@ -2536,6 +2536,7 @@ uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
 
+int16_t timelapse_count = 0;
 
 void interrupt ISR(void)
 {
@@ -2543,7 +2544,7 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-# 92
+# 94
 TMR1H = 0x00;
 TMR1L = 0x00;
 
@@ -2551,6 +2552,7 @@ if(tmr1Counter == tmr1Target){
 printf("Eccomi nell'ISR!\r\n");
 tmr1Counter = 0;
 flag = 1;
+timelapse_count++;
 }
 
 TMR1IF=0;
@@ -2563,6 +2565,8 @@ long int i=0;
 int16_t value;
 uint8_t buffer[5];
 uint8_t temp_tx_buf[32];
+
+uint8_t num_sleep;
 
 
 
@@ -2598,7 +2602,7 @@ PORTDbits.RD2=1;
 PORTCbits.RC3=0;
 PORTCbits.RC5=0;
 
-# 151
+# 156
 TRISEbits.TRISE1=0;
 ANSELEbits.ANSE1=0;
 TRISEbits.TRISE2=1;
@@ -2619,7 +2623,7 @@ GIE=1;
 PEIE=1;
 TMR1IE=1;
 
-# 181
+# 186
 TMR1H = 0x00;
 TMR1L = 0x00;
 
@@ -2645,7 +2649,7 @@ rfm70setPowerdownMode(0);
 asm("sleep");
 asm("sleep");
 
-# 225
+# 230
 value = adcReadVcap();
 while (value < 120) {
 asm("sleep");
@@ -2655,17 +2659,17 @@ printf("Vstorage too low: %d\r\n", value);
 printf("Vstorage OK: %d\r\n", value);
 RFM70_Initialize();
 
-
 rfm70setPowerdownMode(0);
 
-# 242
+# 246
 asm("sleep");
 
-# 290
+# 293
+timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 298
+# 302
 for (i=0;i<2;i++) {
 temp_tx_buf[i]=tx_buf[i];
 }
@@ -2674,15 +2678,19 @@ temp_tx_buf[i]=tx_buf[i];
 
 tx_buf[0] = adcReadTemp();
 tx_buf[1] = adcReadVcap();
+tx_buf[2] = (uint8_t)((timelapse_count/2) & 0xFF);
+tx_buf[3] = (uint8_t)(((timelapse_count/2) >> 8) & 0xFF);
 
 
 
 if (tx_buf[1]> 120) {
 
-Send_Packet(0xB0,tx_buf,2);
+Send_Packet(0xB0,tx_buf,4);
 }
+else
+printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 
-# 320
+# 328
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2692,8 +2700,13 @@ TMR1H = 0x00;
 TMR1L = 0x00;
 T1CONbits.TMR1ON=1;
 
+
+num_sleep = 0;
+while(num_sleep++ < 2) {
 asm("sleep");
-asm("sleep");
+printf("Sleep: %d\r\n", num_sleep);
+}
+
 }
 return (0);
 }
@@ -2731,7 +2744,7 @@ PORTDbits.RD3=0;
 return value;
 }
 
-# 372
+# 385
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2773,7 +2786,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 417
+# 430
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2826,13 +2839,13 @@ putch(c = getch());
 return c;
 }
 
-# 475
+# 488
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 491
+# 504
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2858,7 +2871,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 520
+# 533
 while(!PORTDbits.RD1) {
 
 
@@ -2887,7 +2900,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 557
+# 570
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2933,7 +2946,7 @@ PORTDbits.RD0=1;
 _delay( 100 * ( 8000000L / 4000));
 PORTDbits.RD0=0;
 
-# 606
+# 619
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

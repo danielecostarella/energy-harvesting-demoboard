@@ -39,7 +39,8 @@
 //#pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
 
 
-#define vmin        120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
+#define VMIN            120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
+#define SLEEP_COUNT     2
 
 //#define _XTAL_FREQ 16000000L
 //#define WAIT_US( x ) _delay( x * ( _XTAL_FREQ / 4000000))
@@ -69,7 +70,7 @@ extern void SwitchToRxMode(void);
 //uint8_t tx_buf[17]={0x00,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
           //          0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x79};
 //uint8_t tx_buf[MAX_PACKET_LEN];
-uint8_t tx_buf[2]={0x00, 0x00};
+uint8_t tx_buf[4]={0x00, 0x00, 0x00, 0x00};
 uint8_t rx_buf[MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
@@ -78,6 +79,7 @@ uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
 
+int16_t timelapse_count = 0;
 
 void interrupt ISR(void)
    {
@@ -96,6 +98,7 @@ void interrupt ISR(void)
         printf("Eccomi nell'ISR!\r\n");
         tmr1Counter = 0;
         flag = 1;
+        timelapse_count++;
       }
       
       TMR1IF=0; // azzero il flag di interrupt
@@ -108,6 +111,8 @@ int main(int argc, char** argv) {
     int16_t value;
     uint8_t buffer[5];
     uint8_t temp_tx_buf[32];
+    //int16_t timelapse_count = 0;
+    uint8_t num_sleep;
 
     //power_on_delay();
 
@@ -223,14 +228,13 @@ int main(int argc, char** argv) {
     //printf("ADC value: %d\r\n", adcRead(7));
     
     value = adcReadVcap();
-    while (value < vmin) {
+    while (value < VMIN) {
         SLEEP();
         value = adcReadVcap();
         printf("Vstorage too low: %d\r\n", value);
     }
     printf("Vstorage OK: %d\r\n", value);
     RFM70_Initialize();
-
 
     rfm70setPowerdownMode(0);
     //while(1) {
@@ -286,7 +290,7 @@ int main(int argc, char** argv) {
     //LED=1;
     //WAIT_MS(50);
     //LED=0;
-
+    timelapse_count = 0;
     while(1) {
         rfm70setPowerdownMode(1);
         //if(flag == 1){
@@ -303,13 +307,17 @@ int main(int argc, char** argv) {
         //value = adcReadTemp();
         tx_buf[0] = adcReadTemp();
         tx_buf[1] = adcReadVcap();
+        tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
+        tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
         
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
-        if (tx_buf[1]> vmin) {
+        if (tx_buf[1]> VMIN) {
             //rfm70setPowerdownMode(1);
-            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,2);	// transmit
+            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,4);	// transmit
         }
+        else
+            printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
         //tx_buf[0] = '\0';	// clear tx_buf
         //tx_buf[0]++;
 
@@ -326,8 +334,13 @@ int main(int argc, char** argv) {
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         //WAIT_MS(100);
-        SLEEP();
-        SLEEP();
+        
+        num_sleep = 0;
+        while(num_sleep++ < SLEEP_COUNT) {
+            SLEEP();
+            printf("Sleep: %d\r\n", num_sleep);
+        }
+        //timelapse_count++;
     }
     return (EXIT_SUCCESS);
 }
