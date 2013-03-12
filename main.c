@@ -40,7 +40,7 @@
 
 
 #define VMIN            120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
-#define SLEEP_COUNT     2
+#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
 
 //#define _XTAL_FREQ 16000000L
 //#define WAIT_US( x ) _delay( x * ( _XTAL_FREQ / 4000000))
@@ -91,14 +91,14 @@ void interrupt ISR(void)
 
       //TMR1H = 0xF0; //ritardo breve
       //TMR1H = 0x60; // 10s @ 32KHz questo è quello giusto
-      TMR1H = 0x00;
+      TMR1H = 0x10; // 15s
       TMR1L = 0x00;
 
       if(tmr1Counter == tmr1Target){
         printf("Eccomi nell'ISR!\r\n");
         tmr1Counter = 0;
         flag = 1;
-        timelapse_count++;
+        //timelapse_count++;
       }
       
       TMR1IF=0; // azzero il flag di interrupt
@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
     //TMR1H=0x00;
     //TMR1L=0x00;
 
-    TMR1H = 0x00;
+    TMR1H = 0x10;
     TMR1L = 0x00;
     
     T1CONbits.TMR1CS=2; //0 for instruction clock
@@ -307,8 +307,10 @@ int main(int argc, char** argv) {
         //value = adcReadTemp();
         tx_buf[0] = adcReadTemp();
         tx_buf[1] = adcReadVcap();
-        tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
-        tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
+        tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
+        tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
+        //tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
+        //tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
         
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
@@ -330,7 +332,7 @@ int main(int argc, char** argv) {
         T1CONbits.TMR1ON=0;
         //TMR1H = 0xF0; //ritardo  breve
         //TMR1H = 0x60;
-        TMR1H = 0x00;
+        TMR1H = 0x10;
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         //WAIT_MS(100);
@@ -340,7 +342,7 @@ int main(int argc, char** argv) {
             SLEEP();
             printf("Sleep: %d\r\n", num_sleep);
         }
-        //timelapse_count++;
+        timelapse_count++;
     }
     return (EXIT_SUCCESS);
 }

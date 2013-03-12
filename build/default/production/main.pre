@@ -2545,14 +2545,14 @@ if(TMR1IF)
 tmr1Counter++;
 
 # 94
-TMR1H = 0x00;
+TMR1H = 0x10;
 TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
 printf("Eccomi nell'ISR!\r\n");
 tmr1Counter = 0;
 flag = 1;
-timelapse_count++;
+
 }
 
 TMR1IF=0;
@@ -2624,7 +2624,7 @@ PEIE=1;
 TMR1IE=1;
 
 # 186
-TMR1H = 0x00;
+TMR1H = 0x10;
 TMR1L = 0x00;
 
 T1CONbits.TMR1CS=2;
@@ -2678,11 +2678,10 @@ temp_tx_buf[i]=tx_buf[i];
 
 tx_buf[0] = adcReadTemp();
 tx_buf[1] = adcReadVcap();
-tx_buf[2] = (uint8_t)((timelapse_count/2) & 0xFF);
-tx_buf[3] = (uint8_t)(((timelapse_count/2) >> 8) & 0xFF);
+tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
+tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
 
-
-
+# 317
 if (tx_buf[1]> 120) {
 
 Send_Packet(0xB0,tx_buf,4);
@@ -2690,13 +2689,13 @@ Send_Packet(0xB0,tx_buf,4);
 else
 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 
-# 328
+# 330
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
 
 
-TMR1H = 0x00;
+TMR1H = 0x10;
 TMR1L = 0x00;
 T1CONbits.TMR1ON=1;
 
@@ -2706,7 +2705,7 @@ while(num_sleep++ < 2) {
 asm("sleep");
 printf("Sleep: %d\r\n", num_sleep);
 }
-
+timelapse_count++;
 }
 return (0);
 }
@@ -2744,7 +2743,7 @@ PORTDbits.RD3=0;
 return value;
 }
 
-# 385
+# 387
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2786,7 +2785,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 430
+# 432
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2839,13 +2838,13 @@ putch(c = getch());
 return c;
 }
 
-# 488
+# 490
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 504
+# 506
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2871,7 +2870,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 533
+# 535
 while(!PORTDbits.RD1) {
 
 
@@ -2900,7 +2899,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 570
+# 572
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2946,7 +2945,7 @@ PORTDbits.RD0=1;
 _delay( 100 * ( 8000000L / 4000));
 PORTDbits.RD0=0;
 
-# 619
+# 621
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
