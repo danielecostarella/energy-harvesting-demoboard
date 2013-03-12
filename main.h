@@ -19,7 +19,9 @@
 #define MOSI    PORTCbits.RC5
 #define IRQ     PORTDbits.RD1
 
-#define LED     PORTDbits.RD0
+//#define LED     PORTDbits.RD0
+
+#define SKIP_MEASURE    PORTDbits.RD5
 
 
 /* MCU Configuration */

@@ -40,7 +40,7 @@
 
 
 #define VMIN            120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
-#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
+//#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
 
 //#define _XTAL_FREQ 16000000L
 //#define WAIT_US( x ) _delay( x * ( _XTAL_FREQ / 4000000))
@@ -70,7 +70,7 @@ extern void SwitchToRxMode(void);
 //uint8_t tx_buf[17]={0x00,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
           //          0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x79};
 //uint8_t tx_buf[MAX_PACKET_LEN];
-uint8_t tx_buf[4]={0x00, 0x00, 0x00, 0x00};
+uint8_t tx_buf[5]={0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t rx_buf[MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
@@ -78,6 +78,9 @@ extern const unsigned long Bank1_Reg0_13[];
 uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
+uint8_t jumper_stat;
+uint8_t sleep_counter;
+uint8_t sleep_count;
 
 int16_t timelapse_count = 0;
 
@@ -96,6 +99,24 @@ void interrupt ISR(void)
 
       if(tmr1Counter == tmr1Target){
         printf("Eccomi nell'ISR!\r\n");
+        jumper_stat = PORTD>>4; // read new jumper status
+        sleep_counter = PORTD>>6 & 0x03;       // read sleep count bits
+
+        switch (sleep_counter) {
+            case 0:
+                sleep_count = 1;    // 15s
+                break;
+            case 1:
+                sleep_count = 20;   // 5min
+                break;
+            case 2:
+                sleep_count = 40;   // 10min
+                break;
+            case 3:
+                sleep_count = 120;  // 30min
+                break;
+        }
+
         tmr1Counter = 0;
         flag = 1;
         //timelapse_count++;
@@ -113,18 +134,19 @@ int main(int argc, char** argv) {
     uint8_t temp_tx_buf[32];
     //int16_t timelapse_count = 0;
     uint8_t num_sleep;
+    
 
     //power_on_delay();
 
     OSCCONbits.IRCF=2; //3 for 16MHz
 
-    ANSELDbits.ANSD0=0;     // digital led
+    //ANSELDbits.ANSD0=0;     // digital led
     //ANSELCbits.ANSC0=0;     // digital
     ANSELCbits.ANSC6=0;     // digital
     ANSELCbits.ANSC7=0;     // digital
     //TRISCbits.TRISC0=0;     //LED
-    TRISDbits.TRISD0=0;         //LED
-    LED=0;
+    //TRISDbits.TRISD0=0;         //LED
+    //LED=0;
     TRISCbits.TRISC6=0;     //TX
 
     ANSELCbits.ANSC2=0;     // CE as digital
@@ -153,13 +175,15 @@ int main(int argc, char** argv) {
     //OPTION_REGbits.PS=0x07;
 
     // MCP9700A
-    TRISEbits.TRISE1=0;     // MCP9700A power
-    ANSELEbits.ANSE1=0;     // pin RE1 as digital
+    TRISDbits.TRISD0=0;     // MCP9700A power
+    ANSELDbits.ANSD0=0;     // pin RD0 as digital
     TRISEbits.TRISE2=1;     // MCP9700A Vout
     ANSELEbits.ANSE2=1;     // set RE2 pin as analog
 
     TRISEbits.TRISE0=1;     // RE0 as input
     ANSELEbits.ANSE0=0;     // set RE0 pin as analog (Vstorage)
+
+    PORTDbits.RD0=0;        // turn off MCP9700A
 
     // Vstorage monitor
     TRISEbits.TRISE0=1;     // for Vstorage measuring
@@ -167,6 +191,14 @@ int main(int argc, char** argv) {
     TRISDbits.TRISD3=0;     // enable Vstorage measure
     PORTDbits.RD3=0;        // set to low
 
+    // Skip measure
+    TRISDbits.TRISD5=1;     // RD5 as input
+    ANSELDbits.ANSD5=0;     // RD5 as digital
+    // Number of SLEEP (Set delay)
+    TRISDbits.TRISD6=1;
+    TRISDbits.TRISD7=1;
+    ANSELDbits.ANSD6=0;
+    ANSELDbits.ANSD7=0;
 
 
     GIE=1; // gestione globale interrupt attiva
@@ -193,6 +225,7 @@ int main(int argc, char** argv) {
     T1CONbits.T1OSCEN=1;    //era 0 for disabled
     T1CONbits.TMR1ON=1;
 
+    jumper_stat = PORTD>>4; // lo fa nell'ISR
 
     spiInit();
     uartInit();
@@ -202,7 +235,8 @@ int main(int argc, char** argv) {
     //printf("CONFIG NEW: %X\r\n", SPI_Read_Reg(CONFIG));
     rfm70setPowerdownMode(0); //?
     //printf("CONFIG INIZIALE: %X\r\n", SPI_Read_Reg(CONFIG));
-
+    sleep_counter = PORTD>>6 & 0x03;
+    printf("Sleep counter: %X\r\n", sleep_counter );
     // rimettere sleep
     //SLEEP(); //<-- per farlo consumare poco
     SLEEP();
@@ -228,12 +262,12 @@ int main(int argc, char** argv) {
     //printf("ADC value: %d\r\n", adcRead(7));
     
     value = adcReadVcap();
-    while (value < VMIN) {
+    while (value < VMIN && !SKIP_MEASURE) {
         SLEEP();
         value = adcReadVcap();
         printf("Vstorage too low: %d\r\n", value);
     }
-    printf("Vstorage OK: %d\r\n", value);
+    printf("Vstorage OK or measure skipped: %d\r\n", value);
     RFM70_Initialize();
 
     rfm70setPowerdownMode(0);
@@ -309,14 +343,15 @@ int main(int argc, char** argv) {
         tx_buf[1] = adcReadVcap();
         tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
         tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
+        tx_buf[4] = jumper_stat;
         //tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
         //tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
         
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
-        if (tx_buf[1]> VMIN) {
+        if (tx_buf[1]> VMIN || SKIP_MEASURE) {
             //rfm70setPowerdownMode(1);
-            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,4);	// transmit
+            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,5);	// transmit
         }
         else
             printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
@@ -336,11 +371,12 @@ int main(int argc, char** argv) {
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         //WAIT_MS(100);
-        
+        printf("Sleep counter = %d\r\n", sleep_counter);
+       
         num_sleep = 0;
-        while(num_sleep++ < SLEEP_COUNT) {
+        while(num_sleep++ < sleep_count) {
+            printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
             SLEEP();
-            printf("Sleep: %d\r\n", num_sleep);
         }
         timelapse_count++;
     }
@@ -355,13 +391,13 @@ uint8_t adcReadTemp(void) {
     ADCON0bits.CHS=7;
     FVRCONbits.ADFVR=1;
     ADCON0bits.ADON=1;
-    PORTEbits.RE1=1;     // mcp9700a power up
+    PORTDbits.RD0=1;// mcp9700a power up
     WAIT_MS(5);
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
     value = ADRES;
     ADCON0bits.ADON=0;
-    PORTEbits.RE1=0;     // turn off mcp9700a
+    PORTDbits.RD0=0;     // turn off mcp9700a
     return value;
 }
 
@@ -610,9 +646,9 @@ void Receive_Packet(void)
 
 		if(chksum==rx_buf[rx_count-1])
 		{
-			LED=1; //metterlo verde?
+			//LED=1; //metterlo verde?
 			WAIT_MS(100);
-			LED=0;
+			//LED=0;
 
 			//Send_Packet(W_TX_PAYLOAD_NOACK_CMD,rx_buf,17);
                         // not used...
