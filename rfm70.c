@@ -77,10 +77,10 @@ const uint8_t RX1_Address[]={0x39,0x38,0x37,0x36,0xc2};//Receive address data p1
 uint8_t SPI_RW(uint8_t value)
 {
 	SSPBUF = value;		// send data via SPI - put in SPI Data Register
-        WAIT_MS(4);
+        WAIT_MS(1);                 // era 4 ms
 	while(!PIR1bits.SSPIF);// wait for SPI interrupt flag indicating
                                 //transmit complete
-        WAIT_MS(4);
+        //WAIT_MS(1);
 	return SSPBUF;          // return value in SPI Data Register
 }
 

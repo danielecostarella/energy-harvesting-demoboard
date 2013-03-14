@@ -2562,10 +2562,10 @@ const uint8_t RX1_Address[]={0x39,0x38,0x37,0x36,0xc2};
 uint8_t SPI_RW(uint8_t value)
 {
 SSPBUF = value;
-_delay( 4 * ( 8000000L / 4000));
+_delay( 1 * ( 8000000L / 4000));
 while(!PIR1bits.SSPIF);
 
-_delay( 4 * ( 8000000L / 4000));
+
 return SSPBUF;
 }
 

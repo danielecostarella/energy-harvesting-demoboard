@@ -2040,9 +2040,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;rfm70.c: 79: SSPBUF = value;
 "79
 [e = _SSPBUF _value ]
-[; ;rfm70.c: 80: _delay( 4 * ( 8000000L / 4000));
+[; ;rfm70.c: 80: _delay( 1 * ( 8000000L / 4000));
 "80
-[e ( __delay (1 -> * -> -> 4 `i `l / -> 8000000 `l -> -> 4000 `i `l `ul ]
+[e ( __delay (1 -> * -> -> 1 `i `l / -> 8000000 `l -> -> 4000 `i `l `ul ]
 [; ;rfm70.c: 81: while(!PIR1bits.SSPIF);
 "81
 [e $U 164  ]
@@ -2050,9 +2050,6 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 164 ]
 [e $ ! != -> . . _PIR1bits 0 3 `i -> -> -> 0 `i `Vuc `i 165  ]
 [e :U 166 ]
-[; ;rfm70.c: 83: _delay( 4 * ( 8000000L / 4000));
-"83
-[e ( __delay (1 -> * -> -> 4 `i `l / -> 8000000 `l -> -> 4000 `i `l `ul ]
 [; ;rfm70.c: 84: return SSPBUF;
 "84
 [e ) _SSPBUF ]

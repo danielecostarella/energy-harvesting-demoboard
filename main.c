@@ -225,6 +225,56 @@ int main(int argc, char** argv) {
     T1CONbits.T1OSCEN=1;    //era 0 for disabled
     T1CONbits.TMR1ON=1;
 
+    // not used pins
+    TRISAbits.TRISA1=0;
+    TRISAbits.TRISA2=0;
+    TRISAbits.TRISA3=0;
+    TRISAbits.TRISA4=0;
+    TRISAbits.TRISA5=0;
+    TRISAbits.TRISA6=0;
+    TRISAbits.TRISA7=0;
+    ANSELAbits.ANSA1=0;
+    ANSELAbits.ANSA2=0;
+    ANSELAbits.ANSA3=0;
+    ANSELAbits.ANSA4=0;
+    ANSELAbits.ANSA5=0;
+    ANSELAbits.ANSA6=0;
+    ANSELAbits.ANSA7=0;
+    PORTAbits.RA1=0;
+    PORTAbits.RA2=0;
+    PORTAbits.RA3=0;
+    PORTAbits.RA4=0;
+    PORTAbits.RA5=0;
+    PORTAbits.RA6=0;
+    PORTAbits.RA7=0;
+
+    TRISBbits.TRISB0=0;
+    TRISBbits.TRISB1=0;
+    TRISBbits.TRISB2=0;
+    TRISBbits.TRISB3=0;
+    TRISBbits.TRISB4=0;
+    TRISBbits.TRISB5=0;
+    ANSELBbits.ANSB0=0;
+    ANSELBbits.ANSB1=0;
+    ANSELBbits.ANSB2=0;
+    ANSELBbits.ANSB3=0;
+    ANSELBbits.ANSB4=0;
+    ANSELBbits.ANSB5=0;
+    PORTBbits.RB0=0;
+    PORTBbits.RB1=0;
+    PORTBbits.RB2=0;
+    PORTBbits.RB3=0;
+    PORTBbits.RB4=0;
+    PORTBbits.RB5=0;
+
+    TRISDbits.TRISD4=0;
+    ANSELDbits.ANSD4=0;
+    PORTDbits.RD4=0;
+
+    TRISEbits.TRISE1=0;
+    ANSELEbits.ANSE1=0;
+    PORTEbits.RE1=0;
+
     jumper_stat = PORTD>>4; // lo fa nell'ISR
 
     spiInit();
