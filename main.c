@@ -40,6 +40,8 @@
 
 
 #define VMIN            120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
+#define VCHARGE_STOP     110
+#define VCHARGE_START     130
 //#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
 
 //#define _XTAL_FREQ 16000000L
@@ -61,6 +63,7 @@ uint8_t adcRead(uint8_t ch, uint8_t range);
 void adcInit(void);
 uint8_t adcReadTemp(void);
 uint8_t adcReadVcap(void);
+void sleep(void);
 
 extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
@@ -70,7 +73,7 @@ extern void SwitchToRxMode(void);
 //uint8_t tx_buf[17]={0x00,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
           //          0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x79};
 //uint8_t tx_buf[MAX_PACKET_LEN];
-uint8_t tx_buf[5]={0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t tx_buf[7]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA};
 uint8_t rx_buf[MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
@@ -82,7 +85,12 @@ uint8_t jumper_stat;
 uint8_t sleep_counter;
 uint8_t sleep_count;
 
+unsigned int value;
 int16_t timelapse_count = 0;
+unsigned int charge_time;   // int16_t
+unsigned int charge_pulse = 100; // pulse length in ms
+
+uint8_t values[2] = {0x00, 0x00};
 
 void interrupt ISR(void)
    {
@@ -121,7 +129,7 @@ void interrupt ISR(void)
         flag = 1;
         //timelapse_count++;
       }
-      
+
       TMR1IF=0; // azzero il flag di interrupt
       }
    }
@@ -129,16 +137,19 @@ void interrupt ISR(void)
 
 int main(int argc, char** argv) {
     long int i=0;
-    int16_t value;
+
     uint8_t buffer[5];
     uint8_t temp_tx_buf[32];
     //int16_t timelapse_count = 0;
     uint8_t num_sleep;
-    
+    uint16_t energy_after_pulse;
+    unsigned int temp;
+
+
 
     //power_on_delay();
 
-    OSCCONbits.IRCF=2; //3 for 16MHz
+    OSCCONbits.IRCF=2; //3 for 16MHz and 2 for 8MHz
 
     //ANSELDbits.ANSD0=0;     // digital led
     //ANSELCbits.ANSC0=0;     // digital
@@ -211,13 +222,13 @@ int main(int argc, char** argv) {
         //WAIT_MS(100);
         //LED=0;
         //WAIT_MS(100);
-    
+
     //TMR1H=0x00;
     //TMR1L=0x00;
 
     TMR1H = 0x10;
     TMR1L = 0x00;
-    
+
     T1CONbits.TMR1CS=2; //0 for instruction clock
     T1CONbits.T1CKPS=3; //Prescaler
     T1GCONbits.TMR1GE=1;
@@ -264,7 +275,7 @@ int main(int argc, char** argv) {
     PORTBbits.RB1=0;
     PORTBbits.RB2=0;
     PORTBbits.RB3=0;
-    PORTBbits.RB4=0;
+    PORTBbits.RB4=1;
     PORTBbits.RB5=0;
 
     TRISDbits.TRISD4=0;
@@ -280,7 +291,7 @@ int main(int argc, char** argv) {
     spiInit();
     uartInit();
     adcInit();
-   
+
     //SPI_Write_Reg(WRITE_REG | CONFIG, 0x08);
     //printf("CONFIG NEW: %X\r\n", SPI_Read_Reg(CONFIG));
     rfm70setPowerdownMode(0); //?
@@ -308,9 +319,9 @@ int main(int argc, char** argv) {
         //printf("\r\n");
     //}
 
-    
+
     //printf("ADC value: %d\r\n", adcRead(7));
-    
+
     value = adcReadVcap();
     while (value < VMIN && !SKIP_MEASURE) {
         SLEEP();
@@ -321,11 +332,38 @@ int main(int argc, char** argv) {
     RFM70_Initialize();
 
     rfm70setPowerdownMode(0);
-    //while(1) {
-    
-    //    WAIT_MS(1000);
-    //}
 
+    /*
+    value = adcReadVcap();
+    while (value < VCHARGE_START && !SKIP_MEASURE) {
+        SLEEP();
+        value = adcReadVcap();
+        printf("Vstorage too low (to charge SUPERCAP: %d\r\n", value);
+    }
+
+    value = adcReadVcap();
+*/
+    /*
+    while(value > VCHARGE_STOP) {
+        PORTBbits.RB4=0;
+        T1CONbits.TMR1ON=0;
+        charge_time = 0 - (charge_pulse<<2);    //50ms*4
+        TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
+        TMR1L = (uint8_t)((charge_time) & 0xFF);
+        T1CONbits.TMR1ON=1;
+        SLEEP();    // SLEEP 50MS
+
+        PORTBbits.RB4=1;
+        charge_time = 0x1000 - charge_time;
+        T1CONbits.TMR1ON=0;
+        TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
+        TMR1L = (uint8_t)((charge_time) & 0xFF);
+        T1CONbits.TMR1ON=1;
+        SLEEP();    // SLEEP 15s - 50ms
+        value = adcReadVcap();
+        //WAIT_MS(100);
+        } 
+        */
     //SLEEP();
     SLEEP();
 
@@ -394,14 +432,17 @@ int main(int argc, char** argv) {
         tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
         tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
         tx_buf[4] = jumper_stat;
+        temp = values[0]*values[0]-values[1]*values[1];
+        tx_buf[5] = (uint8_t)(temp & 0xFF);
+        tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
         //tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
         //tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
-        
+
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
         if (tx_buf[1]> VMIN || SKIP_MEASURE) {
             //rfm70setPowerdownMode(1);
-            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,5);	// transmit
+            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,7);	// transmit
         }
         else
             printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
@@ -422,11 +463,13 @@ int main(int argc, char** argv) {
         T1CONbits.TMR1ON=1;
         //WAIT_MS(100);
         printf("Sleep counter = %d\r\n", sleep_counter);
-       
+
         num_sleep = 0;
         while(num_sleep++ < sleep_count) {
             printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
-            SLEEP();
+            sleep();
+            //printf("Sleep result: %d\r\n", energy_after_pulse);
+            //SLEEP();
         }
         timelapse_count++;
     }
@@ -434,6 +477,47 @@ int main(int argc, char** argv) {
 }
 
 
+void sleep(void) {
+    uint8_t new_value;
+    value = adcReadVcap();
+    //value = 135;
+    //charge_pulse = f(value);
+    if (value > VCHARGE_START && charge_pulse > 0 && !SKIP_MEASURE ) {
+
+        PORTBbits.RB4=0;
+        T1CONbits.TMR1ON=0;
+        charge_time = 0 - (charge_pulse<<2);    //50ms*4
+        TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
+        TMR1L = (uint8_t)((charge_time) & 0xFF);
+        T1CONbits.TMR1ON=1;
+        SLEEP();
+        new_value = adcReadVcap();
+
+        PORTBbits.RB4=1;
+        charge_time = 0x1000 - charge_time;
+        T1CONbits.TMR1ON=0;
+        TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
+        TMR1L = (uint8_t)((charge_time) & 0xFF);
+        T1CONbits.TMR1ON=1;
+        SLEEP();    // SLEEP 15s - 50ms
+        
+        
+        //new_value = 121;
+        values[0] = value;
+        values[1] = new_value;
+        //???return (value*value - new_value*new_value);
+    }
+    else {
+        T1CONbits.TMR1ON=0;
+        TMR1H = 0x10;
+        TMR1L = 0x00;
+        T1CONbits.TMR1ON=1;
+        SLEEP();
+        values[0] = 255;
+        values[1] = 255;
+        //???return(-1);
+    }
+}
 
 
 uint8_t adcReadTemp(void) {
@@ -474,7 +558,7 @@ uint8_t adcRead(uint8_t ch, uint8_t range) {
     uint8_t value;
     ADCON0bits.CHS=ch;          // read from channel 'ch'
     //ADCON0bits.ADON=1;
-    
+
     if (range == 0) {              // read from MCP9700A
         //FVRCONbits.FVREN=0;     //FVR disabled
         FVRCONbits.ADFVR=1;     // 1.024 as reference
@@ -489,7 +573,7 @@ uint8_t adcRead(uint8_t ch, uint8_t range) {
         FVRCONbits.ADFVR=2;  // read from Vstorage
         ADCON0bits.ADON=1;
         WAIT_MS(1);         // serve??????
-    
+
     while(!FVRCONbits.FVRRDY);  // 1 = Fixed Voltage Reference output is ready for use
     // Note: FVRRDY is always ?1? on PIC16F707 devices.
 
@@ -599,7 +683,7 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 	if((fifo_sta&FIFO_STATUS_TX_FULL)==0)//if not full, send data
                                                 //(writebuff)
 	{
-            
+
             printf("Sending: ");	// print sent message to terminal
             for (i=0;i<len;i++) {
                 printf("%X",pbuf[i]);
@@ -614,9 +698,9 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
                 PORTCbits.RC2=0;
                 WAIT_MS(1);
 
-                
+
                 //LED=1 ;
-                
+
 
                 while(!IRQ) {
                     //printf("Interrupt! \n\r");
@@ -632,12 +716,12 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
                         SwitchToRxMode();
                         //CE=0;
                     }
-                    
+
                 }
-                
+
 
 		//pbuf[len-1] = '\0';// remove checksum before sending to terminal
-		
+
 		printf("\n\r\n\r");
 
 		//WAIT_MS(100);
