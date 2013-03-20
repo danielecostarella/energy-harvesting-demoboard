@@ -39,9 +39,11 @@
 //#pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
 
 
-#define VMIN            120         // 120 => Vstorage = 10V - 144 => Vstorage = 12V
-#define VCHARGE_STOP     110
-#define VCHARGE_START     130
+// Vmeas = (1000K/95K)*ADC_Count * 2048/256 = (8/95)*ADC_Count
+// Fixed Voltage Reference: 2048 => 8mV/step
+#define VMIN            10*(95/8)           //10 Volts : 120 => Vstorage = 10V - 144 => Vstorage = 12V
+#define VCHARGE_STOP     9*(95/8)           //9 Volts
+#define VCHARGE_START     11*(95/8)         // 11 Volts
 //#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
 
 //#define _XTAL_FREQ 16000000L
@@ -432,7 +434,8 @@ int main(int argc, char** argv) {
         tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
         tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
         tx_buf[4] = jumper_stat;
-        temp = values[0]*values[0]-values[1]*values[1];
+        temp = (values[0] - values[1])*(values[0]+values[1]);
+        //temp = values[0]*values[0]-values[1]*values[1];
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
         //tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);

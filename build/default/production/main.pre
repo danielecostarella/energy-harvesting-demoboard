@@ -2508,7 +2508,7 @@ void rfm70setPowerdownMode(uint8_t value);
 
 #pragma config VCAPEN=0;
 
-# 54
+# 56
 void power_on_delay(void);
 void spiInit(void);
 void uartInit(void);
@@ -2527,7 +2527,7 @@ extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
 extern void SwitchToRxMode(void);
 
-# 76
+# 78
 uint8_t tx_buf[7]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA};
 uint8_t rx_buf[32];
 
@@ -2553,7 +2553,7 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-# 105
+# 107
 TMR1H = 0x10;
 TMR1L = 0x00;
 
@@ -2597,7 +2597,7 @@ uint8_t num_sleep;
 uint16_t energy_after_pulse;
 unsigned int temp;
 
-# 152
+# 154
 OSCCONbits.IRCF=2;
 
 
@@ -2630,7 +2630,7 @@ PORTDbits.RD2=1;
 PORTCbits.RC3=0;
 PORTCbits.RC5=0;
 
-# 189
+# 191
 TRISDbits.TRISD0=0;
 ANSELDbits.ANSD0=0;
 TRISEbits.TRISE2=1;
@@ -2661,7 +2661,7 @@ GIE=1;
 PEIE=1;
 TMR1IE=1;
 
-# 229
+# 231
 TMR1H = 0x10;
 TMR1L = 0x00;
 
@@ -2739,9 +2739,9 @@ printf("Sleep counter: %X\r\n", sleep_counter );
 asm("sleep");
 asm("sleep");
 
-# 325
+# 327
 value = adcReadVcap();
-while (value < 120 && !PORTDbits.RD5) {
+while (value < 10*(95/8) && !PORTDbits.RD5) {
 asm("sleep");
 value = adcReadVcap();
 printf("Vstorage too low: %d\r\n", value);
@@ -2751,15 +2751,15 @@ RFM70_Initialize();
 
 rfm70setPowerdownMode(0);
 
-# 368
+# 370
 asm("sleep");
 
-# 415
+# 417
 timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 424
+# 426
 for (i=0;i<2;i++) {
 temp_tx_buf[i]=tx_buf[i];
 }
@@ -2771,19 +2771,20 @@ tx_buf[1] = adcReadVcap();
 tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
 tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
 tx_buf[4] = jumper_stat;
-temp = values[0]*values[0]-values[1]*values[1];
+temp = (values[0] - values[1])*(values[0]+values[1]);
+
 tx_buf[5] = (uint8_t)(temp & 0xFF);
 tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
 
-# 443
-if (tx_buf[1]> 120 || PORTDbits.RD5) {
+# 446
+if (tx_buf[1]> 10*(95/8) || PORTDbits.RD5) {
 
 Send_Packet(0xB0,tx_buf,7);
 }
 else
 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 
-# 456
+# 459
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2813,7 +2814,7 @@ uint8_t new_value;
 value = adcReadVcap();
 
 
-if (value > 130 && charge_pulse > 0 && !PORTDbits.RD5 ) {
+if (value > 11*(95/8) && charge_pulse > 0 && !PORTDbits.RD5 ) {
 
 PORTBbits.RB4=0;
 T1CONbits.TMR1ON=0;
@@ -2881,7 +2882,7 @@ PORTDbits.RD3=0;
 return value;
 }
 
-# 557
+# 560
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2923,7 +2924,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 602
+# 605
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2976,13 +2977,13 @@ putch(c = getch());
 return c;
 }
 
-# 660
+# 663
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 676
+# 679
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3008,7 +3009,7 @@ _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 705
+# 708
 while(!PORTDbits.RD1) {
 
 
@@ -3037,7 +3038,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 742
+# 745
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3082,7 +3083,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 791
+# 794
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

@@ -303,7 +303,7 @@
 `uc 1 CPSA7 1 0 :1:2 
 ]
 [u S619 . 1 `S605 1 . 1 0 `S610 1 . 1 0 `S615 1 . 1 0 ]
-"66 main.c
+"68 main.c
 [s S678 . 1 `uc 1 ADON 1 0 :1:0 
 `uc 1 GO_nDONE 1 0 :1:1 
 `uc 1 CHS 1 0 :4:2 
@@ -388,7 +388,7 @@
 `uc 1 ADCS2 1 0 :1:6 
 ]
 [u S839 . 1 `S828 1 . 1 0 `S832 1 . 1 0 ]
-"96 main.c
+"98 main.c
 [v F2065 `(v  1 t 0 ]
 "151 /Applications/microchip/xc8/v1.12/include/pic.h
 [s S1137 . 1 `uc 1 TMR1IF 1 0 :1:0 
@@ -547,37 +547,37 @@
 [v ___tmul `(um  1 e 3 0 ]
 "3 /Applications/microchip/xc8/v1.12/sources/wmul.c
 [v ___wmul `(ui  1 e 2 0 ]
-"96 main.c
+"98 main.c
 [v _ISR `II(v  1 e 0 0 ]
-"138
+"140
 [v _main `(i  1 e 2 0 ]
-"480
+"483
 [v _sleep `(v  1 e 0 0 ]
-"523
+"526
 [v _adcReadTemp `(uc  1 e 1 0 ]
-"538
+"541
 [v _adcReadVcap `(uc  1 e 1 0 ]
-"557
+"560
 [v _adcRead `(uc  1 e 1 0 ]
-"591
+"594
 [v _uartInit `(v  1 e 0 0 ]
-"613
+"616
 [v _spiInit `(v  1 e 0 0 ]
-"625
+"628
 [v _adcInit `(v  1 e 0 0 ]
-"636
+"639
 [v _putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
-"641
+"644
 [v _getch `(uc  1 e 1 0 ]
-"648
+"651
 [v _getche `(uc  1 e 1 0 ]
-"661
+"664
 [v _power_on_delay `(v  1 e 0 0 ]
-"677
+"680
 [v _Send_Packet `(v  1 e 0 0 ]
-"743
+"746
 [v _Receive_Packet `(v  1 e 0 0 ]
 "78 rfm70.c
 [v _SPI_RW `(uc  1 e 1 0 ]
@@ -974,31 +974,31 @@
 [v _dpowers `DCC[5]ui  1 s 10 dpowers ]
 "362
 [v _hexpowers `DCC[4]ui  1 s 8 hexpowers ]
-"76 main.c
+"78 main.c
 [v _tx_buf `[7]uc  1 e 7 0 ]
-"77
+"79
 [v _rx_buf `[32]uc  1 e 32 0 ]
-"81
-[v _tmr1Counter `uc  1 e 1 0 ]
-"82
-[v _tmr1Target `uc  1 e 1 0 ]
 "83
-[v _flag `b  1 s 0 flag ]
+[v _tmr1Counter `uc  1 e 1 0 ]
 "84
-[v _jumper_stat `uc  1 e 1 0 ]
+[v _tmr1Target `uc  1 e 1 0 ]
 "85
-[v _sleep_counter `uc  1 e 1 0 ]
+[v _flag `b  1 s 0 flag ]
 "86
-[v _sleep_count `uc  1 e 1 0 ]
+[v _jumper_stat `uc  1 e 1 0 ]
+"87
+[v _sleep_counter `uc  1 e 1 0 ]
 "88
-[v _value `ui  1 e 2 0 ]
-"89
-[v _timelapse_count `i  1 e 2 0 ]
+[v _sleep_count `uc  1 e 1 0 ]
 "90
-[v _charge_time `ui  1 e 2 0 ]
+[v _value `ui  1 e 2 0 ]
 "91
-[v _charge_pulse `ui  1 e 2 0 ]
+[v _timelapse_count `i  1 e 2 0 ]
+"92
+[v _charge_time `ui  1 e 2 0 ]
 "93
+[v _charge_pulse `ui  1 e 2 0 ]
+"95
 [v _values `[2]uc  1 e 2 0 ]
 "8 rfm70.c
 [v _Bank1_Reg0_13 `DCC[14]ul  1 e 56 0 ]
@@ -1012,36 +1012,36 @@
 [v _RX0_Address `DCC[5]uc  1 e 5 0 ]
 "70
 [v _RX1_Address `DCC[5]uc  1 e 5 0 ]
-"138 main.c
+"140 main.c
 [v _main `(i  1 e 2 0 ]
 {
-"142
-[v main@temp_tx_buf `[32]uc  1 a 32 22 ]
-"139
-[v main@i `l  1 a 4 57 ]
-"146
-[v main@temp `ui  1 a 2 54 ]
 "144
-[v main@num_sleep `uc  1 a 1 56 ]
-"138
+[v main@temp_tx_buf `[32]uc  1 a 32 16 ]
+"141
+[v main@i `l  1 a 4 51 ]
+"148
+[v main@temp `ui  1 a 2 48 ]
+"146
+[v main@num_sleep `uc  1 a 1 50 ]
+"140
 [v main@argc `i  1 p 2 8 ]
 [v main@argv `**uc  1 p 2 10 ]
-"477
+"480
 } 0
-"613
+"616
 [v _spiInit `(v  1 e 0 0 ]
 {
-"622
+"625
 } 0
-"591
+"594
 [v _uartInit `(v  1 e 0 0 ]
 {
-"611
+"614
 } 0
-"625
+"628
 [v _adcInit `(v  1 e 0 0 ]
 {
-"632
+"635
 } 0
 "400 rfm70.c
 [v _rfm70setPowerdownMode `(v  1 e 0 0 ]
@@ -1063,25 +1063,25 @@
 [v RFM70_Initialize@i `uc  1 a 1 48 ]
 "359
 } 0
-"523 main.c
+"526 main.c
 [v _adcReadTemp `(uc  1 e 1 0 ]
 {
-"524
+"527
 [v adcReadTemp@value `uc  1 a 1 22 ]
-"536
+"539
 } 0
-"677
+"680
 [v _Send_Packet `(v  1 e 0 0 ]
 {
 [v Send_Packet@type `uc  1 a 1 wreg ]
-"678
+"681
 [v Send_Packet@i `uc  1 a 1 7 ]
 [v Send_Packet@fifo_sta `uc  1 a 1 6 ]
-"677
+"680
 [v Send_Packet@type `uc  1 a 1 wreg ]
 [v Send_Packet@pbuf `*.0uc  1 p 1 0 ]
 [v Send_Packet@len `uc  1 p 1 1 ]
-"731
+"734
 } 0
 "465 /Applications/microchip/xc8/v1.12/sources/doprnt.c
 [v _printf `(i  1 e 2 0 ]
@@ -1104,22 +1104,33 @@
 [v printf@f `*.mDCCuc  1 p 2 34 ]
 "1548
 } 0
-"380 rfm70.c
-[v _rfm70TxDataSentErrorInterrupt `(uc  1 e 1 0 ]
+"483 main.c
+[v _sleep `(v  1 e 0 0 ]
 {
-"387
+"484
+[v sleep@new_value `uc  1 a 1 25 ]
+"523
 } 0
-"165
-[v _SwitchToRxMode `(v  1 e 0 0 ]
+"541
+[v _adcReadVcap `(uc  1 e 1 0 ]
 {
-"166
-[v SwitchToRxMode@value `uc  1 a 1 27 ]
-"183
+"542
+[v adcReadVcap@value `uc  1 a 1 22 ]
+"554
 } 0
-"371
-[v _rfm70TxDataSentInterrupt `(uc  1 e 1 0 ]
+"639
+[v _putch `(v  1 e 0 0 ]
 {
-"378
+[v putch@c `uc  1 a 1 wreg ]
+[v putch@c `uc  1 a 1 wreg ]
+"642
+} 0
+"191 rfm70.c
+[v _SwitchToTxMode `(v  1 e 0 0 ]
+{
+"192
+[v SwitchToTxMode@value `uc  1 a 1 27 ]
+"203
 } 0
 "147
 [v _SPI_Write_Buf `(v  1 e 0 0 ]
@@ -1133,35 +1144,24 @@
 [v SPI_Write_Buf@length `uc  1 p 1 24 ]
 "157
 } 0
-"191
-[v _SwitchToTxMode `(v  1 e 0 0 ]
+"371
+[v _rfm70TxDataSentInterrupt `(uc  1 e 1 0 ]
 {
-"192
-[v SwitchToTxMode@value `uc  1 a 1 27 ]
-"203
+"378
 } 0
-"636 main.c
-[v _putch `(v  1 e 0 0 ]
+"165
+[v _SwitchToRxMode `(v  1 e 0 0 ]
 {
-[v putch@c `uc  1 a 1 wreg ]
-[v putch@c `uc  1 a 1 wreg ]
-"639
+"166
+[v SwitchToRxMode@value `uc  1 a 1 27 ]
+"183
 } 0
-"480
-[v _sleep `(v  1 e 0 0 ]
+"380
+[v _rfm70TxDataSentErrorInterrupt `(uc  1 e 1 0 ]
 {
-"481
-[v sleep@new_value `uc  1 a 1 25 ]
-"520
+"387
 } 0
-"538
-[v _adcReadVcap `(uc  1 e 1 0 ]
-{
-"539
-[v adcReadVcap@value `uc  1 a 1 22 ]
-"551
-} 0
-"218 rfm70.c
+"218
 [v _SwitchCFG `(v  1 e 0 0 ]
 {
 [v SwitchCFG@_cfg `uc  1 a 1 wreg ]
@@ -1170,14 +1170,6 @@
 "218
 [v SwitchCFG@_cfg `uc  1 a 1 wreg ]
 "229
-} 0
-"94
-[v _SPI_Write_Reg `(v  1 e 0 0 ]
-{
-[v SPI_Write_Reg@reg `uc  1 a 1 wreg ]
-[v SPI_Write_Reg@reg `uc  1 a 1 wreg ]
-[v SPI_Write_Reg@value `uc  1 p 1 23 ]
-"99
 } 0
 "109
 [v _SPI_Read_Reg `(uc  1 e 1 0 ]
@@ -1188,6 +1180,14 @@
 "109
 [v SPI_Read_Reg@reg `uc  1 a 1 wreg ]
 "117
+} 0
+"94
+[v _SPI_Write_Reg `(v  1 e 0 0 ]
+{
+[v SPI_Write_Reg@reg `uc  1 a 1 wreg ]
+[v SPI_Write_Reg@reg `uc  1 a 1 wreg ]
+[v SPI_Write_Reg@value `uc  1 p 1 23 ]
+"99
 } 0
 "78
 [v _SPI_RW `(uc  1 e 1 0 ]
@@ -1228,10 +1228,10 @@
 [v ___lwmod@dividend `ui  1 p 2 30 ]
 "21
 } 0
-"96 main.c
+"98 main.c
 [v _ISR `II(v  1 e 0 0 ]
 {
-"135
+"137
 } 0
 "465 /Applications/microchip/xc8/v1.12/sources/doprnt.c
 [v i1_printf `(i  1 e 2 0 ]
@@ -1262,10 +1262,10 @@
 [v i1___lwdiv@dividend `ui  1 p 2 2 ]
 "26
 } 0
-"636 main.c
+"639 main.c
 [v i1_putch `(v  1 e 0 0 ]
 {
 [v i1putch@c `uc  1 a 1 wreg ]
 [v i1putch@c `uc  1 a 1 wreg ]
-"639
+"642
 } 0
