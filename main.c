@@ -12,8 +12,8 @@
 #include "rfm70.h"
 
 
-/* CONFIGURAZIONE MICROCONTROLLORE */
-// CONFIG1
+/* MCU Configuration */
+// set CONFIG1 bits
 #pragma config FOSC = INTOSC// Oscillator Selection bits (INTOSCIO oscillator: I/O function on RA6/OSC2/CLKOUT pin, I/O function on RA7/OSC1/CLKIN)
 #pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled and can be enabled by SWDTEN bit of the WDTCON register)
 #pragma config PWRTE = OFF      // Power-up Timer Enable bit (PWRT disabled)
@@ -33,7 +33,7 @@
 //#pragma config LVP = OFF        // Low Voltage Programming Enable bit (RB3 pin has digital I/O, HV on MCLR must be used for programming)
 #pragma config PLLEN = ON
 
-// CONFIG2
+// set CONFIG2 bits
 #pragma config VCAPEN=0;
 //#pragma config BORV = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 //#pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
@@ -42,7 +42,7 @@
 // Vmeas = (1000K/95K)*ADC_Count * 2048/256 = (8/95)*ADC_Count
 // Fixed Voltage Reference: 2048 => 8mV/step
 #define VMIN            10*(95/8)           //10 Volts : 120 => Vstorage = 10V - 144 => Vstorage = 12V
-#define VCHARGE_STOP     9*(95/8)           //9 Volts
+//#define VCHARGE_STOP     9*(95/8)           //9 Volts
 #define VCHARGE_START     11*(95/8)         // 11 Volts
 //#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
 
@@ -70,12 +70,13 @@ void sleep(void);
 extern void RFM70_Initialize(void);
 extern void SwitchToTxMode(void);
 extern void SwitchToRxMode(void);
+uint8_t adcReadVsupercap(void);
 //void rfm70Task(void);
 
 //uint8_t tx_buf[17]={0x00,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
           //          0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x79};
 //uint8_t tx_buf[MAX_PACKET_LEN];
-uint8_t tx_buf[7]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA};
+uint8_t tx_buf[8]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA, 0xAA};
 uint8_t rx_buf[MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
@@ -90,7 +91,7 @@ uint8_t sleep_count;
 unsigned int value;
 int16_t timelapse_count = 0;
 unsigned int charge_time;   // int16_t
-unsigned int charge_pulse = 100; // pulse length in ms
+unsigned int charge_pulse = 50; //100; // pulse length in ms
 
 uint8_t values[2] = {0x00, 0x00};
 
@@ -132,7 +133,7 @@ void interrupt ISR(void)
         //timelapse_count++;
       }
 
-      TMR1IF=0; // azzero il flag di interrupt
+      TMR1IF=0;             // clean the Interrupt Flag
       }
    }
 
@@ -146,12 +147,13 @@ int main(int argc, char** argv) {
     uint8_t num_sleep;
     uint16_t energy_after_pulse;
     unsigned int temp;
+    //uint8_t vsupercap = 0;
 
 
 
     //power_on_delay();
 
-    OSCCONbits.IRCF=2; //3 for 16MHz and 2 for 8MHz
+    OSCCONbits.IRCF=2; //3 for 16MHz and 2 for 8MHz and 0 for 2MHz
 
     //ANSELDbits.ANSD0=0;     // digital led
     //ANSELCbits.ANSC0=0;     // digital
@@ -170,6 +172,12 @@ int main(int argc, char** argv) {
     //adc
     TRISEbits.TRISE2=1;     // ADC in
     ANSELEbits.ANSE2=1;     // ADC pin as analog
+
+    // dac conf
+    TRISAbits.TRISA2=0;     // RA2 = DAC voltage output
+    DACCON0 = 0xA0;
+    DACCON1 = 0x0F;
+
 
     //RFM70 pins
     TRISCbits.TRISC2=0;     // CE
@@ -240,21 +248,21 @@ int main(int argc, char** argv) {
 
     // not used pins
     TRISAbits.TRISA1=0;
-    TRISAbits.TRISA2=0;
+    //TRISAbits.TRISA2=0;
     TRISAbits.TRISA3=0;
     TRISAbits.TRISA4=0;
     TRISAbits.TRISA5=0;
     TRISAbits.TRISA6=0;
     TRISAbits.TRISA7=0;
     ANSELAbits.ANSA1=0;
-    ANSELAbits.ANSA2=0;
+    //ANSELAbits.ANSA2=0;
     ANSELAbits.ANSA3=0;
     ANSELAbits.ANSA4=0;
     ANSELAbits.ANSA5=0;
     ANSELAbits.ANSA6=0;
     ANSELAbits.ANSA7=0;
     PORTAbits.RA1=0;
-    PORTAbits.RA2=0;
+    //PORTAbits.RA2=0;
     PORTAbits.RA3=0;
     PORTAbits.RA4=0;
     PORTAbits.RA5=0;
@@ -284,8 +292,9 @@ int main(int argc, char** argv) {
     ANSELDbits.ANSD4=0;
     PORTDbits.RD4=0;
 
-    TRISEbits.TRISE1=0;
-    ANSELEbits.ANSE1=0;
+    // V supercap measure
+    TRISEbits.TRISE1=1;
+    ANSELEbits.ANSE1=1;
     PORTEbits.RE1=0;
 
     jumper_stat = PORTD>>4; // lo fa nell'ISR
@@ -301,6 +310,8 @@ int main(int argc, char** argv) {
     sleep_counter = PORTD>>6 & 0x03;
     printf("Sleep counter: %X\r\n", sleep_counter );
     // rimettere sleep
+
+
     //SLEEP(); //<-- per farlo consumare poco
     SLEEP();
     SLEEP();
@@ -438,6 +449,7 @@ int main(int argc, char** argv) {
         //temp = values[0]*values[0]-values[1]*values[1];
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
+        tx_buf[7] = adcReadVsupercap();
         //tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
         //tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
 
@@ -445,7 +457,7 @@ int main(int argc, char** argv) {
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
         if (tx_buf[1]> VMIN || SKIP_MEASURE) {
             //rfm70setPowerdownMode(1);
-            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,7);	// transmit
+            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,8);	// transmit
         }
         else
             printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
@@ -474,6 +486,7 @@ int main(int argc, char** argv) {
             //printf("Sleep result: %d\r\n", energy_after_pulse);
             //SLEEP();
         }
+        //vsupercap = adcReadVsupercap();
         timelapse_count++;
     }
     return (EXIT_SUCCESS);
@@ -550,6 +563,21 @@ uint8_t adcReadVcap(void) {
     value = ADRES;
     ADCON0bits.ADON=0;
     PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
+    return value;
+}
+
+uint8_t adcReadVsupercap(void) {
+    uint8_t value;
+    ADCON0bits.CHS=6;
+    FVRCONbits.ADFVR=2;
+    ADCON0bits.ADON=1;
+    //PORTDbits.RD3=1;        // Select Vstorage measurement pin
+    WAIT_MS(1);
+    ADCON0bits.GO_nDONE=1;
+    while(ADCON0bits.GO_nDONE);
+    value = ADRES;
+    ADCON0bits.ADON=0;
+    //PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
     return value;
 }
 
