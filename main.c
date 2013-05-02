@@ -1,6 +1,6 @@
 /*
  * File:   main.c
- * Author: blackbliss
+ * Author: Daniele Costarella
  *
  * Created on 26 febbraio 2013, 11.11
  */
@@ -14,13 +14,13 @@
 
 /* MCU Configuration */
 // set CONFIG1 bits
-#pragma config FOSC = INTOSC// Oscillator Selection bits (INTOSCIO oscillator: I/O function on RA6/OSC2/CLKOUT pin, I/O function on RA7/OSC1/CLKIN)
-#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled and can be enabled by SWDTEN bit of the WDTCON register)
-#pragma config PWRTE = OFF      // Power-up Timer Enable bit (PWRT disabled)
-#pragma config MCLRE = ON       // RE3/MCLR pin function select bit (RE3/MCLR pin function is MCLR)
-#pragma config CP = OFF         // Code Protection bit (Program memory code protection is disabled)
-//#pragma config CP = OFF        // Data Code Protection bit (Data memory code protection is disabled)
-//#pragma config BOREN = 0//SBODEN   // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
+#pragma config FOSC = INTOSC           // Oscillator Selection bits (INTOSCIO oscillator: I/O function on RA6/OSC2/CLKOUT pin, I/O function on RA7/OSC1/CLKIN)
+#pragma config WDTE = OFF              // Watchdog Timer Enable bit (WDT disabled and can be enabled by SWDTEN bit of the WDTCON register)
+#pragma config PWRTE = OFF             // Power-up Timer Enable bit (PWRT disabled)
+#pragma config MCLRE = ON              // RE3/MCLR pin function select bit (RE3/MCLR pin function is MCLR)
+#pragma config CP = OFF                // Code Protection bit (Program memory code protection is disabled)
+//#pragma config CP = OFF              // Data Code Protection bit (Data memory code protection is disabled)
+//#pragma config BOREN = 0//SBODEN     // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
 
 //new
 //#pragma config BOREN = 2    // 10 = BOR enabled during operation and disabled in Sleep
@@ -34,7 +34,7 @@
 #pragma config PLLEN = ON
 
 // set CONFIG2 bits
-#pragma config VCAPEN=0;
+//#pragma config VCAPEN=0; //non usato per PIC16LF707
 //#pragma config BORV = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 //#pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
 
@@ -115,16 +115,16 @@ void interrupt ISR(void)
 
         switch (sleep_counter) {
             case 0:
-                sleep_count = 1;    // 15s
+                sleep_count = 1;         // 15s
                 break;
             case 1:
-                sleep_count = 20;   // 5min
+                sleep_count = 20;        // 5min
                 break;
             case 2:
-                sleep_count = 40;   // 10min
+                sleep_count = 40;        // 10min
                 break;
             case 3:
-                sleep_count = 120;  // 30min
+                sleep_count = 120;       // 30min
                 break;
         }
 
@@ -133,7 +133,7 @@ void interrupt ISR(void)
         //timelapse_count++;
       }
 
-      TMR1IF=0;             // clean the Interrupt Flag
+      TMR1IF=0;                         // clean the Interrupt Flag
       }
    }
 
@@ -169,11 +169,11 @@ int main(int argc, char** argv) {
     ANSELCbits.ANSC5=0;     // MOSI as digital
     ANSELDbits.ANSD1=0;     // IRQ as digital
 
-    //adc
+    //adc init
     TRISEbits.TRISE2=1;     // ADC in
     ANSELEbits.ANSE2=1;     // ADC pin as analog
 
-    // dac conf
+    // dac init
     TRISAbits.TRISA2=0;     // RA2 = DAC voltage output
     DACCON0 = 0xA0;
     DACCON1 = 0x0F;
@@ -226,16 +226,6 @@ int main(int argc, char** argv) {
     PEIE=1; // interrupt di periferica abilitati
     TMR1IE=1; // interrupt su overflow timer1 abilitato
 
-
-        // LED blinking
-        //LED=1;
-        //WAIT_MS(100);
-        //LED=0;
-        //WAIT_MS(100);
-
-    //TMR1H=0x00;
-    //TMR1L=0x00;
-
     TMR1H = 0x10;
     TMR1L = 0x00;
 
@@ -247,6 +237,7 @@ int main(int argc, char** argv) {
     T1CONbits.TMR1ON=1;
 
     // not used pins
+    TRISAbits.TRISA0=0; //per PIC16LF707
     TRISAbits.TRISA1=0;
     //TRISAbits.TRISA2=0;
     TRISAbits.TRISA3=0;
@@ -254,6 +245,7 @@ int main(int argc, char** argv) {
     TRISAbits.TRISA5=0;
     TRISAbits.TRISA6=0;
     TRISAbits.TRISA7=0;
+    ANSELAbits.ANSA0=0; //per PIC16LF707
     ANSELAbits.ANSA1=0;
     //ANSELAbits.ANSA2=0;
     ANSELAbits.ANSA3=0;
@@ -261,6 +253,7 @@ int main(int argc, char** argv) {
     ANSELAbits.ANSA5=0;
     ANSELAbits.ANSA6=0;
     ANSELAbits.ANSA7=0;
+    PORTAbits.RA0=0;    //per PIC16LF707
     PORTAbits.RA1=0;
     //PORTAbits.RA2=0;
     PORTAbits.RA3=0;
@@ -292,7 +285,7 @@ int main(int argc, char** argv) {
     ANSELDbits.ANSD4=0;
     PORTDbits.RD4=0;
 
-    // V supercap measure
+    // Vsupercap measure
     TRISEbits.TRISE1=1;
     ANSELEbits.ANSE1=1;
     PORTEbits.RE1=0;
@@ -303,35 +296,13 @@ int main(int argc, char** argv) {
     uartInit();
     adcInit();
 
-    //SPI_Write_Reg(WRITE_REG | CONFIG, 0x08);
-    //printf("CONFIG NEW: %X\r\n", SPI_Read_Reg(CONFIG));
     rfm70setPowerdownMode(0); //?
     //printf("CONFIG INIZIALE: %X\r\n", SPI_Read_Reg(CONFIG));
     sleep_counter = PORTD>>6 & 0x03;
     printf("Sleep counter: %X\r\n", sleep_counter );
-    // rimettere sleep
 
-
-    //SLEEP(); //<-- per farlo consumare poco
     SLEEP();
-    SLEEP();
-    // rimettere sleep
-
-
-    //PORTEbits.RE1=1; //mcp9700 power up
-    //adcRead(7,0); // read dummy data (?)
-    //SLEEP();
-    //while(1) {
-        //WAIT_MS(500);
-        //value = adcReadTemp();
-        ////value = adcRead(7,0); //(4*adcRead(7,0)-500);
-        //printf("TEMP value: %X => %d\r\n", value, value);
-        //value = adcReadVcap();
-        ////value = adcRead(5,1); //era 1
-        //printf("Vstorage value: %d\r\n", value);
-        //printf("\r\n");
-    //}
-
+    //SLEEP();  //tolto per la misura
 
     //printf("ADC value: %d\r\n", adcRead(7));
 
@@ -428,12 +399,7 @@ int main(int argc, char** argv) {
     timelapse_count = 0;
     while(1) {
         rfm70setPowerdownMode(1);
-        //if(flag == 1){
-        //    flag = 0;
-        //    SLEEP();
-        //}
-        //PORTCbits.RC0=0;
-        //WAIT_MS(100);
+
         for (i=0;i<2;i++) {
             temp_tx_buf[i]=tx_buf[i];
         }
@@ -450,8 +416,7 @@ int main(int argc, char** argv) {
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
         tx_buf[7] = adcReadVsupercap();
-        //tx_buf[2] = (uint8_t)((timelapse_count/SLEEP_COUNT) & 0xFF);
-        //tx_buf[3] = (uint8_t)(((timelapse_count/SLEEP_COUNT) >> 8) & 0xFF);
+
 
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
@@ -541,13 +506,13 @@ uint8_t adcReadTemp(void) {
     ADCON0bits.CHS=7;
     FVRCONbits.ADFVR=1;
     ADCON0bits.ADON=1;
-    PORTDbits.RD0=1;// mcp9700a power up
+    PORTDbits.RD0=1;            // mcp9700a power up
     WAIT_MS(5);
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
     value = ADRES;
     ADCON0bits.ADON=0;
-    PORTDbits.RD0=0;     // turn off mcp9700a
+    PORTDbits.RD0=0;            // turn off mcp9700a
     return value;
 }
 
@@ -556,7 +521,7 @@ uint8_t adcReadVcap(void) {
     ADCON0bits.CHS=5;
     FVRCONbits.ADFVR=2;
     ADCON0bits.ADON=1;
-    PORTDbits.RD3=1;        // Select Vstorage measurement
+    PORTDbits.RD3=1;            // Select Vstorage measurement
     WAIT_MS(1);
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
@@ -590,20 +555,20 @@ uint8_t adcRead(uint8_t ch, uint8_t range) {
     ADCON0bits.CHS=ch;          // read from channel 'ch'
     //ADCON0bits.ADON=1;
 
-    if (range == 0) {              // read from MCP9700A
-        //FVRCONbits.FVREN=0;     //FVR disabled
+    if (range == 0) {           // read from MCP9700A
+        //FVRCONbits.FVREN=0;   //FVR disabled
         FVRCONbits.ADFVR=1;     // 1.024 as reference
         ADCON0bits.ADON=1;
         //WAIT_MS(1);
         //FVRCONbits.FVREN=1;
-        PORTEbits.RE1=1;     // mcp9700a power up
-        WAIT_MS(20);             // mcp9700 Turn-on Time
+        PORTEbits.RE1=1;        // mcp9700a power up
+        WAIT_MS(20);            // mcp9700 Turn-on Time
     }
     else
         PORTDbits.RD3=1;        // Select Vstorage measurement
-        FVRCONbits.ADFVR=2;  // read from Vstorage
+        FVRCONbits.ADFVR=2;     // read from Vstorage
         ADCON0bits.ADON=1;
-        WAIT_MS(1);         // serve??????
+        WAIT_MS(1);             // serve??????
 
     while(!FVRCONbits.FVRRDY);  // 1 = Fixed Voltage Reference output is ready for use
     // Note: FVRRDY is always ?1? on PIC16F707 devices.
@@ -612,16 +577,16 @@ uint8_t adcRead(uint8_t ch, uint8_t range) {
     while(ADCON0bits.GO_nDONE);
     //while(!PIR1bits.ADIF);
     value = ADRES;
-    ADCON0bits.ADON=0;       //ADC is disabled and consumes no operating current
-    //PORTEbits.RE1=0;            // Turn off mcp9700a
-    PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
+    ADCON0bits.ADON=0;      //ADC is disabled and consumes no operating current
+    //PORTEbits.RE1=0;      // Turn off mcp9700a
+    PORTDbits.RD3=0;        // Turn off switch for Vstorage measure
     return value;
 }
 
 
 void uartInit(void) {
-    TRISCbits.TRISC7=1;             // RC7 as UART RX pin input
-    TRISCbits.TRISC6=0;             // RC6 as UART TX pin input
+    TRISCbits.TRISC7=1;     // RC7 = UART RX pin input
+    TRISCbits.TRISC6=0;     // RC6 = UART TX pin input
 
     TXSTA=0x02;             // High speed
     RCSTA=0x00;
@@ -633,8 +598,8 @@ void uartInit(void) {
     TXSTAbits.BRGH=0;
     TXSTAbits.SYNC=0;
 
-    //SPBRGH=0x00;        // Baudrate
-    SPBRG=12; // 25 for 16MHz
+    //SPBRGH=0x00;          // Baudrate
+    SPBRG=12;               // 25 for 16MHz
 
     RCSTAbits.SPEN=1;
     TXSTAbits.TXEN=1;
@@ -642,13 +607,13 @@ void uartInit(void) {
 }
 
 void spiInit(void) {
-    SSPCONbits.SSPEN=1;       // 1= Enables SPI
-    SSPCONbits.CKP=0; //0 = Idle State for clock is a low level
-    SSPCONbits.SSPM=2;    // SPI Master Mode clock=Fosc/64
+    SSPCONbits.SSPEN=1;     // 1= Enables SPI
+    SSPCONbits.CKP=0;       //0 = Idle State for clock is a low level
+    SSPCONbits.SSPM=2;      // SPI Master Mode clock=Fosc/64
 
-    SSPSTATbits.SMP=0;   //0  // input data sampled at middle of data output time
-    SSPSTATbits.CKE=1;   //1  // Trasmit occurs on transition from idle to active
-                            //clock state //in origine 0
+    SSPSTATbits.SMP=0;      // input data sampled at middle of data output time
+    SSPSTATbits.CKE=1;      // Trasmit occurs on transition from idle to active
+                            // clock state
     WAIT_MS(50);
 }
 
@@ -658,16 +623,17 @@ void adcInit(void) {
     //ADCON1bits.ADCS=0x00;
     ADCON1bits.ADCS=1;      // convert @ fosc/8
     //ADCON1bits.ADREF=0;
-    ADCON1bits.ADREF=3;  // 11 = VREF is connected to internal Fixed Voltage Reference
+    ADCON1bits.ADREF=3;     // 11 = VREF is connected to internal Fixed Voltage Reference
     FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
 }
 
-//You must write putch() else printf will complain
+
 void putch (char c)
 {
     while(!TXIF);
     TXREG = c;
 }
+
 
 unsigned char getch() {
 	// retrieve one byte
@@ -675,6 +641,7 @@ unsigned char getch() {
 		continue;
 	return RCREG;
 }
+
 
 unsigned char getche(void) {
 	unsigned char c;
@@ -722,21 +689,13 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
             printf("\n\r");
 
                 PORTCbits.RC2=0;
-                //WAIT_MS(4);
 		SPI_Write_Buf(type, pbuf, len); // Writes data to buffer
                 PORTCbits.RC2=1;
                 WAIT_US(10);
                 PORTCbits.RC2=0;
                 WAIT_MS(1);
 
-
-                //LED=1 ;
-
-
                 while(!IRQ) {
-                    //printf("Interrupt! \n\r");
-                    //printf("STATUS: %X\r\n", SPI_Read_Reg(0x07));
-                    //LED=1 ; //per risparmiare
                     if (rfm70TxDataSentInterrupt()) {
                         printf("Data sent: OK \r\n");
                         SwitchToRxMode();
@@ -747,17 +706,8 @@ void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
                         SwitchToRxMode();
                         //CE=0;
                     }
-
                 }
-
-
-		//pbuf[len-1] = '\0';// remove checksum before sending to terminal
-
 		printf("\n\r\n\r");
-
-		//WAIT_MS(100);
-		//LED=0; //per risparmiare
-		//WAIT_MS(50);
 	}
 }
 

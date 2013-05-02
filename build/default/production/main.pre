@@ -137,7 +137,7 @@ extern char * ultoa(char * buf, unsigned long val, int base);
 
 extern char * ftoa(float f, int * status);
 
-# 44 "/Applications/microchip/xc8/v1.12/include/pic16f707.h"
+# 44 "/Applications/microchip/xc8/v1.12/include/pic16lf707.h"
 extern volatile unsigned char INDF @ 0x000;
 
 asm("INDF equ 00h");
@@ -2505,9 +2505,6 @@ void rfm70setPowerdownMode(uint8_t value);
 # 34
 #pragma config PLLEN = ON
 
-
-#pragma config VCAPEN=0;
-
 # 56
 void power_on_delay(void);
 void spiInit(void);
@@ -2668,7 +2665,6 @@ GIE=1;
 PEIE=1;
 TMR1IE=1;
 
-# 239
 TMR1H = 0x10;
 TMR1L = 0x00;
 
@@ -2680,6 +2676,7 @@ T1CONbits.T1OSCEN=1;
 T1CONbits.TMR1ON=1;
 
 
+TRISAbits.TRISA0=0;
 TRISAbits.TRISA1=0;
 
 TRISAbits.TRISA3=0;
@@ -2687,6 +2684,7 @@ TRISAbits.TRISA4=0;
 TRISAbits.TRISA5=0;
 TRISAbits.TRISA6=0;
 TRISAbits.TRISA7=0;
+ANSELAbits.ANSA0=0;
 ANSELAbits.ANSA1=0;
 
 ANSELAbits.ANSA3=0;
@@ -2694,6 +2692,7 @@ ANSELAbits.ANSA4=0;
 ANSELAbits.ANSA5=0;
 ANSELAbits.ANSA6=0;
 ANSELAbits.ANSA7=0;
+PORTAbits.RA0=0;
 PORTAbits.RA1=0;
 
 PORTAbits.RA3=0;
@@ -2736,20 +2735,16 @@ spiInit();
 uartInit();
 adcInit();
 
-
-
 rfm70setPowerdownMode(0);
 
 sleep_counter = PORTD>>6 & 0x03;
 printf("Sleep counter: %X\r\n", sleep_counter );
 
-
-
-
-asm("sleep");
 asm("sleep");
 
-# 338
+
+
+
 value = adcReadVcap();
 while (value < 10*(95/8) && !PORTDbits.RD5) {
 asm("sleep");
@@ -2761,15 +2756,14 @@ RFM70_Initialize();
 
 rfm70setPowerdownMode(0);
 
-# 381
+# 352
 asm("sleep");
 
-# 428
+# 399
 timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 437
 for (i=0;i<2;i++) {
 temp_tx_buf[i]=tx_buf[i];
 }
@@ -2787,7 +2781,9 @@ tx_buf[5] = (uint8_t)(temp & 0xFF);
 tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
 tx_buf[7] = adcReadVsupercap();
 
-# 458
+
+
+
 if (tx_buf[1]> 10*(95/8) || PORTDbits.RD5) {
 
 Send_Packet(0xB0,tx_buf,8);
@@ -2795,7 +2791,7 @@ Send_Packet(0xB0,tx_buf,8);
 else
 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 
-# 471
+# 436
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2909,7 +2905,7 @@ ADCON0bits.ADON=0;
 return value;
 }
 
-# 588
+# 553
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2951,7 +2947,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 633
+# 598
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -2991,6 +2987,7 @@ while(!TXIF);
 TXREG = c;
 }
 
+
 unsigned char getch() {
 
 while(!RCIF)
@@ -2998,19 +2995,20 @@ continue;
 return RCREG;
 }
 
+
 unsigned char getche(void) {
 unsigned char c;
 putch(c = getch());
 return c;
 }
 
-# 691
+# 658
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 707
+# 674
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3029,18 +3027,13 @@ printf("%X",pbuf[i]);
 printf("\n\r");
 
 PORTCbits.RC2=0;
-
 SPI_Write_Buf(type, pbuf, len);
 PORTCbits.RC2=1;
 _delay( 10 * ( 8000000L / 4000000));
 PORTCbits.RC2=0;
 _delay( 1 * ( 8000000L / 4000));
 
-# 736
 while(!PORTDbits.RD1) {
-
-
-
 if (rfm70TxDataSentInterrupt()) {
 printf("Data sent: OK \r\n");
 SwitchToRxMode();
@@ -3051,21 +3044,12 @@ printf("No data sent: ERROR \r\n ");
 SwitchToRxMode();
 
 }
-
 }
-
-
-
-
 printf("\n\r\n\r");
-
-
-
-
 }
 }
 
-# 773
+# 723
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3110,7 +3094,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 822
+# 772
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

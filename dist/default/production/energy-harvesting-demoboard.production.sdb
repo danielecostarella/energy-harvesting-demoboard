@@ -1,8 +1,8 @@
 [p LITE_MODE AUTOSTATIC PIC14 PICREGULAR PICMID ]
 [d version 1.1 ]
 [d edition pro ]
-[d chip 16F707 ]
-"713 /Applications/microchip/xc8/v1.12/include/pic16f707.h
+[d chip 16LF707 ]
+"713 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
 [s S28 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 ICSS 1 0 :1:2 
 `uc 1 ICSL 1 0 :1:3 
@@ -315,7 +315,7 @@
 `uc 1 CHS3 1 0 :1:5 
 ]
 [u S694 . 1 `S684 1 . 1 0 `S688 1 . 1 0 ]
-"1623 /Applications/microchip/xc8/v1.12/include/pic16f707.h
+"1623 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
 [s S708 . 1 `uc 1 ADFVR 1 0 :2:0 
 `uc 1 CDAFVR 1 0 :2:2 
 `uc 1 . 1 0 :1:4 
@@ -401,7 +401,7 @@
 `uc 1 TMR1GIF 1 0 :1:7 
 ]
 [u S1154 . 1 `S1145 1 . 1 0 ]
-"1028 /Applications/microchip/xc8/v1.12/include/pic16f707.h
+"1028 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
 [s S1166 . 1 `uc 1 RD0 1 0 :1:0 
 `uc 1 RD1 1 0 :1:1 
 `uc 1 RD2 1 0 :1:2 
@@ -551,35 +551,35 @@
 [v _ISR `II(v  1 e 0 0 ]
 "141
 [v _main `(i  1 e 2 0 ]
-"496
+"461
 [v _sleep `(v  1 e 0 0 ]
-"539
+"504
 [v _adcReadTemp `(uc  1 e 1 0 ]
-"554
+"519
 [v _adcReadVcap `(uc  1 e 1 0 ]
-"569
+"534
 [v _adcReadVsupercap `(uc  1 e 1 0 ]
-"588
+"553
 [v _adcRead `(uc  1 e 1 0 ]
-"622
+"587
 [v _uartInit `(v  1 e 0 0 ]
-"644
+"609
 [v _spiInit `(v  1 e 0 0 ]
-"656
+"621
 [v _adcInit `(v  1 e 0 0 ]
-"667
+"632
 [v _putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
-"672
+"638
 [v _getch `(uc  1 e 1 0 ]
-"679
+"646
 [v _getche `(uc  1 e 1 0 ]
-"692
+"659
 [v _power_on_delay `(v  1 e 0 0 ]
-"708
+"675
 [v _Send_Packet `(v  1 e 0 0 ]
-"774
+"724
 [v _Receive_Packet `(v  1 e 0 0 ]
 "78 rfm70.c
 [v _SPI_RW `(uc  1 e 1 0 ]
@@ -620,7 +620,7 @@
 `uc 1 RA6 1 0 :1:6 
 `uc 1 RA7 1 0 :1:7 
 ]
-"205 /Applications/microchip/xc8/v1.12/include/pic16f707.h
+"205 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
 [s S413 . 1 `uc 1 AN0 1 0 :1:0 
 `uc 1 AN1 1 0 :1:1 
 `uc 1 AN2 1 0 :1:2 
@@ -1032,22 +1032,22 @@
 "141
 [v main@argc `i  1 p 2 8 ]
 [v main@argv `**uc  1 p 2 10 ]
-"493
+"458
 } 0
-"644
+"609
 [v _spiInit `(v  1 e 0 0 ]
 {
-"653
+"618
 } 0
-"622
+"587
 [v _uartInit `(v  1 e 0 0 ]
 {
-"642
+"607
 } 0
-"656
+"621
 [v _adcInit `(v  1 e 0 0 ]
 {
-"663
+"628
 } 0
 "400 rfm70.c
 [v _rfm70setPowerdownMode `(v  1 e 0 0 ]
@@ -1069,32 +1069,32 @@
 [v RFM70_Initialize@i `uc  1 a 1 48 ]
 "359
 } 0
-"539 main.c
+"504 main.c
 [v _adcReadTemp `(uc  1 e 1 0 ]
 {
-"540
+"505
 [v adcReadTemp@value `uc  1 a 1 22 ]
-"552
+"517
 } 0
-"569
+"534
 [v _adcReadVsupercap `(uc  1 e 1 0 ]
 {
-"570
+"535
 [v adcReadVsupercap@value `uc  1 a 1 22 ]
-"582
+"547
 } 0
-"708
+"675
 [v _Send_Packet `(v  1 e 0 0 ]
 {
 [v Send_Packet@type `uc  1 a 1 wreg ]
-"709
+"676
 [v Send_Packet@i `uc  1 a 1 7 ]
 [v Send_Packet@fifo_sta `uc  1 a 1 6 ]
-"708
+"675
 [v Send_Packet@type `uc  1 a 1 wreg ]
 [v Send_Packet@pbuf `*.0uc  1 p 1 0 ]
 [v Send_Packet@len `uc  1 p 1 1 ]
-"762
+"712
 } 0
 "465 /Applications/microchip/xc8/v1.12/sources/doprnt.c
 [v _printf `(i  1 e 2 0 ]
@@ -1153,26 +1153,26 @@
 [v SwitchToTxMode@value `uc  1 a 1 27 ]
 "203
 } 0
-"496 main.c
-[v _sleep `(v  1 e 0 0 ]
-{
-"497
-[v sleep@new_value `uc  1 a 1 25 ]
-"536
-} 0
-"554
-[v _adcReadVcap `(uc  1 e 1 0 ]
-{
-"555
-[v adcReadVcap@value `uc  1 a 1 22 ]
-"567
-} 0
-"667
+"632 main.c
 [v _putch `(v  1 e 0 0 ]
 {
 [v putch@c `uc  1 a 1 wreg ]
 [v putch@c `uc  1 a 1 wreg ]
-"670
+"635
+} 0
+"461
+[v _sleep `(v  1 e 0 0 ]
+{
+"462
+[v sleep@new_value `uc  1 a 1 25 ]
+"501
+} 0
+"519
+[v _adcReadVcap `(uc  1 e 1 0 ]
+{
+"520
+[v adcReadVcap@value `uc  1 a 1 22 ]
+"532
 } 0
 "218 rfm70.c
 [v _SwitchCFG `(v  1 e 0 0 ]
@@ -1266,6 +1266,13 @@
 [v i1___lwmod@dividend `ui  1 p 2 10 ]
 "21
 } 0
+"632 main.c
+[v i1_putch `(v  1 e 0 0 ]
+{
+[v i1putch@c `uc  1 a 1 wreg ]
+[v i1putch@c `uc  1 a 1 wreg ]
+"635
+} 0
 "5 /Applications/microchip/xc8/v1.12/sources/lwdiv.c
 [v i1___lwdiv `(ui  1 e 2 0 ]
 {
@@ -1274,11 +1281,4 @@
 [v i1___lwdiv@divisor `ui  1 p 2 0 ]
 [v i1___lwdiv@dividend `ui  1 p 2 2 ]
 "26
-} 0
-"667 main.c
-[v i1_putch `(v  1 e 0 0 ]
-{
-[v i1putch@c `uc  1 a 1 wreg ]
-[v i1putch@c `uc  1 a 1 wreg ]
-"670
 } 0
