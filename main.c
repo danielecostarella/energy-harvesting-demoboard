@@ -91,7 +91,8 @@ uint8_t sleep_count;
 unsigned int value;
 int16_t timelapse_count = 0;
 unsigned int charge_time;   // int16_t
-unsigned int charge_pulse = 50; //100; // pulse length in ms
+unsigned int charge_pulse = 100; //era 50 100; // pulse length in ms
+unsigned int dac_value = 26; //era 25
 
 uint8_t values[2] = {0x00, 0x00};
 
@@ -110,7 +111,8 @@ void interrupt ISR(void)
 
       if(tmr1Counter == tmr1Target){
         printf("Eccomi nell'ISR!\r\n");
-        jumper_stat = PORTD>>4; // read new jumper status
+        //jumper_stat = PORTD>>4; // read new jumper status
+        jumper_stat = PORTD>>5 & 0x07; //read current jumper status
         sleep_counter = PORTD>>6 & 0x03;       // read sleep count bits
 
         switch (sleep_counter) {
@@ -146,7 +148,7 @@ int main(int argc, char** argv) {
     //int16_t timelapse_count = 0;
     uint8_t num_sleep;
     uint16_t energy_after_pulse;
-    unsigned int temp;
+    unsigned int temp=0;
     //uint8_t vsupercap = 0;
 
 
@@ -175,8 +177,11 @@ int main(int argc, char** argv) {
 
     // dac init
     TRISAbits.TRISA2=0;     // RA2 = DAC voltage output
-    DACCON0 = 0xA0;
-    DACCON1 = 0x0F;
+    ANSELAbits.ANSA2=0;
+    //PORTAbits.RA2=1;
+    //DACCON1 = 0x1F;
+    //DACCON0 = 0x00;         // DAC disabled
+    PORTAbits.RA2=1;
 
 
     //RFM70 pins
@@ -290,11 +295,34 @@ int main(int argc, char** argv) {
     ANSELEbits.ANSE1=1;
     PORTEbits.RE1=0;
 
-    jumper_stat = PORTD>>4; // lo fa nell'ISR
+    //jumper_stat = PORTD>>4; // lo fa nell'ISR
 
     spiInit();
     uartInit();
     adcInit();
+
+    /*
+    while(1) {
+        DACCON1 = 21;           // Preprogrammed
+        DACCON0 = 0xA0;         // DAC Enabled
+        SLEEP();
+        DACCON0 = 0x00;         // DAC disabled
+        PORTAbits.RA2=1;        // and OUTPUT = High
+
+        SLEEP();
+    }
+     */
+    
+    /*
+    while(1) {
+        while (dac_value > 20 ) {
+            DACCON1 = dac_value & 0x1F;
+            dac_value--;
+            WAIT_MS(8000);
+        }
+    }*/
+    
+
 
     rfm70setPowerdownMode(0); //?
     //printf("CONFIG INIZIALE: %X\r\n", SPI_Read_Reg(CONFIG));
@@ -392,10 +420,22 @@ int main(int argc, char** argv) {
     for (i=0;i<5;i++) {
         printf("%X-", buffer[i]);
     }
+     *
     */
     //LED=1;
     //WAIT_MS(50);
     //LED=0;
+    /*
+    SLEEP();
+    while(1) {
+        //PORTAbits.RA2=1;
+        DACCON1 = 31;       //MOS OFF
+        WAIT_MS(2000);
+        DACCON1 = 24;       //MOS e DACOUT ON
+        //PORTAbits.RA2=0;
+        WAIT_MS(2000);
+    }*/
+
     timelapse_count = 0;
     while(1) {
         rfm70setPowerdownMode(1);
@@ -411,7 +451,7 @@ int main(int argc, char** argv) {
         tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
         tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
         tx_buf[4] = jumper_stat;
-        temp = (values[0] - values[1])*(values[0]+values[1]);
+        temp += (values[0] - values[1])*(values[0]+values[1]);
         //temp = values[0]*values[0]-values[1]*values[1];
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
@@ -423,6 +463,7 @@ int main(int argc, char** argv) {
         if (tx_buf[1]> VMIN || SKIP_MEASURE) {
             //rfm70setPowerdownMode(1);
             Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,8);	// transmit
+            temp = 0;
         }
         else
             printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
@@ -465,16 +506,21 @@ void sleep(void) {
     //charge_pulse = f(value);
     if (value > VCHARGE_START && charge_pulse > 0 && !SKIP_MEASURE ) {
 
-        PORTBbits.RB4=0;
+        //PORTBbits.RB4=0;
+        DACCON1 = 0; //21;           // Preprogrammed
+        DACCON0 = 0xA0;         // DAC Enabled
         T1CONbits.TMR1ON=0;
         charge_time = 0 - (charge_pulse<<2);    //50ms*4
         TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
         TMR1L = (uint8_t)((charge_time) & 0xFF);
         T1CONbits.TMR1ON=1;
         SLEEP();
-        new_value = adcReadVcap();
 
-        PORTBbits.RB4=1;
+        //PORTBbits.RB4=1;
+        //DACCON1 = 31;
+        DACCON0 = 0x00;         // DAC disabled
+        PORTAbits.RA2=1;        // and OUTPUT = High
+        new_value = adcReadVcap();
         charge_time = 0x1000 - charge_time;
         T1CONbits.TMR1ON=0;
         TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
@@ -494,8 +540,8 @@ void sleep(void) {
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         SLEEP();
-        values[0] = 255;
-        values[1] = 255;
+        values[0] = 0;
+        values[1] = 0;
         //???return(-1);
     }
 }
