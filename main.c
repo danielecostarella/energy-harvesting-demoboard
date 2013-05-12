@@ -41,7 +41,7 @@
 
 // Vmeas = (1000K/95K)*ADC_Count * 2048/256 = (8/95)*ADC_Count
 // Fixed Voltage Reference: 2048 => 8mV/step
-#define VMIN            10*(95/8)           //10 Volts : 120 => Vstorage = 10V - 144 => Vstorage = 12V
+#define VMIN            8*(95/8)           //10 Volts : 120 => Vstorage = 10V - 144 => Vstorage = 12V
 //#define VCHARGE_STOP     9*(95/8)           //9 Volts
 #define VCHARGE_START     11*(95/8)         // 11 Volts
 //#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
@@ -91,7 +91,7 @@ uint8_t sleep_count;
 unsigned int value;
 int16_t timelapse_count = 0;
 unsigned int charge_time;   // int16_t
-unsigned int charge_pulse = 100; //era 50 100; // pulse length in ms
+unsigned int charge_pulse = 50; //era 50 100; // pulse length in ms
 unsigned int dac_value = 26; //era 25
 
 uint8_t values[2] = {0x00, 0x00};
@@ -455,7 +455,8 @@ int main(int argc, char** argv) {
         //temp = values[0]*values[0]-values[1]*values[1];
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
-        tx_buf[7] = adcReadVsupercap();
+        //tx_buf[7] = adcReadVsupercap();
+        tx_buf[7] = charge_pulse;
 
 
         //PORTCbits.RC0=1;
@@ -488,7 +489,18 @@ int main(int argc, char** argv) {
         num_sleep = 0;
         while(num_sleep++ < sleep_count) {
             printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
-            sleep();
+            if (charge_pulse >= 15000) {// Pulse length is 15s => VSUPERCAP is approaching to 3.3V
+                                        // so SUPERCAP is at VDD voltage <=> MOS always ON
+
+                // Il supercondensatore è collegato permanentemente in parallelo
+                // a VDD
+                
+                DACCON0 = 0x00;         // DAC disabled
+                PORTAbits.RA2=0;        // and OUTPUT = Low => MOS ON
+                SLEEP();
+            }
+            else
+                sleep();
             //printf("Sleep result: %d\r\n", energy_after_pulse);
             //SLEEP();
         }
@@ -507,10 +519,10 @@ void sleep(void) {
     if (value > VCHARGE_START && charge_pulse > 0 && !SKIP_MEASURE ) {
 
         //PORTBbits.RB4=0;
-        DACCON1 = 0; //21;           // Preprogrammed
-        DACCON0 = 0xA0;         // DAC Enabled
+        DACCON1 = 0; //21;                      // Preprogrammed
+        DACCON0 = 0xA0;                         // DAC Enabled
         T1CONbits.TMR1ON=0;
-        charge_time = 0 - (charge_pulse<<2);    //50ms*4
+        charge_time = 0 - (charge_pulse<<2);    //50ms*4 TMR1 è incrementato di 4096 count/s => 4.096 count/ms
         TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
         TMR1L = (uint8_t)((charge_time) & 0xFF);
         T1CONbits.TMR1ON=1;
@@ -532,6 +544,14 @@ void sleep(void) {
         //new_value = 121;
         values[0] = value;
         values[1] = new_value;
+
+        if (new_value > VMIN)
+            if (charge_pulse < 15000)
+                charge_pulse++;    // + 1ms
+        else
+            if (charge_pulse > 0)
+                charge_pulse--;   // or -1ms
+
         //???return (value*value - new_value*new_value);
     }
     else {

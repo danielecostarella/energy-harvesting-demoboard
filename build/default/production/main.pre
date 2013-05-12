@@ -2541,7 +2541,7 @@ uint8_t sleep_count;
 unsigned int value;
 int16_t timelapse_count = 0;
 unsigned int charge_time;
-unsigned int charge_pulse = 100;
+unsigned int charge_pulse = 50;
 unsigned int dac_value = 26;
 
 uint8_t values[2] = {0x00, 0x00};
@@ -2752,7 +2752,7 @@ asm("sleep");
 
 
 value = adcReadVcap();
-while (value < 10*(95/8) && !PORTDbits.RD5) {
+while (value < 8*(95/8) && !PORTDbits.RD5) {
 asm("sleep");
 value = adcReadVcap();
 printf("Vstorage too low: %d\r\n", value);
@@ -2785,12 +2785,13 @@ temp += (values[0] - values[1])*(values[0]+values[1]);
 
 tx_buf[5] = (uint8_t)(temp & 0xFF);
 tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
-tx_buf[7] = adcReadVsupercap();
+
+tx_buf[7] = charge_pulse;
 
 
 
 
-if (tx_buf[1]> 10*(95/8) || PORTDbits.RD5) {
+if (tx_buf[1]> 8*(95/8) || PORTDbits.RD5) {
 
 Send_Packet(0xB0,tx_buf,8);
 temp = 0;
@@ -2798,7 +2799,7 @@ temp = 0;
 else
 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 
-# 477
+# 478
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2813,6 +2814,14 @@ printf("Sleep counter = %d\r\n", sleep_counter);
 num_sleep = 0;
 while(num_sleep++ < sleep_count) {
 printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
+if (charge_pulse >= 15000) {
+
+# 498
+DACCON0 = 0x00;
+PORTAbits.RA2=0;
+asm("sleep");
+}
+else
 sleep();
 
 
@@ -2857,6 +2866,14 @@ asm("sleep");
 
 values[0] = value;
 values[1] = new_value;
+
+if (new_value > 8*(95/8))
+if (charge_pulse < 15000)
+charge_pulse++;
+else
+if (charge_pulse > 0)
+charge_pulse--;
+
 
 }
 else {
@@ -2917,7 +2934,7 @@ ADCON0bits.ADON=0;
 return value;
 }
 
-# 599
+# 619
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2959,7 +2976,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 644
+# 664
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -3014,13 +3031,13 @@ putch(c = getch());
 return c;
 }
 
-# 704
+# 724
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 720
+# 740
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3061,7 +3078,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 769
+# 789
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3106,7 +3123,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 818
+# 838
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
