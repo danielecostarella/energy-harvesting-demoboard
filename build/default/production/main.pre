@@ -2501,6 +2501,8 @@ void rfm70setPowerdownMode(uint8_t value);
 #pragma config MCLRE = ON
 #pragma config CP = OFF
 
+#pragma config BOREN = 0
+
 
 # 34
 #pragma config PLLEN = ON
@@ -2859,12 +2861,14 @@ asm("sleep");
 values[0] = value;
 values[1] = new_value;
 
-if (new_value > 8*(95/8))
+if (new_value > 8*(95/8)) {
 if (charge_pulse < 15000)
 charge_pulse++;
-else
+}
+else {
 if (charge_pulse > 0)
 charge_pulse--;
+}
 
 
 }
@@ -2926,7 +2930,7 @@ ADCON0bits.ADON=0;
 return value;
 }
 
-# 608
+# 610
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2968,7 +2972,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 653
+# 655
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -3023,13 +3027,13 @@ putch(c = getch());
 return c;
 }
 
-# 713
+# 715
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 729
+# 731
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3070,7 +3074,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 778
+# 780
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3115,7 +3119,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 827
+# 829
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

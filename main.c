@@ -20,7 +20,7 @@
 #pragma config MCLRE = ON              // RE3/MCLR pin function select bit (RE3/MCLR pin function is MCLR)
 #pragma config CP = OFF                // Code Protection bit (Program memory code protection is disabled)
 //#pragma config CP = OFF              // Data Code Protection bit (Data memory code protection is disabled)
-//#pragma config BOREN = 0//SBODEN     // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
+#pragma config BOREN = 0//SBODEN     // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
 
 //new
 //#pragma config BOREN = 2    // 10 = BOR enabled during operation and disabled in Sleep
@@ -508,7 +508,7 @@ void sleep(void) {
     if (value > VCHARGE_START && charge_pulse > 0 && !SKIP_MEASURE ) {
 
         //PORTBbits.RB4=0;
-        DACCON1 = 0; //21;                      // Preprogrammed
+        DACCON1 = 0; //0; //21;                      // Preprogrammed
         DACCON0 = 0xA0;                         // DAC Enabled
         T1CONbits.TMR1ON=0;
         charge_time = 0 - (charge_pulse<<2);    //50ms*4 TMR1 è incrementato di 4096 count/s => 4.096 count/ms
@@ -534,12 +534,14 @@ void sleep(void) {
         values[0] = value;
         values[1] = new_value;
 
-        if (new_value > VMIN)
+        if (new_value > VMIN) {
             if (charge_pulse < 15000)
                 charge_pulse++;    // + 1ms
-        else
+            }
+        else {
             if (charge_pulse > 0)
                 charge_pulse--;   // or -1ms
+        }
 
         //???return (value*value - new_value*new_value);
     }
