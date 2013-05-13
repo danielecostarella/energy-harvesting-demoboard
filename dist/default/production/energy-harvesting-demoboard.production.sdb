@@ -303,7 +303,7 @@
 `uc 1 CPSA7 1 0 :1:2 
 ]
 [u S619 . 1 `S605 1 . 1 0 `S610 1 . 1 0 `S615 1 . 1 0 ]
-"3399
+"3345
 [s S680 . 1 `uc 1 ADON 1 0 :1:0 
 `uc 1 GO_nDONE 1 0 :1:1 
 `uc 1 CHS 1 0 :4:2 
@@ -551,35 +551,35 @@
 [v _ISR `II(v  1 e 0 0 ]
 "143
 [v _main `(i  1 e 2 0 ]
-"514
+"503
 [v _sleep `(v  1 e 0 0 ]
-"570
+"559
 [v _adcReadTemp `(uc  1 e 1 0 ]
-"585
+"574
 [v _adcReadVcap `(uc  1 e 1 0 ]
-"600
+"589
 [v _adcReadVsupercap `(uc  1 e 1 0 ]
-"619
+"608
 [v _adcRead `(uc  1 e 1 0 ]
-"653
+"642
 [v _uartInit `(v  1 e 0 0 ]
-"675
+"664
 [v _spiInit `(v  1 e 0 0 ]
-"687
+"676
 [v _adcInit `(v  1 e 0 0 ]
-"698
+"687
 [v _putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
 [v i1_putch `(v  1 e 0 0 ]
-"704
+"693
 [v _getch `(uc  1 e 1 0 ]
-"712
+"701
 [v _getche `(uc  1 e 1 0 ]
-"725
+"714
 [v _power_on_delay `(v  1 e 0 0 ]
-"741
+"730
 [v _Send_Packet `(v  1 e 0 0 ]
-"790
+"779
 [v _Receive_Packet `(v  1 e 0 0 ]
 "78 rfm70.c
 [v _SPI_RW `(uc  1 e 1 0 ]
@@ -1034,22 +1034,22 @@
 "143
 [v main@argc `i  1 p 2 8 ]
 [v main@argv `**uc  1 p 2 10 ]
-"511
+"500
 } 0
-"675
+"664
 [v _spiInit `(v  1 e 0 0 ]
-{
-"684
-} 0
-"653
-[v _uartInit `(v  1 e 0 0 ]
 {
 "673
 } 0
-"687
+"642
+[v _uartInit `(v  1 e 0 0 ]
+{
+"662
+} 0
+"676
 [v _adcInit `(v  1 e 0 0 ]
 {
-"694
+"683
 } 0
 "400 rfm70.c
 [v _rfm70setPowerdownMode `(v  1 e 0 0 ]
@@ -1071,25 +1071,25 @@
 [v RFM70_Initialize@i `uc  1 a 1 48 ]
 "359
 } 0
-"570 main.c
+"559 main.c
 [v _adcReadTemp `(uc  1 e 1 0 ]
 {
-"571
+"560
 [v adcReadTemp@value `uc  1 a 1 22 ]
-"583
+"572
 } 0
-"741
+"730
 [v _Send_Packet `(v  1 e 0 0 ]
 {
 [v Send_Packet@type `uc  1 a 1 wreg ]
-"742
+"731
 [v Send_Packet@i `uc  1 a 1 7 ]
 [v Send_Packet@fifo_sta `uc  1 a 1 6 ]
-"741
+"730
 [v Send_Packet@type `uc  1 a 1 wreg ]
 [v Send_Packet@pbuf `*.0uc  1 p 1 0 ]
 [v Send_Packet@len `uc  1 p 1 1 ]
-"778
+"767
 } 0
 "465 /Applications/microchip/xc8/v1.12/sources/doprnt.c
 [v _printf `(i  1 e 2 0 ]
@@ -1148,26 +1148,26 @@
 [v SwitchToTxMode@value `uc  1 a 1 27 ]
 "203
 } 0
-"698 main.c
+"687 main.c
 [v _putch `(v  1 e 0 0 ]
 {
 [v putch@c `uc  1 a 1 wreg ]
 [v putch@c `uc  1 a 1 wreg ]
-"701
+"690
 } 0
-"514
+"503
 [v _sleep `(v  1 e 0 0 ]
 {
-"515
+"504
 [v sleep@new_value `uc  1 a 1 25 ]
-"567
+"556
 } 0
-"585
+"574
 [v _adcReadVcap `(uc  1 e 1 0 ]
 {
-"586
+"575
 [v adcReadVcap@value `uc  1 a 1 22 ]
-"598
+"587
 } 0
 "218 rfm70.c
 [v _SwitchCFG `(v  1 e 0 0 ]
@@ -1270,10 +1270,10 @@
 [v i1___lwdiv@dividend `ui  1 p 2 2 ]
 "26
 } 0
-"698 main.c
+"687 main.c
 [v i1_putch `(v  1 e 0 0 ]
 {
 [v i1putch@c `uc  1 a 1 wreg ]
 [v i1putch@c `uc  1 a 1 wreg ]
-"701
+"690
 } 0

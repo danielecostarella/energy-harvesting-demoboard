@@ -489,18 +489,7 @@ int main(int argc, char** argv) {
         num_sleep = 0;
         while(num_sleep++ < sleep_count) {
             printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
-            if (charge_pulse >= 15000) {// Pulse length is 15s => VSUPERCAP is approaching to 3.3V
-                                        // so SUPERCAP is at VDD voltage <=> MOS always ON
-
-                // Il supercondensatore è collegato permanentemente in parallelo
-                // a VDD
-                
-                DACCON0 = 0x00;         // DAC disabled
-                PORTAbits.RA2=0;        // and OUTPUT = Low => MOS ON
-                SLEEP();
-            }
-            else
-                sleep();
+            sleep();
             //printf("Sleep result: %d\r\n", energy_after_pulse);
             //SLEEP();
         }
