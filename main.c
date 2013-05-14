@@ -91,7 +91,9 @@ uint8_t sleep_count;
 unsigned int value;
 int16_t timelapse_count = 0;
 unsigned int charge_time;   // int16_t
-unsigned int charge_pulse = 50; //era 50 100; // pulse length in ms
+unsigned int charge_pulse; //= 10; //era 50 100; // pulse length in ms
+float charge_pulse_float = 10; //charge_pulse = (int)charge_pulse_float
+
 unsigned int dac_value = 26; //era 25
 
 uint8_t values[2] = {0x00, 0x00};
@@ -456,7 +458,7 @@ int main(int argc, char** argv) {
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
         //tx_buf[7] = adcReadVsupercap();
-        tx_buf[7] = charge_pulse;
+        tx_buf[7] = (int)charge_pulse_float;
 
 
         //PORTCbits.RC0=1;
@@ -503,6 +505,7 @@ int main(int argc, char** argv) {
 void sleep(void) {
     uint8_t new_value;
     value = adcReadVcap();
+    charge_pulse = (int)(charge_pulse_float);
     //value = 135;
     //charge_pulse = f(value);
     if (value > VCHARGE_START && charge_pulse > 0 && !SKIP_MEASURE ) {
@@ -535,6 +538,15 @@ void sleep(void) {
         values[1] = new_value;
 
         if (new_value > VMIN) {
+            if (charge_pulse_float < 15000)
+                charge_pulse_float *= 1.05;     // +5% ms
+        }
+        else {
+            if (charge_pulse_float > 0)
+                charge_pulse_float /= 1.05;     // -5% ms
+        }
+        /*
+        if (new_value > VMIN) {
             if (charge_pulse < 15000)
                 charge_pulse++;    // + 1ms
             }
@@ -542,6 +554,7 @@ void sleep(void) {
             if (charge_pulse > 0)
                 charge_pulse--;   // or -1ms
         }
+         */
 
         //???return (value*value - new_value*new_value);
     }
