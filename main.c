@@ -42,6 +42,7 @@
 // Vmeas = (1000K/95K)*ADC_Count * 2048/256 = (8/95)*ADC_Count
 // Fixed Voltage Reference: 2048 => 8mV/step
 #define VMIN            8*(95/8)           //10 Volts : 120 => Vstorage = 10V - 144 => Vstorage = 12V
+#define VCAP_MIN        (2.2*(68/248))/0.004    // VCAP = 2.2 partitore: 68/248; VRES = 1024/256 = 4mV
 //#define VCHARGE_STOP     9*(95/8)           //9 Volts
 #define VCHARGE_START     11*(95/8)         // 11 Volts
 //#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
@@ -76,7 +77,7 @@ uint8_t adcReadVsupercap(void);
 //uint8_t tx_buf[17]={0x00,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
           //          0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x79};
 //uint8_t tx_buf[MAX_PACKET_LEN];
-uint8_t tx_buf[8]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA, 0xAA};
+uint8_t tx_buf[10]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0x00};
 uint8_t rx_buf[MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
@@ -84,6 +85,7 @@ extern const unsigned long Bank1_Reg0_13[];
 uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
+static bit scap_on = 0; //scap_on = 1 => power supply not present
 uint8_t jumper_stat;
 uint8_t sleep_counter;
 uint8_t sleep_count;
@@ -114,7 +116,16 @@ void interrupt ISR(void)
       if(tmr1Counter == tmr1Target){
         printf("Eccomi nell'ISR!\r\n");
         //jumper_stat = PORTD>>4; // read new jumper status
-        jumper_stat = PORTD>>5 & 0x07; //read current jumper status
+        /*
+         *  ________ _____ _____ _____ _____ _____ _________ _________ ________
+         * | supply |     |     |     |     |     |  sleep  | sleep   |  skip  |
+         * | status |  x  |  x  |  x  |  x  |  x  | counter | counter |  meas  |
+         * |        |     |     |     |     |     |    1    |    0    |        |
+         * |________|_____|_____|_____|_____|_____|_________|_________|________|
+         *
+         */
+        jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) ; //read current jumper status
+                                        // jumper_stat.7 = supply status
         sleep_counter = PORTD>>6 & 0x03;       // read sleep count bits
 
         switch (sleep_counter) {
@@ -145,11 +156,11 @@ void interrupt ISR(void)
 int main(int argc, char** argv) {
     long int i=0;
 
-    uint8_t buffer[5];
+    //uint8_t buffer[5];
     uint8_t temp_tx_buf[32];
     //int16_t timelapse_count = 0;
     uint8_t num_sleep;
-    uint16_t energy_after_pulse;
+    //uint16_t energy_after_pulse;
     unsigned int temp=0;
     //uint8_t vsupercap = 0;
 
@@ -176,6 +187,11 @@ int main(int argc, char** argv) {
     //adc init
     TRISEbits.TRISE2=1;     // ADC in
     ANSELEbits.ANSE2=1;     // ADC pin as analog
+
+    // supercap meas
+    TRISDbits.TRISD4=0;
+    ANSELDbits.ANSD4=0;
+    PORTDbits.RD4=0;        // era 1
 
     // dac init
     TRISAbits.TRISA2=0;     // RA2 = DAC voltage output
@@ -288,9 +304,9 @@ int main(int argc, char** argv) {
     PORTBbits.RB4=1;
     PORTBbits.RB5=0;
 
-    TRISDbits.TRISD4=0;
-    ANSELDbits.ANSD4=0;
-    PORTDbits.RD4=0;
+    //TRISDbits.TRISD4=0;
+    //ANSELDbits.ANSD4=0;
+    //PORTDbits.RD4=0;
 
     // Vsupercap measure
     TRISEbits.TRISE1=1;
@@ -336,10 +352,10 @@ int main(int argc, char** argv) {
 
     //printf("ADC value: %d\r\n", adcRead(7));
 
-    value = adcReadVcap();
-    while (value < VMIN && !SKIP_MEASURE) {
+    //value = adcReadVcap();
+    while (adcReadVcap() < VMIN && !SKIP_MEASURE && adcReadVsupercap() < VCAP_MIN ) {
         SLEEP();
-        value = adcReadVcap();
+        //value = adcReadVcap();
         printf("Vstorage too low: %d\r\n", value);
     }
     printf("Vstorage OK or measure skipped: %d\r\n", value);
@@ -442,13 +458,13 @@ int main(int argc, char** argv) {
     while(1) {
         rfm70setPowerdownMode(1);
 
-        for (i=0;i<2;i++) {
-            temp_tx_buf[i]=tx_buf[i];
-        }
+        //for (i=0;i<2;i++) {
+        //    temp_tx_buf[i]=tx_buf[i];
+        //}
         //tx_buf[0] = adcRead(5,1);
 
         //value = adcReadTemp();
-        tx_buf[0] = adcReadTemp();
+        //tx_buf[0] = adcReadTemp(); posticipata
         tx_buf[1] = adcReadVcap();
         tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
         tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
@@ -457,19 +473,34 @@ int main(int argc, char** argv) {
         //temp = values[0]*values[0]-values[1]*values[1];
         tx_buf[5] = (uint8_t)(temp & 0xFF);
         tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
-        //tx_buf[7] = adcReadVsupercap();
-        tx_buf[7] = (int)charge_pulse_float;
+        tx_buf[7] = adcReadVsupercap();
+        tx_buf[8] = (int)charge_pulse_float;
+        tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
 
 
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
-        if (tx_buf[1]> VMIN || SKIP_MEASURE) {
+        if (tx_buf[1] > VMIN || SKIP_MEASURE) {
             //rfm70setPowerdownMode(1);
-            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,8);	// transmit
+            tx_buf[0] = adcReadTemp();
+            Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
             temp = 0;
+            jumper_stat |= 0x80;                // power supply is OK
         }
-        else
-            printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
+        else {
+            if (tx_buf[7] > VCAP_MIN) {
+                PORTAbits.RA2=0;        // MOS enabled
+                tx_buf[0] = adcReadTemp();
+                Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit 
+                PORTAbits.RA2=1;        // MOS OFF
+                charge_pulse_float = 10;        // re-init charge pulse length
+                jumper_stat &= 0x7F;            // power supply is not present
+            }
+            else {
+                printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
+            }
+
+        }
         //tx_buf[0] = '\0';	// clear tx_buf
         //tx_buf[0]++;
 
@@ -531,14 +562,16 @@ void sleep(void) {
         TMR1L = (uint8_t)((charge_time) & 0xFF);
         T1CONbits.TMR1ON=1;
         SLEEP();    // SLEEP 15s - 50ms
-        
+
+        if (new_value > value)
+            new_value = value; // errore di lettura
         
         //new_value = 121;
         values[0] = value;
         values[1] = new_value;
 
         if (new_value > VMIN) {
-            if (charge_pulse_float < 15000)
+            if (charge_pulse_float < 10000)
                 charge_pulse_float *= 1.05;     // +5% ms
         }
         else {
@@ -570,6 +603,30 @@ void sleep(void) {
     }
 }
 
+/*
+void makePacket(scap_on) {
+    unsigned int temp=0;
+    if (scap_on) {
+        PORTAbits.RA2=0;        // MOS enabled
+        tx_buf[0] = adcReadTemp();
+        PORTAbits.RA2=1;        // MOS off
+    }
+    else
+        tx_buf[0] = adcReadTemp();
+    //tx_buf[0] = adcReadTemp();
+    tx_buf[1] = adcReadVcap();
+    tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
+    tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
+    tx_buf[4] = jumper_stat;
+    temp += (values[0] - values[1])*(values[0]+values[1]);
+    //temp = values[0]*values[0]-values[1]*values[1];
+    tx_buf[5] = (uint8_t)(temp & 0xFF);
+    tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
+    tx_buf[7] = adcReadVsupercap();
+    tx_buf[8] = (int)charge_pulse_float;
+    tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
+}
+*/
 
 uint8_t adcReadTemp(void) {
     uint8_t value;
@@ -604,15 +661,15 @@ uint8_t adcReadVcap(void) {
 uint8_t adcReadVsupercap(void) {
     uint8_t value;
     ADCON0bits.CHS=6;
-    FVRCONbits.ADFVR=2;
+    FVRCONbits.ADFVR=1;
     ADCON0bits.ADON=1;
-    //PORTDbits.RD3=1;        // Select Vstorage measurement pin
+    PORTDbits.RD4=1;        // Select V supercap measurement pin
     WAIT_MS(1);
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
     value = ADRES;
     ADCON0bits.ADON=0;
-    //PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
+    PORTDbits.RD4=0;            // Turn off switch for V supercap measure
     return value;
 }
 
