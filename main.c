@@ -86,11 +86,12 @@ uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
 static bit scap_on = 0; //scap_on = 1 => power supply not present
-uint8_t jumper_stat;
+uint8_t jumper_stat=0;
 uint8_t sleep_counter;
 uint8_t sleep_count;
 
-unsigned int value;
+uint8_t value = 0;
+//unsigned int value;
 int16_t timelapse_count = 0;
 unsigned int charge_time;   // int16_t
 unsigned int charge_pulse; //= 10; //era 50 100; // pulse length in ms
@@ -157,7 +158,7 @@ int main(int argc, char** argv) {
     long int i=0;
 
     //uint8_t buffer[5];
-    uint8_t temp_tx_buf[32];
+    //uint8_t temp_tx_buf[32];
     //int16_t timelapse_count = 0;
     uint8_t num_sleep;
     //uint16_t energy_after_pulse;
@@ -477,24 +478,34 @@ int main(int argc, char** argv) {
         tx_buf[8] = (int)charge_pulse_float;
         tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
 
-
+        // test if Vin is rising
         //PORTCbits.RC0=1;
         //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
         if (tx_buf[1] > VMIN || SKIP_MEASURE) {
             //rfm70setPowerdownMode(1);
             tx_buf[0] = adcReadTemp();
+            //if ((jumper_stat & 0x80) == 0) {
+            //    // c'è stata una transizione 0->1 (problema nella salita con intervallo impostato a 15s)
+            //    SLEEP();
+            //    jumper_stat |= 0x40;
+            //}
+            jumper_stat |= 0x80;                // power supply is OK
+            tx_buf[4] = jumper_stat;
             Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
             temp = 0;
-            jumper_stat |= 0x80;                // power supply is OK
         }
-        else {
-            if (tx_buf[7] > VCAP_MIN) {
+        else { // Vin<VMIN
+            //SLEEP();
+
+            if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value)) { // vmin sale o scende?
                 PORTAbits.RA2=0;        // MOS enabled
                 tx_buf[0] = adcReadTemp();
+                tx_buf[7] = adcReadVsupercap();
+                jumper_stat &= 0x7F;            // power supply is not present
+                tx_buf[4] = jumper_stat;
                 Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit 
                 PORTAbits.RA2=1;        // MOS OFF
                 charge_pulse_float = 10;        // re-init charge pulse length
-                jumper_stat &= 0x7F;            // power supply is not present
             }
             else {
                 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
@@ -517,6 +528,7 @@ int main(int argc, char** argv) {
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         //WAIT_MS(100);
+        value = adcReadVcap();
         printf("Sleep counter = %d\r\n", sleep_counter);
 
         num_sleep = 0;
@@ -632,6 +644,7 @@ uint8_t adcReadTemp(void) {
     uint8_t value;
     ADCON0bits.CHS=7;
     FVRCONbits.ADFVR=1;
+    while(!FVRCONbits.FVRRDY);      // wait for a stable FVR
     ADCON0bits.ADON=1;
     PORTDbits.RD0=1;            // mcp9700a power up
     WAIT_MS(5);
@@ -662,6 +675,7 @@ uint8_t adcReadVsupercap(void) {
     uint8_t value;
     ADCON0bits.CHS=6;
     FVRCONbits.ADFVR=1;
+    while(!FVRCONbits.FVRRDY);      // wait for a stable FVR
     ADCON0bits.ADON=1;
     PORTDbits.RD4=1;        // Select V supercap measurement pin
     WAIT_MS(1);

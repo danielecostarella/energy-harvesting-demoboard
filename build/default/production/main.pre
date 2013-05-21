@@ -2537,11 +2537,12 @@ uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
 static bit scap_on = 0;
-uint8_t jumper_stat;
+uint8_t jumper_stat=0;
 uint8_t sleep_counter;
 uint8_t sleep_count;
 
-unsigned int value;
+uint8_t value = 0;
+
 int16_t timelapse_count = 0;
 unsigned int charge_time;
 unsigned int charge_pulse;
@@ -2557,14 +2558,14 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-# 113
+# 114
 TMR1H = 0x10;
 TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
 printf("Eccomi nell'ISR!\r\n");
 
-# 127
+# 128
 jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) ;
 
 sleep_counter = PORTD>>6 & 0x03;
@@ -2598,13 +2599,13 @@ int main(int argc, char** argv) {
 long int i=0;
 
 
-uint8_t temp_tx_buf[32];
+
 
 uint8_t num_sleep;
 
 unsigned int temp=0;
 
-# 171
+# 172
 OSCCONbits.IRCF=2;
 
 
@@ -2651,7 +2652,7 @@ PORTDbits.RD2=1;
 PORTCbits.RC3=0;
 PORTCbits.RC5=0;
 
-# 222
+# 223
 TRISDbits.TRISD0=0;
 ANSELDbits.ANSD0=0;
 TRISEbits.TRISE2=1;
@@ -2737,7 +2738,7 @@ PORTBbits.RB3=0;
 PORTBbits.RB4=1;
 PORTBbits.RB5=0;
 
-# 312
+# 313
 TRISEbits.TRISE1=1;
 ANSELEbits.ANSE1=1;
 PORTEbits.RE1=0;
@@ -2748,7 +2749,7 @@ spiInit();
 uartInit();
 adcInit();
 
-# 345
+# 346
 rfm70setPowerdownMode(0);
 
 sleep_counter = PORTD>>6 & 0x03;
@@ -2756,7 +2757,7 @@ printf("Sleep counter: %X\r\n", sleep_counter );
 
 asm("sleep");
 
-# 356
+# 357
 while (adcReadVcap() < 8*(95/8) && !PORTDbits.RD5 && adcReadVsupercap() < (2.2*(68/248))/0.004 ) {
 asm("sleep");
 
@@ -2767,15 +2768,15 @@ RFM70_Initialize();
 
 rfm70setPowerdownMode(0);
 
-# 398
+# 399
 asm("sleep");
 
-# 457
+# 458
 timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 468
+# 469
 tx_buf[1] = adcReadVcap();
 tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
 tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
@@ -2794,18 +2795,25 @@ tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
 if (tx_buf[1] > 8*(95/8) || PORTDbits.RD5) {
 
 tx_buf[0] = adcReadTemp();
+
+# 492
+jumper_stat |= 0x80;
+tx_buf[4] = jumper_stat;
 Send_Packet(0xB0,tx_buf,10);
 temp = 0;
-jumper_stat |= 0x80;
 }
 else {
-if (tx_buf[7] > (2.2*(68/248))/0.004) {
+
+
+if ((tx_buf[7] > (2.2*(68/248))/0.004) && (tx_buf[1] <= value)) {
 PORTAbits.RA2=0;
 tx_buf[0] = adcReadTemp();
+tx_buf[7] = adcReadVsupercap();
+jumper_stat &= 0x7F;
+tx_buf[4] = jumper_stat;
 Send_Packet(0xB0,tx_buf,10);
 PORTAbits.RA2=1;
 charge_pulse_float = 10;
-jumper_stat &= 0x7F;
 }
 else {
 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
@@ -2813,7 +2821,7 @@ printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 
 }
 
-# 511
+# 522
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2823,6 +2831,7 @@ TMR1H = 0x10;
 TMR1L = 0x00;
 T1CONbits.TMR1ON=1;
 
+value = adcReadVcap();
 printf("Sleep counter = %d\r\n", sleep_counter);
 
 num_sleep = 0;
@@ -2885,7 +2894,7 @@ if (charge_pulse_float > 0)
 charge_pulse_float /= 1.05;
 }
 
-# 593
+# 605
 }
 else {
 T1CONbits.TMR1ON=0;
@@ -2899,11 +2908,12 @@ values[1] = 0;
 }
 }
 
-# 631
+# 643
 uint8_t adcReadTemp(void) {
 uint8_t value;
 ADCON0bits.CHS=7;
 FVRCONbits.ADFVR=1;
+while(!FVRCONbits.FVRRDY);
 ADCON0bits.ADON=1;
 PORTDbits.RD0=1;
 _delay( 5 * ( 8000000L / 4000));
@@ -2934,6 +2944,7 @@ uint8_t adcReadVsupercap(void) {
 uint8_t value;
 ADCON0bits.CHS=6;
 FVRCONbits.ADFVR=1;
+while(!FVRCONbits.FVRRDY);
 ADCON0bits.ADON=1;
 PORTDbits.RD4=1;
 _delay( 1 * ( 8000000L / 4000));
@@ -2945,7 +2956,7 @@ PORTDbits.RD4=0;
 return value;
 }
 
-# 680
+# 694
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2987,7 +2998,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 725
+# 739
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -3042,13 +3053,13 @@ putch(c = getch());
 return c;
 }
 
-# 785
+# 799
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 801
+# 815
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3089,7 +3100,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 850
+# 864
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3134,7 +3145,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 899
+# 913
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
