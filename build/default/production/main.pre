@@ -2567,7 +2567,7 @@ if(tmr1Counter == tmr1Target){
 printf("Eccomi nell'ISR!\r\n");
 
 # 129
-jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) ;
+jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PORTBbits.RB0 * 64 ;
 
 sleep_counter = PORTD>>6 & 0x03;
 

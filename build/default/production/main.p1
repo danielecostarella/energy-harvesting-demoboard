@@ -9,6 +9,20 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _printf `(i ~T0 @X0 0 ev`*Cuc ]
 "713 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
 [v _PORTD `Vuc ~T0 @X0 0 e@8 ]
+[s S18 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S18 . RB0 RB1 RB2 RB3 RB4 RB5 RB6 RB7 ]
+[s S19 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S19 . AN12 AN10 AN8 AN9 AN11 AN13 ]
+[s S20 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S20 . CPSB8 CPSB9 CPSB10 CPSB11 CPSB12 CPSB13 CPSB14 CPSB15 ]
+[s S21 :3 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S21 . . CCP2 . T1G ]
+[s S22 :5 `uc 1 :1 `uc 1 ]
+[n S22 . . T3CKI ]
+[u S17 `S18 1 `S19 1 `S20 1 `S21 1 `S22 1 ]
+[n S17 . . . . . . ]
+"389
+[v _PORTBbits `VS17 ~T0 @X0 0 e@6 ]
 [p mainexit ]
 [s S88 :2 `uc 1 :1 `uc 1 :1 `uc 1 :2 `uc 1 ]
 [n S88 . . ICSS ICSL IRCF ]
@@ -146,20 +160,6 @@ Version 3.2 HI-TECH Software Intermediate Code
 [n S149 . . . ]
 "3539
 [v _ANSELBbits `VS149 ~T0 @X0 0 e@390 ]
-[s S18 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S18 . RB0 RB1 RB2 RB3 RB4 RB5 RB6 RB7 ]
-[s S19 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S19 . AN12 AN10 AN8 AN9 AN11 AN13 ]
-[s S20 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S20 . CPSB8 CPSB9 CPSB10 CPSB11 CPSB12 CPSB13 CPSB14 CPSB15 ]
-[s S21 :3 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S21 . . CCP2 . T1G ]
-[s S22 :5 `uc 1 :1 `uc 1 ]
-[n S22 . . T3CKI ]
-[u S17 `S18 1 `S19 1 `S20 1 `S21 1 `S22 1 ]
-[n S17 . . . . . . ]
-"389
-[v _PORTBbits `VS17 ~T0 @X0 0 e@6 ]
 [s S33 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
 [n S33 . RE0 RE1 RE2 RE3 ]
 [s S34 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
@@ -2174,9 +2174,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;main.c: 119: printf("Eccomi nell'ISR!\r\n");
 "119
 [e ( _printf :s 1C ]
-[; ;main.c: 129: jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) ;
+[; ;main.c: 129: jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PORTBbits.RB0 * 64 ;
 "129
-[e = _jumper_stat -> | & -> _jumper_stat `i -> 128 `i & >> -> _PORTD `i -> 5 `i -> 7 `i `uc ]
+[e = _jumper_stat -> | | & -> _jumper_stat `i -> 128 `i & >> -> _PORTD `i -> 5 `i -> 7 `i * -> . . _PORTBbits 0 0 `i -> 64 `i `uc ]
 [; ;main.c: 131: sleep_counter = PORTD>>6 & 0x03;
 "131
 [e = _sleep_counter -> & >> -> _PORTD `i -> 6 `i -> 3 `i `uc ]

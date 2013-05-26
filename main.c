@@ -121,12 +121,12 @@ void interrupt ISR(void)
         /*
          *  ________ _____ _____ _____ _____ _____ _________ _________ ________
          * | supply |     |     |     |     |     |  sleep  | sleep   |  skip  |
-         * | status |  x  |  x  |  x  |  x  |  x  | counter | counter |  meas  |
+         * | status |PGOOD|  x  |  x  |  x  |  x  | counter | counter |  meas  |
          * |        |     |     |     |     |     |    1    |    0    |        |
          * |________|_____|_____|_____|_____|_____|_________|_________|________|
          *
          */
-        jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) ; //read current jumper status
+        jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PGOOD * 64 ; //read current jumper status
                                         // jumper_stat.7 = supply status
         sleep_counter = PORTD>>6 & 0x03;       // read sleep count bits
 
