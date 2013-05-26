@@ -2551,6 +2551,7 @@ float charge_pulse_float = 10;
 unsigned int dac_value = 26;
 
 uint8_t values[2] = {0x00, 0x00};
+unsigned int energy=0;
 
 void interrupt ISR(void)
 {
@@ -2558,14 +2559,14 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-# 114
+# 115
 TMR1H = 0x10;
 TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
 printf("Eccomi nell'ISR!\r\n");
 
-# 128
+# 129
 jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) ;
 
 sleep_counter = PORTD>>6 & 0x03;
@@ -2603,9 +2604,7 @@ long int i=0;
 
 uint8_t num_sleep;
 
-unsigned int temp=0;
-
-# 172
+# 173
 OSCCONbits.IRCF=2;
 
 
@@ -2652,7 +2651,7 @@ PORTDbits.RD2=1;
 PORTCbits.RC3=0;
 PORTCbits.RC5=0;
 
-# 223
+# 224
 TRISDbits.TRISD0=0;
 ANSELDbits.ANSD0=0;
 TRISEbits.TRISE2=1;
@@ -2694,6 +2693,11 @@ T1CONbits.T1OSCEN=1;
 T1CONbits.TMR1ON=1;
 
 
+TRISBbits.TRISB0=1;
+ANSELBbits.ANSB0=0;
+
+
+
 TRISAbits.TRISA0=0;
 TRISAbits.TRISA1=0;
 
@@ -2719,26 +2723,26 @@ PORTAbits.RA5=0;
 PORTAbits.RA6=0;
 PORTAbits.RA7=0;
 
-TRISBbits.TRISB0=0;
+
 TRISBbits.TRISB1=0;
 TRISBbits.TRISB2=0;
 TRISBbits.TRISB3=0;
 TRISBbits.TRISB4=0;
 TRISBbits.TRISB5=0;
-ANSELBbits.ANSB0=0;
+
 ANSELBbits.ANSB1=0;
 ANSELBbits.ANSB2=0;
 ANSELBbits.ANSB3=0;
 ANSELBbits.ANSB4=0;
 ANSELBbits.ANSB5=0;
-PORTBbits.RB0=0;
+
 PORTBbits.RB1=0;
 PORTBbits.RB2=0;
 PORTBbits.RB3=0;
 PORTBbits.RB4=1;
 PORTBbits.RB5=0;
 
-# 313
+# 319
 TRISEbits.TRISE1=1;
 ANSELEbits.ANSE1=1;
 PORTEbits.RE1=0;
@@ -2749,7 +2753,7 @@ spiInit();
 uartInit();
 adcInit();
 
-# 346
+# 352
 rfm70setPowerdownMode(0);
 
 sleep_counter = PORTD>>6 & 0x03;
@@ -2757,7 +2761,7 @@ printf("Sleep counter: %X\r\n", sleep_counter );
 
 asm("sleep");
 
-# 357
+# 363
 while (adcReadVcap() < 8*(95/8) && !PORTDbits.RD5 && adcReadVsupercap() < (2.2*(68/248))/0.004 ) {
 asm("sleep");
 
@@ -2768,23 +2772,23 @@ RFM70_Initialize();
 
 rfm70setPowerdownMode(0);
 
-# 399
+# 405
 asm("sleep");
 
-# 458
+# 464
 timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
 
-# 469
+# 475
 tx_buf[1] = adcReadVcap();
 tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
 tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
 tx_buf[4] = jumper_stat;
-temp += (values[0] - values[1])*(values[0]+values[1]);
 
-tx_buf[5] = (uint8_t)(temp & 0xFF);
-tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
+
+tx_buf[5] = (uint8_t)(energy & 0xFF);
+tx_buf[6] = (uint8_t)((energy >> 8) & 0xFF);
 tx_buf[7] = adcReadVsupercap();
 tx_buf[8] = (int)charge_pulse_float;
 tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
@@ -2796,16 +2800,16 @@ if (tx_buf[1] > 8*(95/8) || PORTDbits.RD5) {
 
 tx_buf[0] = adcReadTemp();
 
-# 492
+# 498
 jumper_stat |= 0x80;
 tx_buf[4] = jumper_stat;
 Send_Packet(0xB0,tx_buf,10);
-temp = 0;
+energy = 0;
 }
 else {
 
 
-if ((tx_buf[7] > (2.2*(68/248))/0.004) && (tx_buf[1] <= value)) {
+if ((tx_buf[7] > (2.2*(68/248))/0.004) && (tx_buf[1] <= value) && !PORTBbits.RB0) {
 PORTAbits.RA2=0;
 tx_buf[0] = adcReadTemp();
 tx_buf[7] = adcReadVsupercap();
@@ -2815,13 +2819,20 @@ Send_Packet(0xB0,tx_buf,10);
 PORTAbits.RA2=1;
 charge_pulse_float = 10;
 }
+else if ((tx_buf[7] > (2.2*(68/248))/0.004) && (tx_buf[1] <= value) && PORTBbits.RB0) {
+jumper_stat &= 0x7F;
+tx_buf[4] = jumper_stat;
+Send_Packet(0xB0,tx_buf,10);
+charge_pulse_float = 10;
+}
+
 else {
 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
 }
 
 }
 
-# 522
+# 535
 PORTCbits.RC2=0;
 rfm70setPowerdownMode(0);
 T1CONbits.TMR1ON=0;
@@ -2838,6 +2849,7 @@ num_sleep = 0;
 while(num_sleep++ < sleep_count) {
 printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
 sleep();
+energy += (values[0] - values[1])*(values[0]+values[1])/sleep_count;
 
 
 }
@@ -2894,7 +2906,7 @@ if (charge_pulse_float > 0)
 charge_pulse_float /= 1.05;
 }
 
-# 605
+# 619
 }
 else {
 T1CONbits.TMR1ON=0;
@@ -2908,7 +2920,7 @@ values[1] = 0;
 }
 }
 
-# 643
+# 657
 uint8_t adcReadTemp(void) {
 uint8_t value;
 ADCON0bits.CHS=7;
@@ -2916,7 +2928,7 @@ FVRCONbits.ADFVR=1;
 while(!FVRCONbits.FVRRDY);
 ADCON0bits.ADON=1;
 PORTDbits.RD0=1;
-_delay( 5 * ( 8000000L / 4000));
+_delay( 1 * ( 8000000L / 4000));
 ADCON0bits.GO_nDONE=1;
 while(ADCON0bits.GO_nDONE);
 value = ADRES;
@@ -2956,7 +2968,7 @@ PORTDbits.RD4=0;
 return value;
 }
 
-# 694
+# 708
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -2998,7 +3010,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 739
+# 753
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -3053,13 +3065,13 @@ putch(c = getch());
 return c;
 }
 
-# 799
+# 813
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 815
+# 829
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3100,7 +3112,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 864
+# 878
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3145,7 +3157,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 913
+# 927
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';

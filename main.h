@@ -23,6 +23,8 @@
 
 #define SKIP_MEASURE    PORTDbits.RD5
 
+#define PGOOD           PORTBbits.RB0
+
 
 /* MCU Configuration */
 // da incollare

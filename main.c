@@ -100,6 +100,7 @@ float charge_pulse_float = 10; //charge_pulse = (int)charge_pulse_float
 unsigned int dac_value = 26; //era 25
 
 uint8_t values[2] = {0x00, 0x00};
+unsigned int energy=0; // energy
 
 void interrupt ISR(void)
    {
@@ -162,7 +163,7 @@ int main(int argc, char** argv) {
     //int16_t timelapse_count = 0;
     uint8_t num_sleep;
     //uint16_t energy_after_pulse;
-    unsigned int temp=0;
+    
     //uint8_t vsupercap = 0;
 
 
@@ -260,6 +261,11 @@ int main(int argc, char** argv) {
     T1CONbits.T1OSCEN=1;    //era 0 for disabled
     T1CONbits.TMR1ON=1;
 
+    // pgood
+    TRISBbits.TRISB0=1;
+    ANSELBbits.ANSB0=0;
+
+
     // not used pins
     TRISAbits.TRISA0=0; //per PIC16LF707
     TRISAbits.TRISA1=0;
@@ -286,19 +292,19 @@ int main(int argc, char** argv) {
     PORTAbits.RA6=0;
     PORTAbits.RA7=0;
 
-    TRISBbits.TRISB0=0;
+    //TRISBbits.TRISB0=0;
     TRISBbits.TRISB1=0;
     TRISBbits.TRISB2=0;
     TRISBbits.TRISB3=0;
     TRISBbits.TRISB4=0;
     TRISBbits.TRISB5=0;
-    ANSELBbits.ANSB0=0;
+    //ANSELBbits.ANSB0=0;
     ANSELBbits.ANSB1=0;
     ANSELBbits.ANSB2=0;
     ANSELBbits.ANSB3=0;
     ANSELBbits.ANSB4=0;
     ANSELBbits.ANSB5=0;
-    PORTBbits.RB0=0;
+    //PORTBbits.RB0=0;
     PORTBbits.RB1=0;
     PORTBbits.RB2=0;
     PORTBbits.RB3=0;
@@ -470,10 +476,10 @@ int main(int argc, char** argv) {
         tx_buf[2] = (uint8_t)((timelapse_count) & 0xFF);
         tx_buf[3] = (uint8_t)(((timelapse_count) >> 8) & 0xFF);
         tx_buf[4] = jumper_stat;
-        temp += (values[0] - values[1])*(values[0]+values[1]);
+        //energy += (values[0] - values[1])*(values[0]+values[1]);
         //temp = values[0]*values[0]-values[1]*values[1];
-        tx_buf[5] = (uint8_t)(temp & 0xFF);
-        tx_buf[6] = (uint8_t)((temp >> 8) & 0xFF);
+        tx_buf[5] = (uint8_t)(energy & 0xFF);
+        tx_buf[6] = (uint8_t)((energy >> 8) & 0xFF);
         tx_buf[7] = adcReadVsupercap();
         tx_buf[8] = (int)charge_pulse_float;
         tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
@@ -492,12 +498,12 @@ int main(int argc, char** argv) {
             jumper_stat |= 0x80;                // power supply is OK
             tx_buf[4] = jumper_stat;
             Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
-            temp = 0;
+            energy = 0;
         }
         else { // Vin<VMIN
             //SLEEP();
 
-            if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value)) { // vmin sale o scende?
+            if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value) && !PGOOD) { // vmin sale o scende?
                 PORTAbits.RA2=0;        // MOS enabled
                 tx_buf[0] = adcReadTemp();
                 tx_buf[7] = adcReadVsupercap();
@@ -507,6 +513,13 @@ int main(int argc, char** argv) {
                 PORTAbits.RA2=1;        // MOS OFF
                 charge_pulse_float = 10;        // re-init charge pulse length
             }
+            else if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value) && PGOOD) {
+                jumper_stat &= 0x7F;            // power supply is not present
+                tx_buf[4] = jumper_stat;
+                Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
+                charge_pulse_float = 10;        // re-init charge pulse length
+            }
+
             else {
                 printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
             }
@@ -535,6 +548,7 @@ int main(int argc, char** argv) {
         while(num_sleep++ < sleep_count) {
             printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
             sleep();
+            energy += (values[0] - values[1])*(values[0]+values[1])/sleep_count; //scalato
             //printf("Sleep result: %d\r\n", energy_after_pulse);
             //SLEEP();
         }
@@ -647,7 +661,7 @@ uint8_t adcReadTemp(void) {
     while(!FVRCONbits.FVRRDY);      // wait for a stable FVR
     ADCON0bits.ADON=1;
     PORTDbits.RD0=1;            // mcp9700a power up
-    WAIT_MS(5);
+    WAIT_MS(1);
     ADCON0bits.GO_nDONE=1;
     while(ADCON0bits.GO_nDONE);
     value = ADRES;
