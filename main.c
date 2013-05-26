@@ -656,6 +656,7 @@ void makePacket(scap_on) {
 
 uint8_t adcReadTemp(void) {
     uint8_t value;
+    FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
     ADCON0bits.CHS=7;
     FVRCONbits.ADFVR=1;
     while(!FVRCONbits.FVRRDY);      // wait for a stable FVR
@@ -667,11 +668,13 @@ uint8_t adcReadTemp(void) {
     value = ADRES;
     ADCON0bits.ADON=0;
     PORTDbits.RD0=0;            // turn off mcp9700a
+    FVRCONbits.FVREN=0;     // 0 = Fixed Voltage Reference is disabled
     return value;
 }
 
 uint8_t adcReadVcap(void) {
     uint8_t value;
+    FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
     ADCON0bits.CHS=5;
     FVRCONbits.ADFVR=2;
     ADCON0bits.ADON=1;
@@ -682,11 +685,13 @@ uint8_t adcReadVcap(void) {
     value = ADRES;
     ADCON0bits.ADON=0;
     PORTDbits.RD3=0;            // Turn off switch for Vstorage measure
+    FVRCONbits.FVREN=0;     // 0 = Fixed Voltage Reference is disabled
     return value;
 }
 
 uint8_t adcReadVsupercap(void) {
     uint8_t value;
+    FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
     ADCON0bits.CHS=6;
     FVRCONbits.ADFVR=1;
     while(!FVRCONbits.FVRRDY);      // wait for a stable FVR
@@ -698,6 +703,7 @@ uint8_t adcReadVsupercap(void) {
     value = ADRES;
     ADCON0bits.ADON=0;
     PORTDbits.RD4=0;            // Turn off switch for V supercap measure
+    FVRCONbits.FVREN=0;     // 0 = Fixed Voltage Reference is disabled
     return value;
 }
 
@@ -779,7 +785,7 @@ void adcInit(void) {
     ADCON1bits.ADCS=1;      // convert @ fosc/8
     //ADCON1bits.ADREF=0;
     ADCON1bits.ADREF=3;     // 11 = VREF is connected to internal Fixed Voltage Reference
-    FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
+    //FVRCONbits.FVREN=1;     // 1 = Fixed Voltage Reference is enabled
 }
 
 

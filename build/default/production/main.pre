@@ -2923,6 +2923,7 @@ values[1] = 0;
 # 657
 uint8_t adcReadTemp(void) {
 uint8_t value;
+FVRCONbits.FVREN=1;
 ADCON0bits.CHS=7;
 FVRCONbits.ADFVR=1;
 while(!FVRCONbits.FVRRDY);
@@ -2934,11 +2935,13 @@ while(ADCON0bits.GO_nDONE);
 value = ADRES;
 ADCON0bits.ADON=0;
 PORTDbits.RD0=0;
+FVRCONbits.FVREN=0;
 return value;
 }
 
 uint8_t adcReadVcap(void) {
 uint8_t value;
+FVRCONbits.FVREN=1;
 ADCON0bits.CHS=5;
 FVRCONbits.ADFVR=2;
 ADCON0bits.ADON=1;
@@ -2949,11 +2952,13 @@ while(ADCON0bits.GO_nDONE);
 value = ADRES;
 ADCON0bits.ADON=0;
 PORTDbits.RD3=0;
+FVRCONbits.FVREN=0;
 return value;
 }
 
 uint8_t adcReadVsupercap(void) {
 uint8_t value;
+FVRCONbits.FVREN=1;
 ADCON0bits.CHS=6;
 FVRCONbits.ADFVR=1;
 while(!FVRCONbits.FVRRDY);
@@ -2965,10 +2970,11 @@ while(ADCON0bits.GO_nDONE);
 value = ADRES;
 ADCON0bits.ADON=0;
 PORTDbits.RD4=0;
+FVRCONbits.FVREN=0;
 return value;
 }
 
-# 708
+# 714
 uint8_t adcRead(uint8_t ch, uint8_t range) {
 uint8_t value;
 ADCON0bits.CHS=ch;
@@ -3010,7 +3016,7 @@ TRISCbits.TRISC6=0;
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 753
+# 759
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
@@ -3040,7 +3046,7 @@ void adcInit(void) {
 ADCON1bits.ADCS=1;
 
 ADCON1bits.ADREF=3;
-FVRCONbits.FVREN=1;
+
 }
 
 
@@ -3065,13 +3071,13 @@ putch(c = getch());
 return c;
 }
 
-# 813
+# 819
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 829
+# 835
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -3112,7 +3118,7 @@ printf("\n\r\n\r");
 }
 }
 
-# 878
+# 884
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -3157,7 +3163,7 @@ if(chksum==rx_buf[rx_count-1])
 
 _delay( 100 * ( 8000000L / 4000));
 
-# 927
+# 933
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
