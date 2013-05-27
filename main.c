@@ -512,12 +512,14 @@ int main(int argc, char** argv) {
                 Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit 
                 PORTAbits.RA2=1;        // MOS OFF
                 charge_pulse_float = 10;        // re-init charge pulse length
+                energy = 0;
             }
             else if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value) && PGOOD) {
                 jumper_stat &= 0x7F;            // power supply is not present
                 tx_buf[4] = jumper_stat;
                 Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
                 charge_pulse_float = 10;        // re-init charge pulse length
+                energy = 0;
             }
 
             else {
