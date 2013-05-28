@@ -1,10 +1,26 @@
-/*
- * File:   main.c
- * Author: Daniele Costarella
+/*****************************************************************************
+ * File:        main.c
+ * Author:      Daniele Costarella <daniele.costarella@gmail.com>
  *
- * Created on 26 febbraio 2013, 11.11
- */
+ * Processor:   PIC16
+ *              tested with 16LF707, 16F707
+ * Compiler:    Microchip XC8 v1.12 or higher
+ *
+ * Released on: June, 2013
+ *
+ *****************************************************************************
+ * File description:
+ *
+ * Energy Harvesting Demoboard firmware
+ *
+ * For new versions of this code please visit:
+ * https://github.com/blackbliss/energy-harvesting-demoboard
+ *
+ * Detailed information can also be found on my master thesis [IT]
+ *
+ *****************************************************************************/
 
+/********************************** HEADERS **********************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <xc.h>
@@ -12,47 +28,36 @@
 #include "rfm70.h"
 
 
-/* MCU Configuration */
+/**************************** MCU Configuration ******************************/
 // set CONFIG1 bits
-#pragma config FOSC = INTOSC           // Oscillator Selection bits (INTOSCIO oscillator: I/O function on RA6/OSC2/CLKOUT pin, I/O function on RA7/OSC1/CLKIN)
-#pragma config WDTE = OFF              // Watchdog Timer Enable bit (WDT disabled and can be enabled by SWDTEN bit of the WDTCON register)
-#pragma config PWRTE = OFF             // Power-up Timer Enable bit (PWRT disabled)
-#pragma config MCLRE = ON              // RE3/MCLR pin function select bit (RE3/MCLR pin function is MCLR)
-#pragma config CP = OFF                // Code Protection bit (Program memory code protection is disabled)
-//#pragma config CP = OFF              // Data Code Protection bit (Data memory code protection is disabled)
-#pragma config BOREN = 0//SBODEN     // Brown Out Reset Selection bits (BOR controlled by SBOREN bit of the PCON register)
-
-//new
-//#pragma config BOREN = 2    // 10 = BOR enabled during operation and disabled in Sleep
-//#pragma config BORV = 0     // 0 = Brown-out Reset Voltage (VBOR) set to 2.5 V nominal
-//#pragma config PWRTE = ON   // 1 = PWRT disabled
-
-
-//#pragma config IESO = OFF       // Internal External Switchover bit (Internal/External Switchover mode is disabled)
-//#pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enabled bit (Fail-Safe Clock Monitor is disabled)
-//#pragma config LVP = OFF        // Low Voltage Programming Enable bit (RB3 pin has digital I/O, HV on MCLR must be used for programming)
+#pragma config FOSC = INTOSC// Oscillator Selection bits (INTOSCIO oscillator: 
+                            // I/O function on RA6/OSC2/CLKOUT pin, I/O function
+                            // on RA7/OSC1/CLKIN)
+#pragma config WDTE = OFF   // Watchdog Timer Enable bit (WDT disabled and can
+                            // be enabled by SWDTEN bit of the WDTCON register)
+#pragma config PWRTE = OFF  // Power-up Timer Enable bit (PWRT disabled)
+#pragma config MCLRE = ON   // RE3/MCLR pin function select bit (RE3/MCLR pin
+                            // function is MCLR)
+#pragma config CP = OFF     // Code Protection bit (Program memory code
+                            // protection is disabled)
+#pragma config BOREN = 0    // Brown Out Reset Selection bits (BOR controlled by
+                            // SBOREN bit of the PCON register)
 #pragma config PLLEN = ON
 
 // set CONFIG2 bits
-//#pragma config VCAPEN=0; //non usato per PIC16LF707
-//#pragma config BORV = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
-//#pragma config WRT = 1FOURTH    // Flash Program Memory Self Write Enable bits (0000h to 07FFh write protected, 0800h to 1FFFh may be modified by EECON control)
+//#pragma config VCAPEN=0;  // only 16F707 (not used for 16LF707)
 
+/******************************** VARIABLES **********************************/
 
+/*****************************************************************************/
 // Vmeas = (1000K/95K)*ADC_Count * 2048/256 = (8/95)*ADC_Count
 // Fixed Voltage Reference: 2048 => 8mV/step
-#define VMIN            8*(95/8)           //10 Volts : 120 => Vstorage = 10V - 144 => Vstorage = 12V
-#define VCAP_MIN        (2.2*(68/248))/0.004    // VCAP = 2.2 partitore: 68/248; VRES = 1024/256 = 4mV
-//#define VCHARGE_STOP     9*(95/8)           //9 Volts
-#define VCHARGE_START     11*(95/8)         // 11 Volts
-//#define SLEEP_COUNT     2           // 2 => 30s; 20 => 5min etc
 
-//#define _XTAL_FREQ 16000000L
-//#define WAIT_US( x ) _delay( x * ( _XTAL_FREQ / 4000000))
-//#define WAIT_MS( x ) _delay( x * ( _XTAL_FREQ / 4000))
-/*
- *
- */
+#define VMIN            8*(95/8)            // 120 => Vstorage = 10V
+                                            // 144 => Vstorage = 12V
+#define VCAP_MIN        (2.2*(68/248))/0.004// VCAP = 2.2 partitore: 68/248;
+                                            // VRES = 1024/256 = 4mV
+#define VCHARGE_START   11*(95/8)           // 11 Volts
 
 void power_on_delay(void);
 void spiInit(void);
@@ -101,56 +106,53 @@ unsigned int dac_value = 26; //era 25
 
 uint8_t values[2] = {0x00, 0x00};
 unsigned int energy=0; // energy
+void boardInit(void);
 
 void interrupt ISR(void)
    {
-   if(TMR1IF) // interrupt su overflow timer1: è passato un secondo
+   if(TMR1IF) // interrupt on TIMER1 overflow
       {
       tmr1Counter++;
-      //TMR1H=0x00;
-      //TMR1L=0x00;
 
-      //TMR1H = 0xF0; //ritardo breve
-      //TMR1H = 0x60; // 10s @ 32KHz questo è quello giusto
       TMR1H = 0x10; // 15s
       TMR1L = 0x00;
 
       if(tmr1Counter == tmr1Target){
-        printf("Eccomi nell'ISR!\r\n");
-        //jumper_stat = PORTD>>4; // read new jumper status
-        /*
-         *  ________ _____ _____ _____ _____ _____ _________ _________ ________
-         * | supply |     |     |     |     |     |  sleep  | sleep   |  skip  |
-         * | status |PGOOD|  x  |  x  |  x  |  x  | counter | counter |  meas  |
-         * |        |     |     |     |     |     |    1    |    0    |        |
-         * |________|_____|_____|_____|_____|_____|_________|_________|________|
+        ///printf("This is the ISR!\r\n");
+        /*********************************************************************
+         * jumper_stat byte
+         *  _______ _____ _____ _____ _____ _____ _________ _________ ________
+         * |supply |     |     |     |     |     |  sleep  | sleep   |  skip  |
+         * |status |PGOOD|  x  |  x  |  x  |  x  | counter | counter |  meas  |
+         * |       |     |     |     |     |     |    1    |    0    |        |
+         * |_______|_____|_____|_____|_____|_____|_________|_________|________|
          *
-         */
-        jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PGOOD * 64 ; //read current jumper status
-                                        // jumper_stat.7 = supply status
-        sleep_counter = PORTD>>6 & 0x03;       // read sleep count bits
+         *********************************************************************/
+        jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PGOOD * 64 ; 
+                                            // read current jumper status
+                                            // [jumper_stat.7 = supply status]
+        sleep_counter = PORTD>>6 & 0x03;    // read sleep count bits
 
         switch (sleep_counter) {
             case 0:
-                sleep_count = 1;         // 15s
+                sleep_count = 1;            // delay = 15s
                 break;
             case 1:
-                sleep_count = 20;        // 5min
+                sleep_count = 20;           // delay = 5min
                 break;
             case 2:
-                sleep_count = 40;        // 10min
+                sleep_count = 40;           // delay = 10min
                 break;
             case 3:
-                sleep_count = 120;       // 30min
+                sleep_count = 120;          // delay = 30min
                 break;
         }
 
         tmr1Counter = 0;
-        flag = 1;
-        //timelapse_count++;
+        flag = 1; // not used?!
       }
 
-      TMR1IF=0;                         // clean the Interrupt Flag
+      TMR1IF=0;                             // clean the Interrupt Flag
       }
    }
 
@@ -158,214 +160,27 @@ void interrupt ISR(void)
 int main(int argc, char** argv) {
     long int i=0;
 
-    //uint8_t buffer[5];
-    //uint8_t temp_tx_buf[32];
-    //int16_t timelapse_count = 0;
     uint8_t num_sleep;
-    //uint16_t energy_after_pulse;
-    
-    //uint8_t vsupercap = 0;
-
-
 
     //power_on_delay();
 
-    OSCCONbits.IRCF=2; //3 for 16MHz and 2 for 8MHz and 0 for 2MHz
-
-    //ANSELDbits.ANSD0=0;     // digital led
-    //ANSELCbits.ANSC0=0;     // digital
-    ANSELCbits.ANSC6=0;     // digital
-    ANSELCbits.ANSC7=0;     // digital
-    //TRISCbits.TRISC0=0;     //LED
-    //TRISDbits.TRISD0=0;         //LED
-    //LED=0;
-    TRISCbits.TRISC6=0;     //TX
-
-    ANSELCbits.ANSC2=0;     // CE as digital
-    ANSELDbits.ANSD2=0;     // CSN as digital
-    ANSELCbits.ANSC5=0;     // MOSI as digital
-    ANSELDbits.ANSD1=0;     // IRQ as digital
-
-    //adc init
-    TRISEbits.TRISE2=1;     // ADC in
-    ANSELEbits.ANSE2=1;     // ADC pin as analog
-
-    // supercap meas
-    TRISDbits.TRISD4=0;
-    ANSELDbits.ANSD4=0;
-    PORTDbits.RD4=0;        // era 1
-
-    // dac init
-    TRISAbits.TRISA2=0;     // RA2 = DAC voltage output
-    ANSELAbits.ANSA2=0;
-    //PORTAbits.RA2=1;
-    //DACCON1 = 0x1F;
-    //DACCON0 = 0x00;         // DAC disabled
-    PORTAbits.RA2=1;
-
-
-    //RFM70 pins
-    TRISCbits.TRISC2=0;     // CE
-    TRISDbits.TRISD2=0;     // CSN
-    TRISCbits.TRISC3=0;     // SCK
-    TRISCbits.TRISC5=0;     // MOSI
-    TRISCbits.TRISC4=1;     // MISO
-    TRISDbits.TRISD1=1;     // IRQ
-    PORTCbits.RC2=0;
-    PORTDbits.RD2=1; //aggiunto csn
-    PORTCbits.RC3=0; //aggiunto sck
-    PORTCbits.RC5=0; //aggiunto mosi
-
-    //WDT
-    //OPTION_REGbits.PSA=1;
-    //OPTION_REGbits.PS=0x07;
-
-    // MCP9700A
-    TRISDbits.TRISD0=0;     // MCP9700A power
-    ANSELDbits.ANSD0=0;     // pin RD0 as digital
-    TRISEbits.TRISE2=1;     // MCP9700A Vout
-    ANSELEbits.ANSE2=1;     // set RE2 pin as analog
-
-    TRISEbits.TRISE0=1;     // RE0 as input
-    ANSELEbits.ANSE0=0;     // set RE0 pin as analog (Vstorage)
-
-    PORTDbits.RD0=0;        // turn off MCP9700A
-
-    // Vstorage monitor
-    TRISEbits.TRISE0=1;     // for Vstorage measuring
-    ANSELEbits.ANSE0=1;     // pin RE0 as analog
-    TRISDbits.TRISD3=0;     // enable Vstorage measure
-    PORTDbits.RD3=0;        // set to low
-
-    // Skip measure
-    TRISDbits.TRISD5=1;     // RD5 as input
-    ANSELDbits.ANSD5=0;     // RD5 as digital
-    // Number of SLEEP (Set delay)
-    TRISDbits.TRISD6=1;
-    TRISDbits.TRISD7=1;
-    ANSELDbits.ANSD6=0;
-    ANSELDbits.ANSD7=0;
-
-
-    GIE=1; // gestione globale interrupt attiva
-    PEIE=1; // interrupt di periferica abilitati
-    TMR1IE=1; // interrupt su overflow timer1 abilitato
-
-    TMR1H = 0x10;
-    TMR1L = 0x00;
-
-    T1CONbits.TMR1CS=2; //0 for instruction clock
-    T1CONbits.T1CKPS=3; //Prescaler
-    T1GCONbits.TMR1GE=1;
-    T1CONbits.nT1SYNC=1;
-    T1CONbits.T1OSCEN=1;    //era 0 for disabled
-    T1CONbits.TMR1ON=1;
-
-    // pgood
-    TRISBbits.TRISB0=1;
-    ANSELBbits.ANSB0=0;
-
-
-    // not used pins
-    TRISAbits.TRISA0=0; //per PIC16LF707
-    TRISAbits.TRISA1=0;
-    //TRISAbits.TRISA2=0;
-    TRISAbits.TRISA3=0;
-    TRISAbits.TRISA4=0;
-    TRISAbits.TRISA5=0;
-    TRISAbits.TRISA6=0;
-    TRISAbits.TRISA7=0;
-    ANSELAbits.ANSA0=0; //per PIC16LF707
-    ANSELAbits.ANSA1=0;
-    //ANSELAbits.ANSA2=0;
-    ANSELAbits.ANSA3=0;
-    ANSELAbits.ANSA4=0;
-    ANSELAbits.ANSA5=0;
-    ANSELAbits.ANSA6=0;
-    ANSELAbits.ANSA7=0;
-    PORTAbits.RA0=0;    //per PIC16LF707
-    PORTAbits.RA1=0;
-    //PORTAbits.RA2=0;
-    PORTAbits.RA3=0;
-    PORTAbits.RA4=0;
-    PORTAbits.RA5=0;
-    PORTAbits.RA6=0;
-    PORTAbits.RA7=0;
-
-    //TRISBbits.TRISB0=0;
-    TRISBbits.TRISB1=0;
-    TRISBbits.TRISB2=0;
-    TRISBbits.TRISB3=0;
-    TRISBbits.TRISB4=0;
-    TRISBbits.TRISB5=0;
-    //ANSELBbits.ANSB0=0;
-    ANSELBbits.ANSB1=0;
-    ANSELBbits.ANSB2=0;
-    ANSELBbits.ANSB3=0;
-    ANSELBbits.ANSB4=0;
-    ANSELBbits.ANSB5=0;
-    //PORTBbits.RB0=0;
-    PORTBbits.RB1=0;
-    PORTBbits.RB2=0;
-    PORTBbits.RB3=0;
-    PORTBbits.RB4=1;
-    PORTBbits.RB5=0;
-
-    //TRISDbits.TRISD4=0;
-    //ANSELDbits.ANSD4=0;
-    //PORTDbits.RD4=0;
-
-    // Vsupercap measure
-    TRISEbits.TRISE1=1;
-    ANSELEbits.ANSE1=1;
-    PORTEbits.RE1=0;
-
-    //jumper_stat = PORTD>>4; // lo fa nell'ISR
-
+    boardInit();
     spiInit();
     uartInit();
     adcInit();
-
-    /*
-    while(1) {
-        DACCON1 = 21;           // Preprogrammed
-        DACCON0 = 0xA0;         // DAC Enabled
-        SLEEP();
-        DACCON0 = 0x00;         // DAC disabled
-        PORTAbits.RA2=1;        // and OUTPUT = High
-
-        SLEEP();
-    }
-     */
     
-    /*
-    while(1) {
-        while (dac_value > 20 ) {
-            DACCON1 = dac_value & 0x1F;
-            dac_value--;
-            WAIT_MS(8000);
-        }
-    }*/
-    
-
 
     rfm70setPowerdownMode(0); //?
-    //printf("CONFIG INIZIALE: %X\r\n", SPI_Read_Reg(CONFIG));
     sleep_counter = PORTD>>6 & 0x03;
-    printf("Sleep counter: %X\r\n", sleep_counter );
+    ///printf("Sleep counter: %X\r\n", sleep_counter );
 
     SLEEP();
-    //SLEEP();  //tolto per la misura
 
-    //printf("ADC value: %d\r\n", adcRead(7));
-
-    //value = adcReadVcap();
     while (adcReadVcap() < VMIN && !SKIP_MEASURE && adcReadVsupercap() < VCAP_MIN ) {
         SLEEP();
-        //value = adcReadVcap();
-        printf("Vstorage too low: %d\r\n", value);
+        ///printf("Vstorage too low: %d\r\n", value);
     }
-    printf("Vstorage OK or measure skipped: %d\r\n", value);
+    ///printf("Vstorage OK or measure skipped: %d\r\n", value);
     RFM70_Initialize();
 
     rfm70setPowerdownMode(0);
@@ -379,7 +194,7 @@ int main(int argc, char** argv) {
     }
 
     value = adcReadVcap();
-*/
+    */
     /*
     while(value > VCHARGE_STOP) {
         PORTBbits.RB4=0;
@@ -401,30 +216,9 @@ int main(int argc, char** argv) {
         //WAIT_MS(100);
         } 
         */
-    //SLEEP();
     SLEEP();
 
-    //WAIT_MS(50);
-    //tx_buf[0] = '\0';	// initialize tx buffer
-    //power_on_delay();
-    //rfm70setPowerdownMode(0);
-    //CSN=0;
-
-    //printf("Sto andando in SLEEP!");
-    //WAIT_MS(2000);
-    //SLEEP();
-
-
-
-
-    //while(1);
-    //Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,2);	// transmit
-    //CE=0;
-    //printf("Packet sent!\r\n");
-    //while(1);
-    //PORTCbits.RC0=1;
-
-    /*
+    /******************************** TESTS **********************************
     printf("=== RFM70 REGISTERS ===\n\r");
     printf("CONFIG: %X\r\n", SPI_Read_Reg(CONFIG));
     printf("ENAA: %X\r\n", SPI_Read_Reg(0x01));
@@ -439,36 +233,12 @@ int main(int argc, char** argv) {
     printf("FIFO_STATUS: %X\r\n", SPI_Read_Reg(0x17));
     printf("DYNPD = %X\r\n",SPI_Read_Reg(0x1D));
     printf("FEATURE = %X\n\r\n\r", SPI_Read_Reg(0x1D));
+    **************************************************************************/
 
-    SPI_Read_Buf(0x10,buffer,5);
-    printf("TX_ADDR = ");
-    for (i=0;i<5;i++) {
-        printf("%X-", buffer[i]);
-    }
-     *
-    */
-    //LED=1;
-    //WAIT_MS(50);
-    //LED=0;
-    /*
-    SLEEP();
-    while(1) {
-        //PORTAbits.RA2=1;
-        DACCON1 = 31;       //MOS OFF
-        WAIT_MS(2000);
-        DACCON1 = 24;       //MOS e DACOUT ON
-        //PORTAbits.RA2=0;
-        WAIT_MS(2000);
-    }*/
 
     timelapse_count = 0;
     while(1) {
         rfm70setPowerdownMode(1);
-
-        //for (i=0;i<2;i++) {
-        //    temp_tx_buf[i]=tx_buf[i];
-        //}
-        //tx_buf[0] = adcRead(5,1);
 
         //value = adcReadTemp();
         //tx_buf[0] = adcReadTemp(); posticipata
@@ -500,17 +270,15 @@ int main(int argc, char** argv) {
             Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
             energy = 0;
         }
-        else { // Vin<VMIN
-            //SLEEP();
-
+        else {              // Vin < VMIN
             if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value) && !PGOOD) { // vmin sale o scende?
-                PORTAbits.RA2=0;        // MOS enabled
+                SCAP_MOS =0;                // MOS enabled
                 tx_buf[0] = adcReadTemp();
                 tx_buf[7] = adcReadVsupercap();
                 jumper_stat &= 0x7F;            // power supply is not present
                 tx_buf[4] = jumper_stat;
                 Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit 
-                PORTAbits.RA2=1;        // MOS OFF
+                SCAP_MOS =1;                // MOS OFF
                 charge_pulse_float = 10;        // re-init charge pulse length
                 energy = 0;
             }
@@ -527,32 +295,24 @@ int main(int argc, char** argv) {
             }
 
         }
-        //tx_buf[0] = '\0';	// clear tx_buf
-        //tx_buf[0]++;
 
-        //tx_buf[1]++;
-        //tx_buf[2]++;
-        //tx_buf[3]++;
-        //SwitchToRxMode();  	// switch to Rx mode - TX VERSION
         CE=0;
         rfm70setPowerdownMode(0);
+
         T1CONbits.TMR1ON=0;
-        //TMR1H = 0xF0; //ritardo  breve
-        //TMR1H = 0x60;
         TMR1H = 0x10;
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
-        //WAIT_MS(100);
+
         value = adcReadVcap();
-        printf("Sleep counter = %d\r\n", sleep_counter);
+        ///printf("Sleep counter = %d\r\n", sleep_counter);
 
         num_sleep = 0;
         while(num_sleep++ < sleep_count) {
-            printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
+            ///printf("Sleep: %d on %d\r\n", num_sleep, sleep_count);
             sleep();
             energy += (values[0] - values[1])*(values[0]+values[1])/sleep_count; //scalato
-            //printf("Sleep result: %d\r\n", energy_after_pulse);
-            //SLEEP();
+            ///printf("Sleep result: %d\r\n", energy_after_pulse);
         }
         //vsupercap = adcReadVsupercap();
         timelapse_count++;
@@ -582,7 +342,7 @@ void sleep(void) {
         //PORTBbits.RB4=1;
         //DACCON1 = 31;
         DACCON0 = 0x00;         // DAC disabled
-        PORTAbits.RA2=1;        // and OUTPUT = High
+        SCAP_MOS=1;        // and OUTPUT = High
         new_value = adcReadVcap();
         charge_time = 0x1000 - charge_time;
         T1CONbits.TMR1ON=0;
@@ -616,8 +376,6 @@ void sleep(void) {
                 charge_pulse--;   // or -1ms
         }
          */
-
-        //???return (value*value - new_value*new_value);
     }
     else {
         T1CONbits.TMR1ON=0;
@@ -627,7 +385,6 @@ void sleep(void) {
         SLEEP();
         values[0] = 0;
         values[1] = 0;
-        //???return(-1);
     }
 }
 
@@ -709,6 +466,8 @@ uint8_t adcReadVsupercap(void) {
     return value;
 }
 
+
+// not used
 // range 0: Vref_int = 1.024
 // range 1: Vref_int = 2.048
 // ch = 7 => mpc9700a read
@@ -946,4 +705,151 @@ void Receive_Packet(void)
 	}
 	SPI_Write_Reg(WRITE_REG|STATUS,sta);	// clear RX_DR or TX_DS or
                                                    //MAX_RT interrupt flag
+}
+
+void boardInit(void) {
+        OSCCONbits.IRCF=2; //3 for 16MHz and 2 for 8MHz and 0 for 2MHz
+
+    //ANSELDbits.ANSD0=0;   // digital led
+    //ANSELCbits.ANSC0=0;   // digital
+    ANSELCbits.ANSC6=0;     // digital
+    ANSELCbits.ANSC7=0;     // digital
+    TRISCbits.TRISC6=0;     //TX
+
+    ANSELCbits.ANSC2=0;     // CE as digital
+    ANSELDbits.ANSD2=0;     // CSN as digital
+    ANSELCbits.ANSC5=0;     // MOSI as digital
+    ANSELDbits.ANSD1=0;     // IRQ as digital
+
+    //adc init
+    TRISEbits.TRISE2=1;     // ADC in
+    ANSELEbits.ANSE2=1;     // ADC pin as analog
+
+    // supercap meas
+    TRISDbits.TRISD4=0;
+    ANSELDbits.ANSD4=0;
+    PORTDbits.RD4=0;        // era 1
+
+    // dac init
+    TRISAbits.TRISA2=0;     // RA2 = DAC voltage output
+    ANSELAbits.ANSA2=0;
+    //PORTAbits.RA2=1;
+    SCAP_MOS=1;
+
+
+    //RFM70 pins
+    TRISCbits.TRISC2=0;     // CE
+    TRISDbits.TRISD2=0;     // CSN
+    TRISCbits.TRISC3=0;     // SCK
+    TRISCbits.TRISC5=0;     // MOSI
+    TRISCbits.TRISC4=1;     // MISO
+    TRISDbits.TRISD1=1;     // IRQ
+    PORTCbits.RC2=0;
+    PORTDbits.RD2=1; //aggiunto csn
+    PORTCbits.RC3=0; //aggiunto sck
+    PORTCbits.RC5=0; //aggiunto mosi
+
+    //WDT
+    //OPTION_REGbits.PSA=1;
+    //OPTION_REGbits.PS=0x07;
+
+    // MCP9700A
+    TRISDbits.TRISD0=0;     // MCP9700A power
+    ANSELDbits.ANSD0=0;     // pin RD0 as digital
+    TRISEbits.TRISE2=1;     // MCP9700A Vout
+    ANSELEbits.ANSE2=1;     // set RE2 pin as analog
+
+    TRISEbits.TRISE0=1;     // RE0 as input
+    ANSELEbits.ANSE0=0;     // set RE0 pin as analog (Vstorage)
+
+    PORTDbits.RD0=0;        // turn off MCP9700A
+
+    // Vstorage monitor
+    TRISEbits.TRISE0=1;     // for Vstorage measuring
+    ANSELEbits.ANSE0=1;     // pin RE0 as analog
+    TRISDbits.TRISD3=0;     // enable Vstorage measure
+    PORTDbits.RD3=0;        // set to low
+
+    // Skip measure
+    TRISDbits.TRISD5=1;     // RD5 as input
+    ANSELDbits.ANSD5=0;     // RD5 as digital
+    // Number of SLEEP (Set delay)
+    TRISDbits.TRISD6=1;
+    TRISDbits.TRISD7=1;
+    ANSELDbits.ANSD6=0;
+    ANSELDbits.ANSD7=0;
+
+
+    GIE=1; // gestione globale interrupt attiva
+    PEIE=1; // interrupt di periferica abilitati
+    TMR1IE=1; // interrupt su overflow timer1 abilitato
+
+    TMR1H = 0x10;
+    TMR1L = 0x00;
+
+    T1CONbits.TMR1CS=2; //0 for instruction clock
+    T1CONbits.T1CKPS=3; //Prescaler
+    T1GCONbits.TMR1GE=1;
+    T1CONbits.nT1SYNC=1;
+    T1CONbits.T1OSCEN=1;    //era 0 for disabled
+    T1CONbits.TMR1ON=1;
+
+    // pgood
+    TRISBbits.TRISB0=1;
+    ANSELBbits.ANSB0=0;
+
+
+    // not used pins
+    TRISAbits.TRISA0=0; //per PIC16LF707
+    TRISAbits.TRISA1=0;
+    //TRISAbits.TRISA2=0;
+    TRISAbits.TRISA3=0;
+    TRISAbits.TRISA4=0;
+    TRISAbits.TRISA5=0;
+    TRISAbits.TRISA6=0;
+    TRISAbits.TRISA7=0;
+    ANSELAbits.ANSA0=0; //per PIC16LF707
+    ANSELAbits.ANSA1=0;
+    //ANSELAbits.ANSA2=0;
+    ANSELAbits.ANSA3=0;
+    ANSELAbits.ANSA4=0;
+    ANSELAbits.ANSA5=0;
+    ANSELAbits.ANSA6=0;
+    ANSELAbits.ANSA7=0;
+    PORTAbits.RA0=0;    //per PIC16LF707
+    PORTAbits.RA1=0;
+    //PORTAbits.RA2=0;
+    PORTAbits.RA3=0;
+    PORTAbits.RA4=0;
+    PORTAbits.RA5=0;
+    PORTAbits.RA6=0;
+    PORTAbits.RA7=0;
+
+    //TRISBbits.TRISB0=0;
+    TRISBbits.TRISB1=0;
+    TRISBbits.TRISB2=0;
+    TRISBbits.TRISB3=0;
+    TRISBbits.TRISB4=0;
+    TRISBbits.TRISB5=0;
+    //ANSELBbits.ANSB0=0;
+    ANSELBbits.ANSB1=0;
+    ANSELBbits.ANSB2=0;
+    ANSELBbits.ANSB3=0;
+    ANSELBbits.ANSB4=0;
+    ANSELBbits.ANSB5=0;
+    //PORTBbits.RB0=0;
+    PORTBbits.RB1=0;
+    PORTBbits.RB2=0;
+    PORTBbits.RB3=0;
+    PORTBbits.RB4=1;
+    PORTBbits.RB5=0;
+
+    //TRISDbits.TRISD4=0;
+    //ANSELDbits.ANSD4=0;
+    //PORTDbits.RD4=0;
+
+    // Vsupercap measure
+    TRISEbits.TRISE1=1;
+    ANSELEbits.ANSE1=1;
+    PORTEbits.RE1=0;
 }
