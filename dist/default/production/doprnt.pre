@@ -275,18 +275,6 @@ extern double round(double);
 # 13 "/Applications/microchip/xc8/v1.12/sources/doprnt.c"
 #pragma warning disable 350
 
-# 354
-const static unsigned int dpowers[] = {1, 10, 100, 1000, 10000,
-
-# 359
-};
-
-
-const static unsigned int hexpowers[] = {1, 0x10, 0x100, 0x1000,
-
-# 366
-};
-
 # 455
 int
 
@@ -334,22 +322,6 @@ switch(c = *f++) {
 case 0:
 goto alldone;
 
-# 706
-case 'd':
-case 'i':
-break;
-
-# 721
-case 'X':
-
-# 727
-case 'x':
-
-
-flag |= 0x80;
-
-break;
-
 # 811
 default:
 
@@ -360,108 +332,10 @@ continue;
 # 831
 }
 
-# 1258
-if((flag & 0x80) == 0x00)
-
-{
-
-# 1266
-_val._val = (int)(*(int *)__va_arg((*(int **)ap), (int)0));
-
-if((int)_val._val < 0) {
-flag |= 0x03;
-_val._val = -_val._val;
-}
-
-}
-
-else
-
-
-
-
-{
-
-# 1293
-_val._val = (*(unsigned *)__va_arg((*(unsigned **)ap), (unsigned)0));
-}
-
-# 1301
-switch((unsigned char)(flag & 0x80)) {
-
-
-
-
-case 0x00:
-
-# 1312
-for(c = 1 ; c != sizeof dpowers/sizeof dpowers[0] ; c++)
-if(_val._val < dpowers[c])
-break;
-
-break;
-
-
-
-
-case 0x80:
-
-for(c = 1 ; c != sizeof hexpowers/sizeof hexpowers[0] ; c++)
-if(_val._val < hexpowers[c])
-break;
-
-break;
-
-# 1343
-}
-
 # 1429
 {
 
-# 1445
-if(flag & 0x03)
-(putch('-') );
-
 # 1476
-}
-
-
-prec = c;
-
-while(prec--) {
-
-switch((unsigned char)(flag & 0x80))
-
-{
-
-
-
-
-case 0x00:
-
-# 1496
-c = (_val._val / dpowers[prec]) % 10 + '0';
-
-break;
-
-# 1504
-case 0x80:
-
-{
-unsigned char idx = (_val._val / hexpowers[prec]) & 0xF;
-
-
-
-c = "0123456789ABCDEF"[idx];
-
-# 1515
-}
-
-break;
-
-# 1530
-}
-(putch(c) );
 }
 
 # 1540

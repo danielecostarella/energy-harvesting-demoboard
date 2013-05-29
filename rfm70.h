@@ -11,7 +11,8 @@
 #include <stdint.h>
 #include <xc.h>
 
-#define MAX_PACKET_LEN  32// max value is 32
+#define MAX_PACKET_LEN          32// max value is 32
+#define TX_PACKET_LEN           10
 
 //****************************************************************************//
 // RFM70(nRF24L01) commands

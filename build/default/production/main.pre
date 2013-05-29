@@ -2468,7 +2468,7 @@ typedef int16_t intptr_t;
 
 typedef uint16_t uintptr_t;
 
-# 78 "rfm70.h"
+# 79 "rfm70.h"
 uint8_t SPI_Read_Reg(uint8_t reg);
 void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
 
@@ -2509,17 +2509,17 @@ void rfm70setPowerdownMode(uint8_t value);
 
 #pragma config PLLEN = ON
 
-# 62
+# 63
 void power_on_delay(void);
 void spiInit(void);
 void uartInit(void);
 void putch (char c);
+void adcInit(void);
 unsigned char getche(void);
 
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len);
 void Receive_Packet(void);
-uint8_t adcRead(uint8_t ch, uint8_t range);
-void adcInit(void);
+
 uint8_t adcReadTemp(void);
 uint8_t adcReadVcap(void);
 void sleep(void);
@@ -2529,7 +2529,6 @@ extern void SwitchToTxMode(void);
 extern void SwitchToRxMode(void);
 uint8_t adcReadVsupercap(void);
 
-# 85
 uint8_t tx_buf[10]={0x00, 0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0x00};
 uint8_t rx_buf[32];
 
@@ -2544,7 +2543,6 @@ uint8_t sleep_counter;
 uint8_t sleep_count;
 
 uint8_t value = 0;
-
 int16_t timelapse_count = 0;
 unsigned int charge_time;
 unsigned int charge_pulse;
@@ -2567,13 +2565,14 @@ TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
 
-# 131
+# 130
 jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PORTBbits.RB0 * 64 ;
 
 
 sleep_counter = PORTD>>6 & 0x03;
 
 switch (sleep_counter) {
+
 case 0:
 sleep_count = 1;
 break;
@@ -2591,24 +2590,20 @@ break;
 tmr1Counter = 0;
 flag = 1;
 }
-
 TMR1IF=0;
 }
 }
 
-
+# 169
 int main(int argc, char** argv) {
 long int i=0;
-
 uint8_t num_sleep;
 
-
-
+# 177
 boardInit();
 spiInit();
 uartInit();
 adcInit();
-
 
 rfm70setPowerdownMode(0);
 sleep_counter = PORTD>>6 & 0x03;
@@ -2622,13 +2617,12 @@ asm("sleep");
 }
 
 RFM70_Initialize();
-
 rfm70setPowerdownMode(0);
 
-# 219
+# 227
 asm("sleep");
 
-# 239
+# 247
 timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
@@ -2654,7 +2648,7 @@ if (tx_buf[1] > 8*(95/8) || PORTDbits.RD5) {
 
 tx_buf[0] = adcReadTemp();
 
-# 268
+# 276
 jumper_stat |= 0x80;
 tx_buf[4] = jumper_stat;
 Send_Packet(0xB0,tx_buf,10);
@@ -2680,10 +2674,7 @@ charge_pulse_float = 10;
 energy = 0;
 }
 
-else {
-printf("VStorage: %d  => not OK\r\n", tx_buf[1]);
-}
-
+# 305
 }
 
 PORTCbits.RC2=0;
@@ -2704,7 +2695,6 @@ sleep();
 energy += (values[0] - values[1])*(values[0]+values[1])/sleep_count;
 
 }
-
 timelapse_count++;
 }
 return (0);
@@ -2715,7 +2705,6 @@ void sleep(void) {
 uint8_t new_value;
 value = adcReadVcap();
 charge_pulse = (int)(charge_pulse_float);
-
 
 if (value > 11*(95/8) && charge_pulse > 0 && !PORTDbits.RD5 ) {
 
@@ -2728,8 +2717,6 @@ TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
 TMR1L = (uint8_t)((charge_time) & 0xFF);
 T1CONbits.TMR1ON=1;
 asm("sleep");
-
-
 
 DACCON0 = 0x00;
 PORTAbits.RA2=1;
@@ -2744,7 +2731,6 @@ asm("sleep");
 if (new_value > value)
 new_value = value;
 
-
 values[0] = value;
 values[1] = new_value;
 
@@ -2757,7 +2743,7 @@ if (charge_pulse_float > 0)
 charge_pulse_float /= 1.05;
 }
 
-# 379
+# 382
 }
 else {
 T1CONbits.TMR1ON=0;
@@ -2770,7 +2756,7 @@ values[1] = 0;
 }
 }
 
-# 416
+
 uint8_t adcReadTemp(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2789,6 +2775,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
+# 422
 uint8_t adcReadVcap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2806,6 +2793,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
+# 448
 uint8_t adcReadVsupercap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2824,79 +2812,38 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 475
-uint8_t adcRead(uint8_t ch, uint8_t range) {
-uint8_t value;
-ADCON0bits.CHS=ch;
-
-
-if (range == 0) {
-
-FVRCONbits.ADFVR=1;
-ADCON0bits.ADON=1;
-
-
-PORTEbits.RE1=1;
-_delay( 20 * ( 8000000L / 4000));
-}
-else
-PORTDbits.RD3=1;
-FVRCONbits.ADFVR=2;
-ADCON0bits.ADON=1;
-_delay( 1 * ( 8000000L / 4000));
-
-while(!FVRCONbits.FVRRDY);
-
-
-ADCON0bits.GO_nDONE=1;
-while(ADCON0bits.GO_nDONE);
-
-value = ADRES;
-ADCON0bits.ADON=0;
-
-PORTDbits.RD3=0;
-return value;
-}
-
-
+# 474
 void uartInit(void) {
 TRISCbits.TRISC7=1;
 TRISCbits.TRISC6=0;
-
 TXSTA=0x02;
 RCSTA=0x00;
 
-# 520
+
 TXSTAbits.BRGH=0;
 TXSTAbits.SYNC=0;
 
-
 SPBRG=12;
-
 RCSTAbits.SPEN=1;
 TXSTAbits.TXEN=1;
 
 }
 
+# 500
 void spiInit(void) {
 SSPCONbits.SSPEN=1;
 SSPCONbits.CKP=0;
 SSPCONbits.SSPM=2;
-
 SSPSTATbits.SMP=0;
 SSPSTATbits.CKE=1;
 
 _delay( 50 * ( 8000000L / 4000));
 }
 
-
+# 518
 void adcInit(void) {
-
-
 ADCON1bits.ADCS=1;
-
 ADCON1bits.ADREF=3;
-
 }
 
 
@@ -2921,13 +2868,13 @@ putch(c = getch());
 return c;
 }
 
-# 580
+# 551
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 596
+# 566
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2939,12 +2886,7 @@ if((fifo_sta&0x20)==0)
 
 {
 
-printf("Sending: ");
-for (i=0;i<len;i++) {
-printf("%X",pbuf[i]);
-}
-printf("\n\r");
-
+# 582
 PORTCbits.RC2=0;
 SPI_Write_Buf(type, pbuf, len);
 PORTCbits.RC2=1;
@@ -2954,21 +2896,21 @@ _delay( 1 * ( 8000000L / 4000));
 
 while(!PORTDbits.RD1) {
 if (rfm70TxDataSentInterrupt()) {
-printf("Data sent: OK \r\n");
+
 SwitchToRxMode();
 
 }
 if (rfm70TxDataSentErrorInterrupt()) {
-printf("No data sent: ERROR \r\n ");
+
 SwitchToRxMode();
 
 }
 }
-printf("\n\r\n\r");
+
 }
 }
 
-# 645
+# 611
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2977,43 +2919,37 @@ uint8_t rx_buf[32];
 rx_count = 0;
 sta=SPI_Read_Reg(0x07);
 
-if((0x40&sta) == 0x40)
-{
-do
-{
+
+if((0x40&sta) == 0x40) {
+do {
 len=SPI_Read_Reg(0x60);
 
-if(len<=32)
-{
+if(len<=32) {
 SPI_Read_Buf(0x61,rx_buf,len);
+
 
 rx_count += len;
 
 }
-else
-{
+else {
 SPI_Write_Reg(0xE2,0);
 }
 
 fifo_sta=SPI_Read_Reg(0x17);
 
 
-}while((fifo_sta&0x01)==0);
+} while((fifo_sta&0x01)==0);
 
 rx_buf[rx_count] = '\0';
 
 chksum = 0;
-for(j=0;j<(rx_count-1);j++)
-{
+for(j=0;j<(rx_count-1);j++) {
 chksum += rx_buf[j];
 }
 
-if(chksum==rx_buf[rx_count-1])
-{
+if(chksum==rx_buf[rx_count-1]) {
 
-_delay( 100 * ( 8000000L / 4000));
-
-# 694
+# 656
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
@@ -3030,19 +2966,13 @@ SPI_Write_Reg(0x20|0x07,sta);
 
 }
 
+# 679
 void boardInit(void) {
 OSCCONbits.IRCF=2;
-
-
 
 ANSELCbits.ANSC6=0;
 ANSELCbits.ANSC7=0;
 TRISCbits.TRISC6=0;
-
-ANSELCbits.ANSC2=0;
-ANSELDbits.ANSD2=0;
-ANSELCbits.ANSC5=0;
-ANSELDbits.ANSD1=0;
 
 
 TRISEbits.TRISE2=1;
@@ -3056,11 +2986,14 @@ PORTDbits.RD4=0;
 
 TRISAbits.TRISA2=0;
 ANSELAbits.ANSA2=0;
-
 PORTAbits.RA2=1;
 
 
 
+ANSELCbits.ANSC2=0;
+ANSELDbits.ANSD2=0;
+ANSELCbits.ANSC5=0;
+ANSELDbits.ANSD1=0;
 TRISCbits.TRISC2=0;
 TRISDbits.TRISD2=0;
 TRISCbits.TRISC3=0;
@@ -3072,15 +3005,13 @@ PORTDbits.RD2=1;
 PORTCbits.RC3=0;
 PORTCbits.RC5=0;
 
-# 757
+
 TRISDbits.TRISD0=0;
 ANSELDbits.ANSD0=0;
 TRISEbits.TRISE2=1;
 ANSELEbits.ANSE2=1;
-
 TRISEbits.TRISE0=1;
 ANSELEbits.ANSE0=0;
-
 PORTDbits.RD0=0;
 
 
@@ -3093,10 +3024,12 @@ PORTDbits.RD3=0;
 TRISDbits.TRISD5=1;
 ANSELDbits.ANSD5=0;
 
+
 TRISDbits.TRISD6=1;
 TRISDbits.TRISD7=1;
 ANSELDbits.ANSD6=0;
 ANSELDbits.ANSD7=0;
+
 
 
 GIE=1;
@@ -3105,7 +3038,6 @@ TMR1IE=1;
 
 TMR1H = 0x10;
 TMR1L = 0x00;
-
 T1CONbits.TMR1CS=2;
 T1CONbits.T1CKPS=3;
 T1GCONbits.TMR1GE=1;
@@ -3118,10 +3050,13 @@ TRISBbits.TRISB0=1;
 ANSELBbits.ANSB0=0;
 
 
+TRISEbits.TRISE1=1;
+ANSELEbits.ANSE1=1;
+PORTEbits.RE1=0;
+
 
 TRISAbits.TRISA0=0;
 TRISAbits.TRISA1=0;
-
 TRISAbits.TRISA3=0;
 TRISAbits.TRISA4=0;
 TRISAbits.TRISA5=0;
@@ -3129,7 +3064,6 @@ TRISAbits.TRISA6=0;
 TRISAbits.TRISA7=0;
 ANSELAbits.ANSA0=0;
 ANSELAbits.ANSA1=0;
-
 ANSELAbits.ANSA3=0;
 ANSELAbits.ANSA4=0;
 ANSELAbits.ANSA5=0;
@@ -3137,34 +3071,25 @@ ANSELAbits.ANSA6=0;
 ANSELAbits.ANSA7=0;
 PORTAbits.RA0=0;
 PORTAbits.RA1=0;
-
 PORTAbits.RA3=0;
 PORTAbits.RA4=0;
 PORTAbits.RA5=0;
 PORTAbits.RA6=0;
 PORTAbits.RA7=0;
 
-
 TRISBbits.TRISB1=0;
 TRISBbits.TRISB2=0;
 TRISBbits.TRISB3=0;
 TRISBbits.TRISB4=0;
 TRISBbits.TRISB5=0;
-
 ANSELBbits.ANSB1=0;
 ANSELBbits.ANSB2=0;
 ANSELBbits.ANSB3=0;
 ANSELBbits.ANSB4=0;
 ANSELBbits.ANSB5=0;
-
 PORTBbits.RB1=0;
 PORTBbits.RB2=0;
 PORTBbits.RB3=0;
 PORTBbits.RB4=1;
 PORTBbits.RB5=0;
-
-# 852
-TRISEbits.TRISE1=1;
-ANSELEbits.ANSE1=1;
-PORTEbits.RE1=0;
 }

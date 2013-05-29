@@ -1748,22 +1748,22 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic.h: 28: extern void _nop(void);
 [; ;pic.h: 77: extern unsigned int flash_read(unsigned short addr);
 [; ;pic.h: 151: extern void _delay(unsigned long);
-[; ;rfm70.h: 78: uint8_t SPI_Read_Reg(uint8_t reg);
-[; ;rfm70.h: 79: void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
-[; ;rfm70.h: 81: void SPI_Write_Reg(uint8_t reg, uint8_t value);
-[; ;rfm70.h: 84: void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
-[; ;rfm70.h: 85: void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
-[; ;rfm70.h: 87: void SwitchToTxMode(void);
-[; ;rfm70.h: 88: void SwitchToRxMode(void);
-[; ;rfm70.h: 90: void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
-[; ;rfm70.h: 91: void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
-[; ;rfm70.h: 92: void SwitchCFG(char _cfg);
-[; ;rfm70.h: 94: void RFM70_Initialize(void);
-[; ;rfm70.h: 96: uint8_t rfm70_data_sent(void);
-[; ;rfm70.h: 97: uint8_t rfm70Interrupt(void);
-[; ;rfm70.h: 98: uint8_t rfm70TxDataSentErrorInterrupt(void);
-[; ;rfm70.h: 99: uint8_t rfm70TxDataSentInterrupt(void);
-[; ;rfm70.h: 100: void rfm70setPowerdownMode(uint8_t value);
+[; ;rfm70.h: 79: uint8_t SPI_Read_Reg(uint8_t reg);
+[; ;rfm70.h: 80: void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
+[; ;rfm70.h: 82: void SPI_Write_Reg(uint8_t reg, uint8_t value);
+[; ;rfm70.h: 85: void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
+[; ;rfm70.h: 86: void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
+[; ;rfm70.h: 88: void SwitchToTxMode(void);
+[; ;rfm70.h: 89: void SwitchToRxMode(void);
+[; ;rfm70.h: 91: void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
+[; ;rfm70.h: 92: void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
+[; ;rfm70.h: 93: void SwitchCFG(char _cfg);
+[; ;rfm70.h: 95: void RFM70_Initialize(void);
+[; ;rfm70.h: 97: uint8_t rfm70_data_sent(void);
+[; ;rfm70.h: 98: uint8_t rfm70Interrupt(void);
+[; ;rfm70.h: 99: uint8_t rfm70TxDataSentErrorInterrupt(void);
+[; ;rfm70.h: 100: uint8_t rfm70TxDataSentInterrupt(void);
+[; ;rfm70.h: 101: void rfm70setPowerdownMode(uint8_t value);
 "8 rfm70.c
 [v _Bank1_Reg0_13 `Cul ~T0 @X0 -> 0 `x e ]
 [i _Bank1_Reg0_13

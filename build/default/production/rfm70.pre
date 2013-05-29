@@ -2468,7 +2468,7 @@ extern unsigned int flash_read(unsigned short addr);
 #pragma intrinsic(_delay)
 extern void _delay(unsigned long);
 
-# 78 "rfm70.h"
+# 79 "rfm70.h"
 uint8_t SPI_Read_Reg(uint8_t reg);
 void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
 
