@@ -1748,77 +1748,77 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic.h: 28: extern void _nop(void);
 [; ;pic.h: 77: extern unsigned int flash_read(unsigned short addr);
 [; ;pic.h: 151: extern void _delay(unsigned long);
-[; ;rfm70.h: 79: uint8_t SPI_Read_Reg(uint8_t reg);
-[; ;rfm70.h: 80: void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
+[; ;rfm70.h: 80: uint8_t SPI_Read_Reg(uint8_t reg);
+[; ;rfm70.h: 81: void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
 [; ;rfm70.h: 82: void SPI_Write_Reg(uint8_t reg, uint8_t value);
-[; ;rfm70.h: 85: void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
-[; ;rfm70.h: 86: void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
-[; ;rfm70.h: 88: void SwitchToTxMode(void);
-[; ;rfm70.h: 89: void SwitchToRxMode(void);
-[; ;rfm70.h: 91: void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
-[; ;rfm70.h: 92: void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
-[; ;rfm70.h: 93: void SwitchCFG(char _cfg);
-[; ;rfm70.h: 95: void RFM70_Initialize(void);
-[; ;rfm70.h: 97: uint8_t rfm70_data_sent(void);
-[; ;rfm70.h: 98: uint8_t rfm70Interrupt(void);
-[; ;rfm70.h: 99: uint8_t rfm70TxDataSentErrorInterrupt(void);
-[; ;rfm70.h: 100: uint8_t rfm70TxDataSentInterrupt(void);
-[; ;rfm70.h: 101: void rfm70setPowerdownMode(uint8_t value);
-"8 rfm70.c
+[; ;rfm70.h: 83: void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
+[; ;rfm70.h: 84: void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
+[; ;rfm70.h: 85: void SwitchToTxMode(void);
+[; ;rfm70.h: 86: void SwitchToRxMode(void);
+[; ;rfm70.h: 87: void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
+[; ;rfm70.h: 88: void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
+[; ;rfm70.h: 89: void SwitchCFG(char _cfg);
+[; ;rfm70.h: 90: void RFM70_Initialize(void);
+[; ;rfm70.h: 91: void rfm70setPowerdownMode(uint8_t value);
+[; ;rfm70.h: 92: uint8_t rfm70_data_sent(void);
+[; ;rfm70.h: 93: uint8_t rfm70Interrupt(void);
+[; ;rfm70.h: 94: uint8_t rfm70TxDataSentErrorInterrupt(void);
+[; ;rfm70.h: 95: uint8_t rfm70TxDataSentInterrupt(void);
+"31 rfm70.c
 [v _Bank1_Reg0_13 `Cul ~T0 @X0 -> 0 `x e ]
 [i _Bank1_Reg0_13
 :U ..
-"9
+"32
 -> -503231680 `ul
-"10
+"33
 -> -> -> 19392 `i `l `ul
-"11
+"34
 -> -> 42794192 `l `ul
-"12
+"35
 -> -> 1094254745 `l `ul
-"13
+"36
 -> -> 193371897 `l `ul
-"14
+"37
 -> -1501624796 `ul
-"15
+"38
 -> -> -> 0 `i `l `ul
-"16
+"39
 -> -> -> 0 `i `l `ul
-"17
+"40
 -> -> -> 0 `i `l `ul
-"18
+"41
 -> -> -> 0 `i `l `ul
-"19
+"42
 -> -> -> 0 `i `l `ul
-"20
+"43
 -> -> -> 0 `i `l `ul
-"21
+"44
 -> -> 1209088 `l `ul
-"22
+"45
 -> -> 917798912 `l `ul
 ..
 ]
-[; ;rfm70.c: 8: const unsigned long Bank1_Reg0_13[]={
-[; ;rfm70.c: 9: 0xE2014B40,
-[; ;rfm70.c: 10: 0x00004BC0,
-[; ;rfm70.c: 11: 0x028CFCD0,
-[; ;rfm70.c: 12: 0x41390099,
-[; ;rfm70.c: 13: 0x0B869Ef9,
-[; ;rfm70.c: 14: 0xA67F0624,
-[; ;rfm70.c: 15: 0x00000000,
-[; ;rfm70.c: 16: 0x00000000,
-[; ;rfm70.c: 17: 0x00000000,
-[; ;rfm70.c: 18: 0x00000000,
-[; ;rfm70.c: 19: 0x00000000,
-[; ;rfm70.c: 20: 0x00000000,
-[; ;rfm70.c: 21: 0x00127300,
-[; ;rfm70.c: 22: 0x36B48000,
-[; ;rfm70.c: 23: };
-"25
+[; ;rfm70.c: 31: const unsigned long Bank1_Reg0_13[]={
+[; ;rfm70.c: 32: 0xE2014B40,
+[; ;rfm70.c: 33: 0x00004BC0,
+[; ;rfm70.c: 34: 0x028CFCD0,
+[; ;rfm70.c: 35: 0x41390099,
+[; ;rfm70.c: 36: 0x0B869Ef9,
+[; ;rfm70.c: 37: 0xA67F0624,
+[; ;rfm70.c: 38: 0x00000000,
+[; ;rfm70.c: 39: 0x00000000,
+[; ;rfm70.c: 40: 0x00000000,
+[; ;rfm70.c: 41: 0x00000000,
+[; ;rfm70.c: 42: 0x00000000,
+[; ;rfm70.c: 43: 0x00000000,
+[; ;rfm70.c: 44: 0x00127300,
+[; ;rfm70.c: 45: 0x36B48000,
+[; ;rfm70.c: 46: };
+"48
 [v _Bank1_Reg14 `Cuc ~T0 @X0 -> 0 `x e ]
 [i _Bank1_Reg14
 :U ..
-"27
+"50
 -> -> 65 `i `uc
 -> -> 32 `i `uc
 -> -> 8 `i `uc
@@ -1829,183 +1829,183 @@ Version 3.2 HI-TECH Software Intermediate Code
 -> -> 247 `i `uc
 -> -> 254 `i `uc
 -> -> 255 `i `uc
-"28
+"51
 -> -> 255 `i `uc
 ..
 ]
-[; ;rfm70.c: 25: const uint8_t Bank1_Reg14[]=
-[; ;rfm70.c: 26: {
-[; ;rfm70.c: 27: 0x41,0x20,0x08,0x04,0x81,0x20,0xCF,0xF7,0xFE,0xFF,0xFF
-[; ;rfm70.c: 28: };
-"32
+[; ;rfm70.c: 48: const uint8_t Bank1_Reg14[]=
+[; ;rfm70.c: 49: {
+[; ;rfm70.c: 50: 0x41,0x20,0x08,0x04,0x81,0x20,0xCF,0xF7,0xFE,0xFF,0xFF
+[; ;rfm70.c: 51: };
+"57
 [v F2023 `Cuc ~T0 @X0 -> 2 `i t ]
 [v _Bank0_Reg `F2023 ~T0 @X0 -> 0 `x e ]
 [i _Bank0_Reg
 :U ..
 :U ..
-"33
--> -> 0 `i `uc
--> -> 15 `i `uc
-..
-:U ..
-"34
--> -> 1 `i `uc
--> -> 63 `i `uc
-..
-:U ..
-"35
--> -> 2 `i `uc
--> -> 63 `i `uc
-..
-:U ..
-"36
--> -> 3 `i `uc
--> -> 3 `i `uc
-..
-:U ..
-"37
--> -> 4 `i `uc
--> -> 255 `i `uc
-..
-:U ..
-"39
--> -> 5 `i `uc
--> -> 23 `i `uc
-..
-:U ..
-"40
--> -> 6 `i `uc
--> -> 1 `i `uc
-..
-:U ..
-"41
--> -> 7 `i `uc
--> -> 7 `i `uc
-..
-:U ..
-"42
--> -> 8 `i `uc
--> -> 0 `i `uc
-..
-:U ..
-"43
--> -> 9 `i `uc
--> -> 0 `i `uc
-..
-:U ..
-"44
--> -> 12 `i `uc
--> -> 195 `i `uc
-..
-:U ..
-"46
--> -> 13 `i `uc
--> -> 196 `i `uc
-..
-:U ..
-"48
--> -> 14 `i `uc
--> -> 197 `i `uc
-..
-:U ..
-"50
--> -> 15 `i `uc
--> -> 198 `i `uc
-..
-:U ..
-"52
--> -> 17 `i `uc
--> -> 32 `i `uc
-..
-:U ..
-"53
--> -> 18 `i `uc
--> -> 32 `i `uc
-..
-:U ..
-"54
--> -> 19 `i `uc
--> -> 32 `i `uc
-..
-:U ..
-"55
--> -> 20 `i `uc
--> -> 32 `i `uc
-..
-:U ..
-"56
--> -> 21 `i `uc
--> -> 32 `i `uc
-..
-:U ..
-"57
--> -> 22 `i `uc
--> -> 32 `i `uc
-..
-:U ..
 "58
--> -> 23 `i `uc
 -> -> 0 `i `uc
+-> -> 15 `i `uc
 ..
 :U ..
 "59
--> -> 28 `i `uc
+-> -> 1 `i `uc
 -> -> 63 `i `uc
 ..
 :U ..
 "60
+-> -> 2 `i `uc
+-> -> 63 `i `uc
+..
+:U ..
+"61
+-> -> 3 `i `uc
+-> -> 3 `i `uc
+..
+:U ..
+"62
+-> -> 4 `i `uc
+-> -> 255 `i `uc
+..
+:U ..
+"63
+-> -> 5 `i `uc
+-> -> 23 `i `uc
+..
+:U ..
+"64
+-> -> 6 `i `uc
+-> -> 1 `i `uc
+..
+:U ..
+"65
+-> -> 7 `i `uc
+-> -> 7 `i `uc
+..
+:U ..
+"66
+-> -> 8 `i `uc
+-> -> 0 `i `uc
+..
+:U ..
+"67
+-> -> 9 `i `uc
+-> -> 0 `i `uc
+..
+:U ..
+"68
+-> -> 12 `i `uc
+-> -> 195 `i `uc
+..
+:U ..
+"70
+-> -> 13 `i `uc
+-> -> 196 `i `uc
+..
+:U ..
+"72
+-> -> 14 `i `uc
+-> -> 197 `i `uc
+..
+:U ..
+"74
+-> -> 15 `i `uc
+-> -> 198 `i `uc
+..
+:U ..
+"76
+-> -> 17 `i `uc
+-> -> 32 `i `uc
+..
+:U ..
+"77
+-> -> 18 `i `uc
+-> -> 32 `i `uc
+..
+:U ..
+"78
+-> -> 19 `i `uc
+-> -> 32 `i `uc
+..
+:U ..
+"79
+-> -> 20 `i `uc
+-> -> 32 `i `uc
+..
+:U ..
+"80
+-> -> 21 `i `uc
+-> -> 32 `i `uc
+..
+:U ..
+"81
+-> -> 22 `i `uc
+-> -> 32 `i `uc
+..
+:U ..
+"82
+-> -> 23 `i `uc
+-> -> 0 `i `uc
+..
+:U ..
+"83
+-> -> 28 `i `uc
+-> -> 63 `i `uc
+..
+:U ..
+"84
 -> -> 29 `i `uc
 -> -> 7 `i `uc
 ..
 ..
 ]
-[; ;rfm70.c: 32: const uint8_t Bank0_Reg[][2]={
-[; ;rfm70.c: 33: {0,0x0F},
-[; ;rfm70.c: 34: {1,0x3F},
-[; ;rfm70.c: 35: {2,0x3F},
-[; ;rfm70.c: 36: {3,0x03},
-[; ;rfm70.c: 37: {4,0xFF},
-[; ;rfm70.c: 39: {5,0x17},
-[; ;rfm70.c: 40: {6,0x01},
-[; ;rfm70.c: 41: {7,0x07},
-[; ;rfm70.c: 42: {8,0x00},
-[; ;rfm70.c: 43: {9,0x00},
-[; ;rfm70.c: 44: {12,0xc3},
-[; ;rfm70.c: 46: {13,0xc4},
-[; ;rfm70.c: 48: {14,0xc5},
-[; ;rfm70.c: 50: {15,0xc6},
-[; ;rfm70.c: 52: {17,0x20},
-[; ;rfm70.c: 53: {18,0x20},
-[; ;rfm70.c: 54: {19,0x20},
-[; ;rfm70.c: 55: {20,0x20},
-[; ;rfm70.c: 56: {21,0x20},
-[; ;rfm70.c: 57: {22,0x20},
-[; ;rfm70.c: 58: {23,0x00},
-[; ;rfm70.c: 59: {28,0x3F},
-[; ;rfm70.c: 60: {29,0x07}
-[; ;rfm70.c: 62: };
-"64
+[; ;rfm70.c: 57: const uint8_t Bank0_Reg[][2]={
+[; ;rfm70.c: 58: {0,0x0F},
+[; ;rfm70.c: 59: {1,0x3F},
+[; ;rfm70.c: 60: {2,0x3F},
+[; ;rfm70.c: 61: {3,0x03},
+[; ;rfm70.c: 62: {4,0xFF},
+[; ;rfm70.c: 63: {5,0x17},
+[; ;rfm70.c: 64: {6,0x01},
+[; ;rfm70.c: 65: {7,0x07},
+[; ;rfm70.c: 66: {8,0x00},
+[; ;rfm70.c: 67: {9,0x00},
+[; ;rfm70.c: 68: {12,0xc3},
+[; ;rfm70.c: 70: {13,0xc4},
+[; ;rfm70.c: 72: {14,0xc5},
+[; ;rfm70.c: 74: {15,0xc6},
+[; ;rfm70.c: 76: {17,0x20},
+[; ;rfm70.c: 77: {18,0x20},
+[; ;rfm70.c: 78: {19,0x20},
+[; ;rfm70.c: 79: {20,0x20},
+[; ;rfm70.c: 80: {21,0x20},
+[; ;rfm70.c: 81: {22,0x20},
+[; ;rfm70.c: 82: {23,0x00},
+[; ;rfm70.c: 83: {28,0x3F},
+[; ;rfm70.c: 84: {29,0x07}
+[; ;rfm70.c: 86: };
+"88
 [v F2025 `Cuc ~T0 @X0 -> 2 `i t ]
 [v _Bank0_RegAct `F2025 ~T0 @X0 -> 2 `i e ]
 [i _Bank0_RegAct
 :U ..
 :U ..
-"65
+"89
 -> -> 28 `i `uc
 -> -> 63 `i `uc
 ..
 :U ..
-"66
+"90
 -> -> 29 `i `uc
 -> -> 7 `i `uc
 ..
 ..
 ]
-[; ;rfm70.c: 64: const uint8_t Bank0_RegAct[2][2] = {
-[; ;rfm70.c: 65: {0x1C, 0x3F},
-[; ;rfm70.c: 66: {0x1D, 0x07}
-[; ;rfm70.c: 67: };
-"68
+[; ;rfm70.c: 88: const uint8_t Bank0_RegAct[2][2] = {
+[; ;rfm70.c: 89: {0x1C, 0x3F},
+[; ;rfm70.c: 90: {0x1D, 0x07}
+[; ;rfm70.c: 91: };
+"93
 [v _RX0_Address `Cuc ~T0 @X0 -> 0 `x e ]
 [i _RX0_Address
 :U ..
@@ -2016,8 +2016,8 @@ Version 3.2 HI-TECH Software Intermediate Code
 -> -> 1 `i `uc
 ..
 ]
-[; ;rfm70.c: 68: const uint8_t RX0_Address[]={0x34,0x43,0x10,0x10,0x01};
-"70
+[; ;rfm70.c: 93: const uint8_t RX0_Address[]={0x34,0x43,0x10,0x10,0x01};
+"96
 [v _RX1_Address `Cuc ~T0 @X0 -> 0 `x e ]
 [i _RX1_Address
 :U ..
@@ -2028,756 +2028,756 @@ Version 3.2 HI-TECH Software Intermediate Code
 -> -> 194 `i `uc
 ..
 ]
-[; ;rfm70.c: 70: const uint8_t RX1_Address[]={0x39,0x38,0x37,0x36,0xc2};
-"78
+[; ;rfm70.c: 96: const uint8_t RX1_Address[]={0x39,0x38,0x37,0x36,0xc2};
+"103
 [v _SPI_RW `(uc ~T0 @X0 1 ef1`uc ]
 {
-[; ;rfm70.c: 77: uint8_t SPI_RW(uint8_t value)
-[; ;rfm70.c: 78: {
+[; ;rfm70.c: 102: uint8_t SPI_RW(uint8_t value)
+[; ;rfm70.c: 103: {
 [e :U _SPI_RW ]
 [v _value `uc ~T0 @X0 1 r1 ]
 [f ]
-[; ;rfm70.c: 79: SSPBUF = value;
-"79
+[; ;rfm70.c: 104: SSPBUF = value;
+"104
 [e = _SSPBUF _value ]
-[; ;rfm70.c: 80: _delay( 1 * ( 8000000L / 4000));
-"80
+[; ;rfm70.c: 105: _delay( 1 * ( 8000000L / 4000));
+"105
 [e ( __delay (1 -> * -> -> 1 `i `l / -> 8000000 `l -> -> 4000 `i `l `ul ]
-[; ;rfm70.c: 81: while(!PIR1bits.SSPIF);
-"81
+[; ;rfm70.c: 106: while(!PIR1bits.SSPIF);
+"106
 [e $U 164  ]
 [e :U 165 ]
 [e :U 164 ]
 [e $ ! != -> . . _PIR1bits 0 3 `i -> -> -> 0 `i `Vuc `i 165  ]
 [e :U 166 ]
-[; ;rfm70.c: 84: return SSPBUF;
-"84
+[; ;rfm70.c: 109: return SSPBUF;
+"109
 [e ) _SSPBUF ]
 [e $UE 163  ]
-[; ;rfm70.c: 85: }
-"85
+[; ;rfm70.c: 110: }
+"110
 [e :UE 163 ]
 }
-"94
+"122
 [v _SPI_Write_Reg `(v ~T0 @X0 1 ef2`uc`uc ]
 {
-[; ;rfm70.c: 93: void SPI_Write_Reg(uint8_t reg, uint8_t value)
-[; ;rfm70.c: 94: {
+[; ;rfm70.c: 121: void SPI_Write_Reg(uint8_t reg, uint8_t value)
+[; ;rfm70.c: 122: {
 [e :U _SPI_Write_Reg ]
 [v _reg `uc ~T0 @X0 1 r1 ]
 [v _value `uc ~T0 @X0 1 r2 ]
 [f ]
-[; ;rfm70.c: 95: PORTDbits.RD2=0;
-"95
+[; ;rfm70.c: 123: PORTDbits.RD2=0;
+"123
 [e = . . _PORTDbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 96: SPI_RW(reg);
-"96
+[; ;rfm70.c: 124: SPI_RW(reg);
+"124
 [e ( _SPI_RW (1 _reg ]
-[; ;rfm70.c: 97: SPI_RW(value);
-"97
+[; ;rfm70.c: 125: SPI_RW(value);
+"125
 [e ( _SPI_RW (1 _value ]
-[; ;rfm70.c: 98: PORTDbits.RD2=1;
-"98
+[; ;rfm70.c: 126: PORTDbits.RD2=1;
+"126
 [e = . . _PORTDbits 0 2 -> -> 1 `i `uc ]
-[; ;rfm70.c: 99: }
-"99
+[; ;rfm70.c: 127: }
+"127
 [e :UE 167 ]
 }
-"109
+"139
 [v _SPI_Read_Reg `(uc ~T0 @X0 1 ef1`uc ]
 {
-[; ;rfm70.c: 108: uint8_t SPI_Read_Reg(uint8_t reg)
-[; ;rfm70.c: 109: {
+[; ;rfm70.c: 138: uint8_t SPI_Read_Reg(uint8_t reg)
+[; ;rfm70.c: 139: {
 [e :U _SPI_Read_Reg ]
 [v _reg `uc ~T0 @X0 1 r1 ]
 [f ]
-"110
+"140
 [v _value `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 110: uint8_t value;
-[; ;rfm70.c: 111: PORTDbits.RD2=0;
-"111
+[; ;rfm70.c: 140: uint8_t value;
+[; ;rfm70.c: 141: PORTDbits.RD2=0;
+"141
 [e = . . _PORTDbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 112: SPI_RW(reg);
-"112
+[; ;rfm70.c: 142: SPI_RW(reg);
+"142
 [e ( _SPI_RW (1 _reg ]
-[; ;rfm70.c: 113: value = SPI_RW(0);
-"113
+[; ;rfm70.c: 143: value = SPI_RW(0);
+"143
 [e = _value ( _SPI_RW (1 -> -> 0 `i `uc ]
-[; ;rfm70.c: 114: PORTDbits.RD2=1;
-"114
+[; ;rfm70.c: 144: PORTDbits.RD2=1;
+"144
 [e = . . _PORTDbits 0 2 -> -> 1 `i `uc ]
-[; ;rfm70.c: 116: return(value);
-"116
+[; ;rfm70.c: 146: return(value);
+"146
 [e ) _value ]
 [e $UE 168  ]
-[; ;rfm70.c: 117: }
-"117
+[; ;rfm70.c: 147: }
+"147
 [e :UE 168 ]
 }
-"126
+"159
 [v _SPI_Read_Buf `(v ~T0 @X0 1 ef3`uc`*uc`uc ]
 {
-[; ;rfm70.c: 125: void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length)
-[; ;rfm70.c: 126: {
+[; ;rfm70.c: 158: void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length)
+[; ;rfm70.c: 159: {
 [e :U _SPI_Read_Buf ]
 [v _reg `uc ~T0 @X0 1 r1 ]
 [v _pBuf `*uc ~T0 @X0 1 r2 ]
 [v _length `uc ~T0 @X0 1 r3 ]
 [f ]
-"127
+"160
 [v _status `uc ~T0 @X0 1 a ]
 [v _byte_ctr `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 127: uint8_t status,byte_ctr;
-[; ;rfm70.c: 129: PORTDbits.RD2=0;
-"129
+[; ;rfm70.c: 160: uint8_t status,byte_ctr;
+[; ;rfm70.c: 162: PORTDbits.RD2=0;
+"162
 [e = . . _PORTDbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 130: status = SPI_RW(reg);
-"130
+[; ;rfm70.c: 163: status = SPI_RW(reg);
+"163
 [e = _status ( _SPI_RW (1 _reg ]
-[; ;rfm70.c: 132: for(byte_ctr=0;byte_ctr<length;byte_ctr++)
-"132
+[; ;rfm70.c: 167: for(byte_ctr=0;byte_ctr<length;byte_ctr++)
+"167
 {
 [e = _byte_ctr -> -> 0 `i `uc ]
 [e $U 173  ]
-"133
+"168
 [e :U 170 ]
-[; ;rfm70.c: 133: pBuf[byte_ctr] = SPI_RW(0);
+[; ;rfm70.c: 168: pBuf[byte_ctr] = SPI_RW(0);
 [e = *U + _pBuf * -> _byte_ctr `ux -> -> # *U _pBuf `ui `ux ( _SPI_RW (1 -> -> 0 `i `uc ]
-"132
+"167
 [e ++ _byte_ctr -> -> 1 `i `uc ]
 [e :U 173 ]
 [e $ < -> _byte_ctr `i -> _length `i 170  ]
 [e :U 171 ]
-"133
+"168
 }
-[; ;rfm70.c: 136: PORTDbits.RD2=1;
-"136
+[; ;rfm70.c: 170: PORTDbits.RD2=1;
+"170
 [e = . . _PORTDbits 0 2 -> -> 1 `i `uc ]
-[; ;rfm70.c: 138: }
-"138
+[; ;rfm70.c: 172: }
+"172
 [e :UE 169 ]
 }
-"147
+"183
 [v _SPI_Write_Buf `(v ~T0 @X0 1 ef3`uc`*uc`uc ]
 {
-[; ;rfm70.c: 146: void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length)
-[; ;rfm70.c: 147: {
+[; ;rfm70.c: 182: void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length)
+[; ;rfm70.c: 183: {
 [e :U _SPI_Write_Buf ]
 [v _reg `uc ~T0 @X0 1 r1 ]
 [v _pBuf `*uc ~T0 @X0 1 r2 ]
 [v _length `uc ~T0 @X0 1 r3 ]
 [f ]
-"148
+"184
 [v _byte_ctr `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 148: uint8_t byte_ctr;
-[; ;rfm70.c: 150: PORTDbits.RD2=0;
-"150
+[; ;rfm70.c: 184: uint8_t byte_ctr;
+[; ;rfm70.c: 186: PORTDbits.RD2=0;
+"186
 [e = . . _PORTDbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 151: SPI_RW(reg);
-"151
+[; ;rfm70.c: 187: SPI_RW(reg);
+"187
 [e ( _SPI_RW (1 _reg ]
-[; ;rfm70.c: 152: for(byte_ctr=0; byte_ctr<length; byte_ctr++)
-"152
+[; ;rfm70.c: 190: for(byte_ctr=0; byte_ctr<length; byte_ctr++)
+"190
 {
 [e = _byte_ctr -> -> 0 `i `uc ]
 [e $U 178  ]
-"154
+"191
 [e :U 175 ]
-[; ;rfm70.c: 154: SPI_RW(*pBuf++);
+[; ;rfm70.c: 191: SPI_RW(*pBuf++);
 [e ( _SPI_RW (1 *U ++ _pBuf * -> -> 1 `i `x -> -> # *U _pBuf `i `x ]
-"152
+"190
 [e ++ _byte_ctr -> -> 1 `i `uc ]
 [e :U 178 ]
 [e $ < -> _byte_ctr `i -> _length `i 175  ]
 [e :U 176 ]
-"154
+"191
 }
-[; ;rfm70.c: 155: PORTDbits.RD2=1;
-"155
+[; ;rfm70.c: 192: PORTDbits.RD2=1;
+"192
 [e = . . _PORTDbits 0 2 -> -> 1 `i `uc ]
-[; ;rfm70.c: 157: }
-"157
+[; ;rfm70.c: 194: }
+"194
 [e :UE 174 ]
 }
-"165
+"205
 [v _SwitchToRxMode `(v ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 164: void SwitchToRxMode()
-[; ;rfm70.c: 165: {
+[; ;rfm70.c: 204: void SwitchToRxMode()
+[; ;rfm70.c: 205: {
 [e :U _SwitchToRxMode ]
 [f ]
-"166
+"206
 [v _value `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 166: uint8_t value;
-[; ;rfm70.c: 168: SPI_Write_Reg(0xE2,0);
-"168
+[; ;rfm70.c: 206: uint8_t value;
+[; ;rfm70.c: 208: SPI_Write_Reg(0xE2,0);
+"208
 [e ( _SPI_Write_Reg (2 , -> -> 226 `i `uc -> -> 0 `i `uc ]
-[; ;rfm70.c: 170: value=SPI_Read_Reg(0x07);
-"170
+[; ;rfm70.c: 210: value=SPI_Read_Reg(0x07);
+"210
 [e = _value ( _SPI_Read_Reg (1 -> -> 7 `i `uc ]
-[; ;rfm70.c: 171: SPI_Write_Reg(0x20|0x07,value);
-"171
+[; ;rfm70.c: 211: SPI_Write_Reg(0x20|0x07,value);
+"211
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 7 `i `uc _value ]
-[; ;rfm70.c: 174: PORTCbits.RC2=0;
-"174
+[; ;rfm70.c: 215: PORTCbits.RC2=0;
+"215
 [e = . . _PORTCbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 176: value=SPI_Read_Reg(0x00);
-"176
+[; ;rfm70.c: 217: value=SPI_Read_Reg(0x00);
+"217
 [e = _value ( _SPI_Read_Reg (1 -> -> 0 `i `uc ]
-[; ;rfm70.c: 179: value=value|0x01;
-"179
+[; ;rfm70.c: 219: value=value|0x01;
+"219
 [e = _value -> | -> _value `i -> 1 `i `uc ]
-[; ;rfm70.c: 180: SPI_Write_Reg(0x20 | 0x00, value);
-"180
+[; ;rfm70.c: 220: SPI_Write_Reg(0x20 | 0x00, value);
+"220
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 0 `i `uc _value ]
-[; ;rfm70.c: 182: PORTCbits.RC2=1;
-"182
+[; ;rfm70.c: 223: PORTCbits.RC2=1;
+"223
 [e = . . _PORTCbits 0 2 -> -> 1 `i `uc ]
-[; ;rfm70.c: 183: }
-"183
+[; ;rfm70.c: 224: }
+"224
 [e :UE 179 ]
 }
-"191
+"236
 [v _SwitchToTxMode `(v ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 190: void SwitchToTxMode()
-[; ;rfm70.c: 191: {
+[; ;rfm70.c: 235: void SwitchToTxMode()
+[; ;rfm70.c: 236: {
 [e :U _SwitchToTxMode ]
 [f ]
-"192
+"237
 [v _value `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 192: uint8_t value;
-[; ;rfm70.c: 193: SPI_Write_Reg(0xE1,0);
-"193
+[; ;rfm70.c: 237: uint8_t value;
+[; ;rfm70.c: 238: SPI_Write_Reg(0xE1,0);
+"238
 [e ( _SPI_Write_Reg (2 , -> -> 225 `i `uc -> -> 0 `i `uc ]
-[; ;rfm70.c: 195: PORTCbits.RC2=0;
-"195
+[; ;rfm70.c: 240: PORTCbits.RC2=0;
+"240
 [e = . . _PORTCbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 196: value=SPI_Read_Reg(0x00);
-"196
+[; ;rfm70.c: 241: value=SPI_Read_Reg(0x00);
+"241
 [e = _value ( _SPI_Read_Reg (1 -> -> 0 `i `uc ]
-[; ;rfm70.c: 198: value=value&0xfe;
-"198
+[; ;rfm70.c: 243: value=value&0xfe;
+"243
 [e = _value -> & -> _value `i -> 254 `i `uc ]
-[; ;rfm70.c: 199: SPI_Write_Reg(0x20 | 0x00, value);
-"199
+[; ;rfm70.c: 244: SPI_Write_Reg(0x20 | 0x00, value);
+"244
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 0 `i `uc _value ]
-[; ;rfm70.c: 202: PORTCbits.RC2=1;
-"202
+[; ;rfm70.c: 248: PORTCbits.RC2=1;
+"248
 [e = . . _PORTCbits 0 2 -> -> 1 `i `uc ]
-[; ;rfm70.c: 203: }
-"203
+[; ;rfm70.c: 249: }
+"249
 [e :UE 180 ]
 }
-"218
+"261
 [v _SwitchCFG `(v ~T0 @X0 1 ef1`uc ]
 {
-[; ;rfm70.c: 217: void SwitchCFG(char _cfg)
-[; ;rfm70.c: 218: {
+[; ;rfm70.c: 260: void SwitchCFG(char _cfg)
+[; ;rfm70.c: 261: {
 [e :U _SwitchCFG ]
 [v __cfg `uc ~T0 @X0 1 r1 ]
 [f ]
-"219
+"262
 [v _Tmp `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 219: uint8_t Tmp;
-[; ;rfm70.c: 221: Tmp=SPI_Read_Reg(7);
-"221
+[; ;rfm70.c: 262: uint8_t Tmp;
+[; ;rfm70.c: 264: Tmp=SPI_Read_Reg(7);
+"264
 [e = _Tmp ( _SPI_Read_Reg (1 -> -> 7 `i `uc ]
-[; ;rfm70.c: 222: Tmp=Tmp&0x80;
-"222
+[; ;rfm70.c: 265: Tmp=Tmp&0x80;
+"265
 [e = _Tmp -> & -> _Tmp `i -> 128 `i `uc ]
-[; ;rfm70.c: 224: if( ( (Tmp)&&(_cfg==0) )
-[; ;rfm70.c: 225: ||( ((Tmp)==0)&&(_cfg) ) )
-"225
+[; ;rfm70.c: 267: if( ( (Tmp)&&(_cfg==0) )
+[; ;rfm70.c: 268: ||( ((Tmp)==0)&&(_cfg) ) )
+"268
 [e $ ! || && != -> _Tmp `i -> -> -> 0 `i `uc `i == -> __cfg `i -> 0 `i && == -> _Tmp `i -> 0 `i != -> __cfg `i -> -> -> 0 `i `uc `i 182  ]
-[; ;rfm70.c: 226: {
-"226
+[; ;rfm70.c: 269: {
+"269
 {
-[; ;rfm70.c: 227: SPI_Write_Reg(0x50,0x53);
-"227
+[; ;rfm70.c: 270: SPI_Write_Reg(0x50,0x53);
+"270
 [e ( _SPI_Write_Reg (2 , -> -> 80 `i `uc -> -> 83 `i `uc ]
-"228
+"271
 }
 [e :U 182 ]
-[; ;rfm70.c: 228: }
-[; ;rfm70.c: 229: }
-"229
+[; ;rfm70.c: 271: }
+[; ;rfm70.c: 272: }
+"272
 [e :UE 181 ]
 }
-"238
+"284
 [v _SetChannelNum `(v ~T0 @X0 1 ef1`uc ]
 {
-[; ;rfm70.c: 237: void SetChannelNum(uint8_t ch)
-[; ;rfm70.c: 238: {
+[; ;rfm70.c: 283: void SetChannelNum(uint8_t ch)
+[; ;rfm70.c: 284: {
 [e :U _SetChannelNum ]
 [v _ch `uc ~T0 @X0 1 r1 ]
 [f ]
-[; ;rfm70.c: 239: SPI_Write_Reg((uint8_t)(0x20|5),(uint8_t)(ch));
-"239
+[; ;rfm70.c: 285: SPI_Write_Reg((uint8_t)(0x20|5),(uint8_t)(ch));
+"285
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 5 `i `uc _ch ]
-[; ;rfm70.c: 240: }
-"240
+[; ;rfm70.c: 286: }
+"286
 [e :UE 183 ]
 }
-"252
+"300
 [v _RFM70_Initialize `(v ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 251: void RFM70_Initialize()
-[; ;rfm70.c: 252: {
+[; ;rfm70.c: 299: void RFM70_Initialize()
+[; ;rfm70.c: 300: {
 [e :U _RFM70_Initialize ]
 [f ]
-"253
+"301
 [v _i `uc ~T0 @X0 1 a ]
 [v _j `uc ~T0 @X0 1 a ]
-"254
+"302
 [v _WriteArr `uc ~T0 @X0 -> 12 `i a ]
-[; ;rfm70.c: 253: uint8_t i,j;
-[; ;rfm70.c: 254: uint8_t WriteArr[12];
-[; ;rfm70.c: 256: _delay( 200 * ( 8000000L / 4000));
-"256
+[; ;rfm70.c: 301: uint8_t i,j;
+[; ;rfm70.c: 302: uint8_t WriteArr[12];
+[; ;rfm70.c: 304: _delay( 200 * ( 8000000L / 4000));
+"304
 [e ( __delay (1 -> * -> -> 200 `i `l / -> 8000000 `l -> -> 4000 `i `l `ul ]
-[; ;rfm70.c: 258: SwitchCFG(0);
-"258
+[; ;rfm70.c: 306: SwitchCFG(0);
+"306
 [e ( _SwitchCFG (1 -> -> 0 `i `uc ]
-[; ;rfm70.c: 260: for(i=0;i<20;i++)
-"260
+[; ;rfm70.c: 308: for(i=0;i<20;i++)
+"308
 {
 [e = _i -> -> 0 `i `uc ]
 [e $ < -> _i `i -> 20 `i 185  ]
 [e $U 186  ]
-"261
+"309
 [e :U 185 ]
-[; ;rfm70.c: 261: {
+[; ;rfm70.c: 309: {
 {
-[; ;rfm70.c: 262: SPI_Write_Reg((0x20|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
-"262
+[; ;rfm70.c: 310: SPI_Write_Reg((0x20|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
+"310
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> *U + &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux * -> -> -> 0 `i `ui `ux -> -> # *U &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux `ui `ux `i `uc *U + &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux * -> -> -> 1 `i `ui `ux -> -> # *U &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux `ui `ux ]
-"263
+"311
 }
-"260
+"308
 [e ++ _i -> -> 1 `i `uc ]
 [e $ < -> _i `i -> 20 `i 185  ]
 [e :U 186 ]
-"263
+"311
 }
-[; ;rfm70.c: 263: }
-[; ;rfm70.c: 275: for(j=0;j<5;j++)
-"275
+[; ;rfm70.c: 311: }
+[; ;rfm70.c: 323: for(j=0;j<5;j++)
+"323
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 5 `i 188  ]
 [e $U 189  ]
-"276
+"324
 [e :U 188 ]
-[; ;rfm70.c: 276: {
+[; ;rfm70.c: 324: {
 {
-[; ;rfm70.c: 277: WriteArr[j]=RX0_Address[j];
-"277
+[; ;rfm70.c: 325: WriteArr[j]=RX0_Address[j];
+"325
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux *U + &U _RX0_Address * -> _j `ux -> -> # *U &U _RX0_Address `ui `ux ]
-"278
+"326
 }
-"275
+"323
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 5 `i 188  ]
 [e :U 189 ]
-"278
+"326
 }
-[; ;rfm70.c: 278: }
-[; ;rfm70.c: 279: SPI_Write_Buf((0x20|10),&(WriteArr[0]),5);
-"279
+[; ;rfm70.c: 326: }
+[; ;rfm70.c: 327: SPI_Write_Buf((0x20|10),&(WriteArr[0]),5);
+"327
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> 10 `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 5 `i `uc ]
-[; ;rfm70.c: 282: for(j=0;j<5;j++)
-"282
+[; ;rfm70.c: 330: for(j=0;j<5;j++)
+"330
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 5 `i 191  ]
 [e $U 192  ]
-"283
+"331
 [e :U 191 ]
-[; ;rfm70.c: 283: {
+[; ;rfm70.c: 331: {
 {
-[; ;rfm70.c: 284: WriteArr[j]=RX1_Address[j];
-"284
+[; ;rfm70.c: 332: WriteArr[j]=RX1_Address[j];
+"332
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux *U + &U _RX1_Address * -> _j `ux -> -> # *U &U _RX1_Address `ui `ux ]
-"285
+"333
 }
-"282
+"330
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 5 `i 191  ]
 [e :U 192 ]
-"285
+"333
 }
-[; ;rfm70.c: 285: }
-[; ;rfm70.c: 286: SPI_Write_Buf((0x20|11),&(WriteArr[0]),5);
-"286
+[; ;rfm70.c: 333: }
+[; ;rfm70.c: 334: SPI_Write_Buf((0x20|11),&(WriteArr[0]),5);
+"334
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> 11 `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 5 `i `uc ]
-[; ;rfm70.c: 288: for(j=0;j<5;j++)
-"288
+[; ;rfm70.c: 336: for(j=0;j<5;j++)
+"336
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 5 `i 194  ]
 [e $U 195  ]
-"289
+"337
 [e :U 194 ]
-[; ;rfm70.c: 289: {
+[; ;rfm70.c: 337: {
 {
-[; ;rfm70.c: 290: WriteArr[j]=RX0_Address[j];
-"290
+[; ;rfm70.c: 338: WriteArr[j]=RX0_Address[j];
+"338
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux *U + &U _RX0_Address * -> _j `ux -> -> # *U &U _RX0_Address `ui `ux ]
-"291
+"339
 }
-"288
+"336
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 5 `i 194  ]
 [e :U 195 ]
-"291
+"339
 }
-[; ;rfm70.c: 291: }
-[; ;rfm70.c: 292: SPI_Write_Buf((0x20|16),&(WriteArr[0]),5);
-"292
+[; ;rfm70.c: 339: }
+[; ;rfm70.c: 340: SPI_Write_Buf((0x20|16),&(WriteArr[0]),5);
+"340
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> 16 `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 5 `i `uc ]
-[; ;rfm70.c: 296: i=SPI_Read_Reg(29);
-"296
+[; ;rfm70.c: 344: i=SPI_Read_Reg(29);
+"344
 [e = _i ( _SPI_Read_Reg (1 -> -> 29 `i `uc ]
-[; ;rfm70.c: 297: if(i==0)
-"297
+[; ;rfm70.c: 345: if(i==0)
+"345
 [e $ ! == -> _i `i -> 0 `i 197  ]
-[; ;rfm70.c: 298: SPI_Write_Reg(0x50,0x73);
-"298
+[; ;rfm70.c: 347: SPI_Write_Reg(0x50,0x73);
+"347
 [e ( _SPI_Write_Reg (2 , -> -> 80 `i `uc -> -> 115 `i `uc ]
 [e :U 197 ]
-[; ;rfm70.c: 305: for(i=22;i>=21;i--)
-"305
+[; ;rfm70.c: 354: for(i=22;i>=21;i--)
+"354
 {
 [e = _i -> -> 22 `i `uc ]
 [e $ >= -> _i `i -> 21 `i 198  ]
 [e $U 199  ]
-"306
+"355
 [e :U 198 ]
-[; ;rfm70.c: 306: {
+[; ;rfm70.c: 355: {
 {
-[; ;rfm70.c: 307: SPI_Write_Reg((0x20|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
-"307
+[; ;rfm70.c: 356: SPI_Write_Reg((0x20|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
+"356
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> *U + &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux * -> -> -> 0 `i `ui `ux -> -> # *U &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux `ui `ux `i `uc *U + &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux * -> -> -> 1 `i `ui `ux -> -> # *U &U *U + &U _Bank0_Reg * -> _i `ux -> * -> # *U &U *U &U _Bank0_Reg `ui -> -> 2 `i `ui `ux `ui `ux ]
-"309
+"358
 }
-"305
+"354
 [e -- _i -> -> 1 `i `uc ]
 [e $ >= -> _i `i -> 21 `i 198  ]
 [e :U 199 ]
-"309
+"358
 }
-[; ;rfm70.c: 309: }
-[; ;rfm70.c: 312: SwitchCFG(1);
-"312
+[; ;rfm70.c: 358: }
+[; ;rfm70.c: 362: SwitchCFG(1);
+"362
 [e ( _SwitchCFG (1 -> -> 1 `i `uc ]
-[; ;rfm70.c: 314: for(i=0;i<=8;i++)
-"314
+[; ;rfm70.c: 364: for(i=0;i<=8;i++)
+"364
 {
 [e = _i -> -> 0 `i `uc ]
 [e $ <= -> _i `i -> 8 `i 201  ]
 [e $U 202  ]
-"315
+"365
 [e :U 201 ]
-[; ;rfm70.c: 315: {
+[; ;rfm70.c: 365: {
 {
-[; ;rfm70.c: 316: for(j=0;j<4;j++)
-"316
+[; ;rfm70.c: 366: for(j=0;j<4;j++)
+"366
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 4 `i 204  ]
 [e $U 205  ]
-"317
+"367
 [e :U 204 ]
-[; ;rfm70.c: 317: WriteArr[j]=(Bank1_Reg0_13[i]>>(8*(j) ) )&0xff;
+[; ;rfm70.c: 367: WriteArr[j]=(Bank1_Reg0_13[i]>>(8*(j) ) )&0xff;
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux -> & >> *U + &U _Bank1_Reg0_13 * -> _i `ux -> -> # *U &U _Bank1_Reg0_13 `ui `ux * -> 8 `i -> _j `i -> -> -> 255 `i `l `ul `uc ]
-"316
+"366
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 4 `i 204  ]
 [e :U 205 ]
-"317
+"367
 }
-[; ;rfm70.c: 319: SPI_Write_Buf((0x20|i),&(WriteArr[0]),4);
-"319
+[; ;rfm70.c: 369: SPI_Write_Buf((0x20|i),&(WriteArr[0]),4);
+"369
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> _i `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 4 `i `uc ]
-"320
+"370
 }
-"314
+"364
 [e ++ _i -> -> 1 `i `uc ]
 [e $ <= -> _i `i -> 8 `i 201  ]
 [e :U 202 ]
-"320
+"370
 }
-[; ;rfm70.c: 320: }
-[; ;rfm70.c: 322: for(i=9;i<=13;i++)
-"322
+[; ;rfm70.c: 370: }
+[; ;rfm70.c: 372: for(i=9;i<=13;i++)
+"372
 {
 [e = _i -> -> 9 `i `uc ]
 [e $ <= -> _i `i -> 13 `i 207  ]
 [e $U 208  ]
-"323
+"373
 [e :U 207 ]
-[; ;rfm70.c: 323: {
+[; ;rfm70.c: 373: {
 {
-[; ;rfm70.c: 324: for(j=0;j<4;j++)
-"324
+[; ;rfm70.c: 374: for(j=0;j<4;j++)
+"374
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 4 `i 210  ]
 [e $U 211  ]
-"325
+"375
 [e :U 210 ]
-[; ;rfm70.c: 325: WriteArr[j]=(Bank1_Reg0_13[i]>>(8*(3-j) ) )&0xff;
+[; ;rfm70.c: 375: WriteArr[j]=(Bank1_Reg0_13[i]>>(8*(3-j) ) )&0xff;
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux -> & >> *U + &U _Bank1_Reg0_13 * -> _i `ux -> -> # *U &U _Bank1_Reg0_13 `ui `ux * -> 8 `i - -> 3 `i -> _j `i -> -> -> 255 `i `l `ul `uc ]
-"324
+"374
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 4 `i 210  ]
 [e :U 211 ]
-"325
+"375
 }
-[; ;rfm70.c: 327: SPI_Write_Buf((0x20|i),&(WriteArr[0]),4);
-"327
+[; ;rfm70.c: 377: SPI_Write_Buf((0x20|i),&(WriteArr[0]),4);
+"377
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> _i `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 4 `i `uc ]
-"328
+"378
 }
-"322
+"372
 [e ++ _i -> -> 1 `i `uc ]
 [e $ <= -> _i `i -> 13 `i 207  ]
 [e :U 208 ]
-"328
+"378
 }
-[; ;rfm70.c: 328: }
-[; ;rfm70.c: 331: for(j=0;j<11;j++)
-"331
+[; ;rfm70.c: 378: }
+[; ;rfm70.c: 381: for(j=0;j<11;j++)
+"381
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 11 `i 213  ]
 [e $U 214  ]
-"332
+"382
 [e :U 213 ]
-[; ;rfm70.c: 332: {
+[; ;rfm70.c: 382: {
 {
-[; ;rfm70.c: 333: WriteArr[j]=Bank1_Reg14[j];
-"333
+[; ;rfm70.c: 383: WriteArr[j]=Bank1_Reg14[j];
+"383
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux *U + &U _Bank1_Reg14 * -> _j `ux -> -> # *U &U _Bank1_Reg14 `ui `ux ]
-"334
+"384
 }
-"331
+"381
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 11 `i 213  ]
 [e :U 214 ]
-"334
+"384
 }
-[; ;rfm70.c: 334: }
-[; ;rfm70.c: 335: SPI_Write_Buf((0x20|14),&(WriteArr[0]),11);
-"335
+[; ;rfm70.c: 384: }
+[; ;rfm70.c: 385: SPI_Write_Buf((0x20|14),&(WriteArr[0]),11);
+"385
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> 14 `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 11 `i `uc ]
-[; ;rfm70.c: 338: for(j=0;j<4;j++)
-"338
+[; ;rfm70.c: 388: for(j=0;j<4;j++)
+"388
 {
 [e = _j -> -> 0 `i `uc ]
 [e $ < -> _j `i -> 4 `i 216  ]
 [e $U 217  ]
-"340
+"390
 [e :U 216 ]
-[; ;rfm70.c: 340: WriteArr[j]=(Bank1_Reg0_13[4]>>(8*(j) ) )&0xff;
+[; ;rfm70.c: 390: WriteArr[j]=(Bank1_Reg0_13[4]>>(8*(j) ) )&0xff;
 [e = *U + &U _WriteArr * -> _j `ux -> -> # *U &U _WriteArr `ui `ux -> & >> *U + &U _Bank1_Reg0_13 * -> -> -> 4 `i `ui `ux -> -> # *U &U _Bank1_Reg0_13 `ui `ux * -> 8 `i -> _j `i -> -> -> 255 `i `l `ul `uc ]
-"338
+"388
 [e ++ _j -> -> 1 `i `uc ]
 [e $ < -> _j `i -> 4 `i 216  ]
 [e :U 217 ]
-"340
+"390
 }
-[; ;rfm70.c: 342: WriteArr[0]=WriteArr[0]|0x06;
-"342
+[; ;rfm70.c: 392: WriteArr[0]=WriteArr[0]|0x06;
+"392
 [e = *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> | -> *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux `i -> 6 `i `uc ]
-[; ;rfm70.c: 343: SPI_Write_Buf((0x20|4),&(WriteArr[0]),4);
-"343
+[; ;rfm70.c: 393: SPI_Write_Buf((0x20|4),&(WriteArr[0]),4);
+"393
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> 4 `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 4 `i `uc ]
-[; ;rfm70.c: 345: WriteArr[0]=WriteArr[0]&0xf9;
-"345
+[; ;rfm70.c: 395: WriteArr[0]=WriteArr[0]&0xf9;
+"395
 [e = *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> & -> *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux `i -> 249 `i `uc ]
-[; ;rfm70.c: 346: SPI_Write_Buf((0x20|4),&(WriteArr[0]),4);
-"346
+[; ;rfm70.c: 396: SPI_Write_Buf((0x20|4),&(WriteArr[0]),4);
+"396
 [e ( _SPI_Write_Buf (3 , , -> | -> 32 `i -> 4 `i `uc &U *U + &U _WriteArr * -> -> -> 0 `i `ui `ux -> -> # *U &U _WriteArr `ui `ux -> -> 4 `i `uc ]
-[; ;rfm70.c: 353: _delay( 50 * ( 8000000L / 4000));
-"353
+[; ;rfm70.c: 398: _delay( 50 * ( 8000000L / 4000));
+"398
 [e ( __delay (1 -> * -> -> 50 `i `l / -> 8000000 `l -> -> 4000 `i `l `ul ]
-[; ;rfm70.c: 356: SwitchCFG(0);
-"356
+[; ;rfm70.c: 403: SwitchCFG(0);
+"403
 [e ( _SwitchCFG (1 -> -> 0 `i `uc ]
-[; ;rfm70.c: 358: PORTCbits.RC2=0;
-"358
+[; ;rfm70.c: 405: PORTCbits.RC2=0;
+"405
 [e = . . _PORTCbits 0 2 -> -> 0 `i `uc ]
-[; ;rfm70.c: 359: }
-"359
+[; ;rfm70.c: 406: }
+"406
 [e :UE 184 ]
 }
-"362
+"409
 [v _rfm70_data_sent `(uc ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 362: uint8_t rfm70_data_sent(void) {
+[; ;rfm70.c: 409: uint8_t rfm70_data_sent(void) {
 [e :U _rfm70_data_sent ]
 [f ]
-[; ;rfm70.c: 363: if (SPI_Read_Reg(0x07)&0x20) {
-"363
+[; ;rfm70.c: 410: if (SPI_Read_Reg(0x07)&0x20) {
+"410
 [e $ ! != & -> ( _SPI_Read_Reg (1 -> -> 7 `i `uc `i -> 32 `i -> 0 `i 220  ]
 {
-[; ;rfm70.c: 364: SPI_Write_Reg(0x20|0x07,0x20);
-"364
+[; ;rfm70.c: 411: SPI_Write_Reg(0x20|0x07,0x20);
+"411
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 7 `i `uc -> -> 32 `i `uc ]
-[; ;rfm70.c: 365: return(1);
-"365
+[; ;rfm70.c: 412: return(1);
+"412
 [e ) -> -> 1 `i `uc ]
 [e $UE 219  ]
-"366
+"413
 }
-[; ;rfm70.c: 366: }
+[; ;rfm70.c: 413: }
 [e $U 221  ]
-"367
+"414
 [e :U 220 ]
-[; ;rfm70.c: 367: else
-[; ;rfm70.c: 368: return(0);
-"368
+[; ;rfm70.c: 414: else
+[; ;rfm70.c: 415: return(0);
+"415
 [e ) -> -> 0 `i `uc ]
 [e $UE 219  ]
 [e :U 221 ]
-[; ;rfm70.c: 369: }
-"369
+[; ;rfm70.c: 416: }
+"416
 [e :UE 219 ]
 }
-"371
+"418
 [v _rfm70TxDataSentInterrupt `(uc ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 371: uint8_t rfm70TxDataSentInterrupt(void) {
+[; ;rfm70.c: 418: uint8_t rfm70TxDataSentInterrupt(void) {
 [e :U _rfm70TxDataSentInterrupt ]
 [f ]
-[; ;rfm70.c: 372: if (SPI_Read_Reg(0x07)&0x20) {
-"372
+[; ;rfm70.c: 419: if (SPI_Read_Reg(0x07)&0x20) {
+"419
 [e $ ! != & -> ( _SPI_Read_Reg (1 -> -> 7 `i `uc `i -> 32 `i -> 0 `i 223  ]
 {
-[; ;rfm70.c: 373: SPI_Write_Reg(0x20|0x07,0x20);
-"373
+[; ;rfm70.c: 420: SPI_Write_Reg(0x20|0x07,0x20);
+"420
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 7 `i `uc -> -> 32 `i `uc ]
-[; ;rfm70.c: 374: return(1);
-"374
+[; ;rfm70.c: 421: return(1);
+"421
 [e ) -> -> 1 `i `uc ]
 [e $UE 222  ]
-"375
+"422
 }
-[; ;rfm70.c: 375: }
+[; ;rfm70.c: 422: }
 [e $U 224  ]
-"376
+"423
 [e :U 223 ]
-[; ;rfm70.c: 376: else
-[; ;rfm70.c: 377: return(0);
-"377
+[; ;rfm70.c: 423: else
+[; ;rfm70.c: 424: return(0);
+"424
 [e ) -> -> 0 `i `uc ]
 [e $UE 222  ]
 [e :U 224 ]
-[; ;rfm70.c: 378: }
-"378
+[; ;rfm70.c: 425: }
+"425
 [e :UE 222 ]
 }
-"380
+"427
 [v _rfm70TxDataSentErrorInterrupt `(uc ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 380: uint8_t rfm70TxDataSentErrorInterrupt(void) {
+[; ;rfm70.c: 427: uint8_t rfm70TxDataSentErrorInterrupt(void) {
 [e :U _rfm70TxDataSentErrorInterrupt ]
 [f ]
-[; ;rfm70.c: 381: if (SPI_Read_Reg(0x07)&0x20) {
-"381
+[; ;rfm70.c: 428: if (SPI_Read_Reg(0x07)&0x20) {
+"428
 [e $ ! != & -> ( _SPI_Read_Reg (1 -> -> 7 `i `uc `i -> 32 `i -> 0 `i 226  ]
 {
-[; ;rfm70.c: 382: SPI_Write_Reg(0x20|0x07,0x10);
-"382
+[; ;rfm70.c: 429: SPI_Write_Reg(0x20|0x07,0x10);
+"429
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 7 `i `uc -> -> 16 `i `uc ]
-[; ;rfm70.c: 383: return(1);
-"383
+[; ;rfm70.c: 430: return(1);
+"430
 [e ) -> -> 1 `i `uc ]
 [e $UE 225  ]
-"384
+"431
 }
-[; ;rfm70.c: 384: }
+[; ;rfm70.c: 431: }
 [e $U 227  ]
-"385
+"432
 [e :U 226 ]
-[; ;rfm70.c: 385: else
-[; ;rfm70.c: 386: return(0);
-"386
+[; ;rfm70.c: 432: else
+[; ;rfm70.c: 433: return(0);
+"433
 [e ) -> -> 0 `i `uc ]
 [e $UE 225  ]
 [e :U 227 ]
-[; ;rfm70.c: 387: }
-"387
+[; ;rfm70.c: 434: }
+"434
 [e :UE 225 ]
 }
-"389
+"436
 [v _rfm70Interrupt `(uc ~T0 @X0 1 ef ]
 {
-[; ;rfm70.c: 389: uint8_t rfm70Interrupt(void) {
+[; ;rfm70.c: 436: uint8_t rfm70Interrupt(void) {
 [e :U _rfm70Interrupt ]
 [f ]
-[; ;rfm70.c: 390: if (PORTDbits.RD1)
-"390
+[; ;rfm70.c: 437: if (PORTDbits.RD1)
+"437
 [e $ ! != -> . . _PORTDbits 0 1 `i -> -> -> 0 `i `Vuc `i 229  ]
-[; ;rfm70.c: 391: return(0);
-"391
+[; ;rfm70.c: 438: return(0);
+"438
 [e ) -> -> 0 `i `uc ]
 [e $UE 228  ]
 [e $U 230  ]
-"392
+"439
 [e :U 229 ]
-[; ;rfm70.c: 392: else
-[; ;rfm70.c: 393: return(1);
-"393
+[; ;rfm70.c: 439: else
+[; ;rfm70.c: 440: return(1);
+"440
 [e ) -> -> 1 `i `uc ]
 [e $UE 228  ]
 [e :U 230 ]
-[; ;rfm70.c: 394: }
-"394
+[; ;rfm70.c: 441: }
+"441
 [e :UE 228 ]
 }
-"400
+"454
 [v _rfm70setPowerdownMode `(v ~T0 @X0 1 ef1`uc ]
 {
-[; ;rfm70.c: 399: void rfm70setPowerdownMode(uint8_t value)
-[; ;rfm70.c: 400: {
+[; ;rfm70.c: 453: void rfm70setPowerdownMode(uint8_t value)
+[; ;rfm70.c: 454: {
 [e :U _rfm70setPowerdownMode ]
 [v _value `uc ~T0 @X0 1 r1 ]
 [f ]
-"401
+"455
 [v _reg `uc ~T0 @X0 1 a ]
-[; ;rfm70.c: 401: uint8_t reg;
-[; ;rfm70.c: 403: reg=SPI_Read_Reg(0x00);
-"403
+[; ;rfm70.c: 455: uint8_t reg;
+[; ;rfm70.c: 457: reg=SPI_Read_Reg(0x00);
+"457
 [e = _reg ( _SPI_Read_Reg (1 -> -> 0 `i `uc ]
-[; ;rfm70.c: 407: if (value==0) {
-"407
+[; ;rfm70.c: 462: if (value==0) {
+"462
 [e $ ! == -> _value `i -> 0 `i 232  ]
 {
-[; ;rfm70.c: 408: reg &= 0xFD;
-"408
+[; ;rfm70.c: 463: reg &= 0xFD;
+"463
 [e =& _reg -> -> 253 `i `uc ]
-"409
+"464
 }
-[; ;rfm70.c: 409: }
+[; ;rfm70.c: 464: }
 [e $U 233  ]
-"410
+"465
 [e :U 232 ]
-[; ;rfm70.c: 410: else {
+[; ;rfm70.c: 465: else {
 {
-[; ;rfm70.c: 411: reg |= 0x02;
-"411
+[; ;rfm70.c: 466: reg |= 0x02;
+"466
 [e =| _reg -> -> 2 `i `uc ]
-"412
+"467
 }
 [e :U 233 ]
-[; ;rfm70.c: 412: }
-[; ;rfm70.c: 414: SPI_Write_Reg(0x20 | 0x00, reg);
-"414
+[; ;rfm70.c: 467: }
+[; ;rfm70.c: 469: SPI_Write_Reg(0x20 | 0x00, reg);
+"469
 [e ( _SPI_Write_Reg (2 , -> | -> 32 `i -> 0 `i `uc _reg ]
-[; ;rfm70.c: 415: }
-"415
+[; ;rfm70.c: 470: }
+"470
 [e :UE 231 ]
 }

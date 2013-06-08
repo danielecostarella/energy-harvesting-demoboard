@@ -5,15 +5,14 @@ _Send_Packet: CODE, 3183 0 100
 __stringtab: STRING, 2048 0 6
 _adcReadVcap: CODE, 2957 0 51
 _adcReadTemp: CODE, 3008 0 56
-__stringdata: STRING, 2181 0 17
 _Bank0_Reg: STRING, 2110 0 46
 _ISR: CODE, 3283 0 106
-_rfm70TxDataSentErrorInterrupt: CODE, 2647 0 31
+_rfm70TxDataSentErrorInterrupt: CODE, 2678 0 31
 _Bank0_RegAct: STRING, 0 0 2181
 ___ftpack: CODE, 3615 0 125
 _adcReadVsupercap: CODE, 3064 0 56
 _main: CODE, 763 0 536
-_rfm70TxDataSentInterrupt: CODE, 2678 0 31
+_rfm70TxDataSentInterrupt: CODE, 2647 0 31
 _Bank1_Reg14: STRING, 2156 0 11
 _spiInit: CODE, 2573 0 24
 _Bank1_Reg0_13: STRING, 2054 0 56
@@ -23,13 +22,13 @@ __initialization: CODE, 1993 0 50
 ___lbtoft: CODE, 2709 0 33
 _RX1_Address: STRING, 2172 0 5
 _SPI_Write_Reg: CODE, 2529 0 22
-_SPI_Write_Buf: CODE, 2779 0 42
+_SPI_Write_Buf: CODE, 2821 0 42
 _SPI_Read_Reg: CODE, 2622 0 25
 _adcInit: CODE, 2488 0 9
 ___ftmul: CODE, 1555 0 238
 _RFM70_Initialize: CODE, 21 0 742
 _SwitchToRxMode: CODE, 3120 0 63
-_SwitchToTxMode: CODE, 2821 0 42
+_SwitchToTxMode: CODE, 2779 0 42
 ___wmul: CODE, 2863 0 44
 _SwitchCFG: CODE, 2907 0 50
 _sleep: CODE, 1299 0 256
@@ -37,4 +36,4 @@ _uartInit: CODE, 2551 0 22
 ___fttol: CODE, 3740 0 166
 ___ftge: CODE, 3389 0 110
 ___ftdiv: CODE, 1793 0 200
-Total: 5925
+Total: 5908

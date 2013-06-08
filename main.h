@@ -1,9 +1,3 @@
-/*
- * File:   main.h
- * Author: blackbliss
- *
- * Created on 22 febbraio 2013, 20.56
- */
 /*****************************************************************************
  * File:        main.h
  * Author:      Daniele Costarella <daniele.costarella@gmail.com>
@@ -42,24 +36,8 @@
 #define MOSI    PORTCbits.RC5
 #define IRQ     PORTDbits.RD1
 
-//#define LED     PORTDbits.RD0
-
 #define SKIP_MEASURE    PORTDbits.RD5
-
 #define PGOOD           PORTBbits.RB0
-
 #define SCAP_MOS        PORTAbits.RA2   // 0: enabled; 1: disabled
-
-/* MCU Configuration */
-// da incollare
-
-//void init(void);
-//void spiInit(void);
-//void serialInit(void);
-//void adcInit(void);
-//int adcRead(unsigned char channel);
-//void putch (char c);
-//unsigned char getch();
-//unsigned char getche(void);
 
 #endif	/* MAIN_H */

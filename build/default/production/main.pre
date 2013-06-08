@@ -2468,30 +2468,23 @@ typedef int16_t intptr_t;
 
 typedef uint16_t uintptr_t;
 
-# 79 "rfm70.h"
+# 80 "rfm70.h"
 uint8_t SPI_Read_Reg(uint8_t reg);
 void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
-
 void SPI_Write_Reg(uint8_t reg, uint8_t value);
-
-
 void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
 void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
-
 void SwitchToTxMode(void);
 void SwitchToRxMode(void);
-
 void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
 void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
 void SwitchCFG(char _cfg);
-
 void RFM70_Initialize(void);
-
+void rfm70setPowerdownMode(uint8_t value);
 uint8_t rfm70_data_sent(void);
 uint8_t rfm70Interrupt(void);
 uint8_t rfm70TxDataSentErrorInterrupt(void);
 uint8_t rfm70TxDataSentInterrupt(void);
-void rfm70setPowerdownMode(uint8_t value);
 
 
 # 33 "main.c"
@@ -2560,12 +2553,13 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-TMR1H = 0x10;
+TMR1H = 0x60;
+
 TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
 
-# 130
+# 131
 jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PORTBbits.RB0 * 64 ;
 
 
@@ -2594,12 +2588,12 @@ TMR1IF=0;
 }
 }
 
-# 169
+# 170
 int main(int argc, char** argv) {
 long int i=0;
 uint8_t num_sleep;
 
-# 177
+# 178
 boardInit();
 spiInit();
 uartInit();
@@ -2619,10 +2613,10 @@ asm("sleep");
 RFM70_Initialize();
 rfm70setPowerdownMode(0);
 
-# 227
+# 208
 asm("sleep");
 
-# 247
+# 228
 timelapse_count = 0;
 while(1) {
 rfm70setPowerdownMode(1);
@@ -2642,19 +2636,15 @@ tx_buf[8] = (int)charge_pulse_float;
 tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
 
 
-
-
 if (tx_buf[1] > 8*(95/8) || PORTDbits.RD5) {
-
 tx_buf[0] = adcReadTemp();
-
-# 276
 jumper_stat |= 0x80;
 tx_buf[4] = jumper_stat;
 Send_Packet(0xB0,tx_buf,10);
 energy = 0;
 }
 else {
+
 if ((tx_buf[7] > (2.2*(68/248))/0.004) && (tx_buf[1] <= value) && !PORTBbits.RB0) {
 PORTAbits.RA2 =0;
 tx_buf[0] = adcReadTemp();
@@ -2674,7 +2664,7 @@ charge_pulse_float = 10;
 energy = 0;
 }
 
-# 305
+# 279
 }
 
 PORTCbits.RC2=0;
@@ -2713,6 +2703,7 @@ DACCON1 = 0;
 DACCON0 = 0xA0;
 T1CONbits.TMR1ON=0;
 charge_time = 0 - (charge_pulse<<2);
+
 TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
 TMR1L = (uint8_t)((charge_time) & 0xFF);
 T1CONbits.TMR1ON=1;
@@ -2721,7 +2712,8 @@ asm("sleep");
 DACCON0 = 0x00;
 PORTAbits.RA2=1;
 new_value = adcReadVcap();
-charge_time = 0x1000 - charge_time;
+charge_time = 0x6000 - charge_time;
+
 T1CONbits.TMR1ON=0;
 TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
 TMR1L = (uint8_t)((charge_time) & 0xFF);
@@ -2743,11 +2735,12 @@ if (charge_pulse_float > 0)
 charge_pulse_float /= 1.05;
 }
 
-# 382
+# 358
 }
 else {
 T1CONbits.TMR1ON=0;
-TMR1H = 0x10;
+TMR1H = 0x60;
+
 TMR1L = 0x00;
 T1CONbits.TMR1ON=1;
 asm("sleep");
@@ -2775,7 +2768,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 422
+# 399
 uint8_t adcReadVcap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2793,7 +2786,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 448
+# 425
 uint8_t adcReadVsupercap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2812,7 +2805,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 474
+# 451
 void uartInit(void) {
 TRISCbits.TRISC7=1;
 TRISCbits.TRISC6=0;
@@ -2829,7 +2822,7 @@ TXSTAbits.TXEN=1;
 
 }
 
-# 500
+# 477
 void spiInit(void) {
 SSPCONbits.SSPEN=1;
 SSPCONbits.CKP=0;
@@ -2840,7 +2833,7 @@ SSPSTATbits.CKE=1;
 _delay( 50 * ( 8000000L / 4000));
 }
 
-# 518
+# 495
 void adcInit(void) {
 ADCON1bits.ADCS=1;
 ADCON1bits.ADREF=3;
@@ -2868,13 +2861,13 @@ putch(c = getch());
 return c;
 }
 
-# 551
+# 528
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 566
+# 543
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2886,7 +2879,7 @@ if((fifo_sta&0x20)==0)
 
 {
 
-# 582
+# 559
 PORTCbits.RC2=0;
 SPI_Write_Buf(type, pbuf, len);
 PORTCbits.RC2=1;
@@ -2910,7 +2903,7 @@ SwitchToRxMode();
 }
 }
 
-# 611
+# 588
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2949,24 +2942,19 @@ chksum += rx_buf[j];
 
 if(chksum==rx_buf[rx_count-1]) {
 
-# 656
+
 SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
 
-
-printf("Receiving: ");
-printf(rx_buf);
-printf("\n\r\n\r");
-
-
+# 635
 }
 }
 SPI_Write_Reg(0x20|0x07,sta);
 
 }
 
-# 679
+# 648
 void boardInit(void) {
 OSCCONbits.IRCF=2;
 

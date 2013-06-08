@@ -87,30 +87,31 @@ extern const unsigned long Bank1_Reg0_13[];
 uint8_t tmr1Counter = 0;
 uint8_t tmr1Target = 1;
 static bit flag = 0;
-static bit scap_on = 0; //scap_on = 1 => power supply not present
+static bit scap_on = 0;             // scap_on = 1 => power supply not present
 uint8_t jumper_stat=0;
 uint8_t sleep_counter;
 uint8_t sleep_count;
 
 uint8_t value = 0;
 int16_t timelapse_count = 0;
-unsigned int charge_time;   // int16_t
-unsigned int charge_pulse; //= 10; //era 50 100; // pulse length in ms
-float charge_pulse_float = 10; //charge_pulse = (int)charge_pulse_float
+unsigned int charge_time;           // int16_t
+unsigned int charge_pulse;          // pulse length in ms
+float charge_pulse_float = 10;      // charge_pulse = (int)charge_pulse_float
 
 unsigned int dac_value = 26; //era 25
 
 uint8_t values[2] = {0x00, 0x00};
-unsigned int energy=0; // energy
+unsigned int energy=0;
 void boardInit(void);
 
 void interrupt ISR(void)
    {
-   if(TMR1IF) // interrupt on TIMER1 overflow
+   if(TMR1IF)                       // interrupt on TIMER1 overflow
       {
       tmr1Counter++;
 
-      TMR1H = 0x10; // 15s
+      TMR1H = 0x60;      // 10s (only for DEMO)
+      //TMR1H = 0x10; // 15s
       TMR1L = 0x00;
 
       if(tmr1Counter == tmr1Target){
@@ -203,27 +204,7 @@ int main(int argc, char** argv) {
 
     value = adcReadVcap();
     */
-    /*
-    while(value > VCHARGE_STOP) {
-        PORTBbits.RB4=0;
-        T1CONbits.TMR1ON=0;
-        charge_time = 0 - (charge_pulse<<2);    //50ms*4
-        TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
-        TMR1L = (uint8_t)((charge_time) & 0xFF);
-        T1CONbits.TMR1ON=1;
-        SLEEP();    // SLEEP 50MS
 
-        PORTBbits.RB4=1;
-        charge_time = 0x1000 - charge_time;
-        T1CONbits.TMR1ON=0;
-        TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
-        TMR1L = (uint8_t)((charge_time) & 0xFF);
-        T1CONbits.TMR1ON=1;
-        SLEEP();    // SLEEP 15s - 50ms
-        value = adcReadVcap();
-        //WAIT_MS(100);
-        } 
-        */
     SLEEP();
 
     /******************************** TESTS **********************************
@@ -263,30 +244,23 @@ int main(int argc, char** argv) {
         tx_buf[9] = ((((int)charge_pulse_float) >> 8) & 0xFF);
 
         // test if Vin is rising
-        //PORTCbits.RC0=1;
-        //Send_Packet(W_ACK_PAYLOAD_CMD,temp_tx_buf,17);	// transmit
         if (tx_buf[1] > VMIN || SKIP_MEASURE) {
-            //rfm70setPowerdownMode(1);
             tx_buf[0] = adcReadTemp();
-            //if ((jumper_stat & 0x80) == 0) {
-            //    // c'è stata una transizione 0->1 (problema nella salita con intervallo impostato a 15s)
-            //    SLEEP();
-            //    jumper_stat |= 0x40;
-            //}
             jumper_stat |= 0x80;                // power supply is OK
             tx_buf[4] = jumper_stat;
             Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit
             energy = 0;
         }
-        else {              // Vin < VMIN
-            if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value) && !PGOOD) { // vmin sale o scende?
+        else {                                  // Vin < VMIN
+            /* test if vmin is rising or falling */
+            if ((tx_buf[7] > VCAP_MIN) && (tx_buf[1] <= value) && !PGOOD) {
                 SCAP_MOS =0;                // MOS enabled
                 tx_buf[0] = adcReadTemp();
                 tx_buf[7] = adcReadVsupercap();
                 jumper_stat &= 0x7F;            // power supply is not present
                 tx_buf[4] = jumper_stat;
                 Send_Packet(W_TX_PAYLOAD_NOACK_CMD,tx_buf,10);	// transmit 
-                SCAP_MOS =1;                // MOS OFF
+                SCAP_MOS =1;                    // MOS OFF
                 charge_pulse_float = 10;        // re-init charge pulse length
                 energy = 0;
             }
@@ -308,7 +282,7 @@ int main(int argc, char** argv) {
         rfm70setPowerdownMode(0);
 
         T1CONbits.TMR1ON=0;
-        TMR1H = 0x10;
+        TMR1H = 0x10;               // 15 s
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
 
@@ -339,7 +313,8 @@ void sleep(void) {
         DACCON1 = 0;                            // Preprogrammed
         DACCON0 = 0xA0;                         // DAC Enabled
         T1CONbits.TMR1ON=0;
-        charge_time = 0 - (charge_pulse<<2);    //50ms*4 TMR1 è incrementato di 4096 count/s => 4.096 count/ms
+        charge_time = 0 - (charge_pulse<<2);    // 50ms*4 TMR1 is incremented by
+                                                // 4096 count/s=>4.096 count/ms
         TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
         TMR1L = (uint8_t)((charge_time) & 0xFF);
         T1CONbits.TMR1ON=1;
@@ -348,7 +323,8 @@ void sleep(void) {
         DACCON0 = 0x00;                         // DAC disabled
         SCAP_MOS=1;                             // and OUTPUT = High
         new_value = adcReadVcap();
-        charge_time = 0x1000 - charge_time;
+        charge_time = 0x6000 - charge_time;     // only for DEMO
+        //charge_time = 0x1000 - charge_time;
         T1CONbits.TMR1ON=0;
         TMR1H = (uint8_t)(((charge_time) >> 8) & 0xFF);
         TMR1L = (uint8_t)((charge_time) & 0xFF);
@@ -382,7 +358,8 @@ void sleep(void) {
     }
     else {
         T1CONbits.TMR1ON=0;
-        TMR1H = 0x10;
+        TMR1H = 0x60;                // only for DEMO
+        //TMR1H = 0x10;
         TMR1L = 0x00;
         T1CONbits.TMR1ON=1;
         SLEEP();
@@ -645,24 +622,16 @@ void Receive_Packet(void)
 	}
 
 	if(chksum==rx_buf[rx_count-1]) {
-            //LED=1;                                // LED blinking
-            // WAIT_MS(100);
-            //LED=0;
-
             //Send_Packet(W_TX_PAYLOAD_NOACK_CMD,rx_buf,17);
             // not used...
-
-            //=========USE THE FOLLOWING FOR RX VERSION=======
             SwitchToRxMode();//switch to RX mode// RX VERSION
 
-            rx_buf[len-1] = '\0';// terminate string with NULL
-                                        //character (and remove the checksum)
+            rx_buf[len-1] = '\0';       // terminate string with NULL
+                                        // character (and remove the checksum)
 
-            printf("Receiving: ");
-            printf(rx_buf);
-            printf("\n\r\n\r");
-            //===============================================
-
+            ///printf("Receiving: ");
+            ///printf(rx_buf);
+            ///printf("\n\r\n\r");
 	}
     }
     SPI_Write_Reg(WRITE_REG|STATUS,sta);            // clear RX_DR or TX_DS or

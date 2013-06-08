@@ -2468,32 +2468,25 @@ extern unsigned int flash_read(unsigned short addr);
 #pragma intrinsic(_delay)
 extern void _delay(unsigned long);
 
-# 79 "rfm70.h"
+# 80 "rfm70.h"
 uint8_t SPI_Read_Reg(uint8_t reg);
 void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
-
 void SPI_Write_Reg(uint8_t reg, uint8_t value);
-
-
 void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
 void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
-
 void SwitchToTxMode(void);
 void SwitchToRxMode(void);
-
 void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
 void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
 void SwitchCFG(char _cfg);
-
 void RFM70_Initialize(void);
-
+void rfm70setPowerdownMode(uint8_t value);
 uint8_t rfm70_data_sent(void);
 uint8_t rfm70Interrupt(void);
 uint8_t rfm70TxDataSentErrorInterrupt(void);
 uint8_t rfm70TxDataSentInterrupt(void);
-void rfm70setPowerdownMode(uint8_t value);
 
-# 8 "rfm70.c"
+# 31 "rfm70.c"
 const unsigned long Bank1_Reg0_13[]={
 0xE2014B40,
 0x00004BC0,
@@ -2516,15 +2509,13 @@ const uint8_t Bank1_Reg14[]=
 0x41,0x20,0x08,0x04,0x81,0x20,0xCF,0xF7,0xFE,0xFF,0xFF
 };
 
-
-
+# 57
 const uint8_t Bank0_Reg[][2]={
 {0,0x0F},
 {1,0x3F},
 {2,0x3F},
 {3,0x03},
 {4,0xFF},
-
 {5,0x17},
 {6,0x01},
 {7,0x07},
@@ -2554,11 +2545,13 @@ const uint8_t Bank0_RegAct[2][2] = {
 {0x1C, 0x3F},
 {0x1D, 0x07}
 };
+
 const uint8_t RX0_Address[]={0x34,0x43,0x10,0x10,0x01};
+
 
 const uint8_t RX1_Address[]={0x39,0x38,0x37,0x36,0xc2};
 
-# 77
+# 102
 uint8_t SPI_RW(uint8_t value)
 {
 SSPBUF = value;
@@ -2569,7 +2562,7 @@ while(!PIR1bits.SSPIF);
 return SSPBUF;
 }
 
-# 93
+# 121
 void SPI_Write_Reg(uint8_t reg, uint8_t value)
 {
 PORTDbits.RD2=0;
@@ -2578,7 +2571,7 @@ SPI_RW(value);
 PORTDbits.RD2=1;
 }
 
-# 108
+# 138
 uint8_t SPI_Read_Reg(uint8_t reg)
 {
 uint8_t value;
@@ -2590,7 +2583,7 @@ PORTDbits.RD2=1;
 return(value);
 }
 
-# 125
+# 158
 void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length)
 {
 uint8_t status,byte_ctr;
@@ -2598,29 +2591,31 @@ uint8_t status,byte_ctr;
 PORTDbits.RD2=0;
 status = SPI_RW(reg);
 
+
+
 for(byte_ctr=0;byte_ctr<length;byte_ctr++)
 pBuf[byte_ctr] = SPI_RW(0);
-
 
 PORTDbits.RD2=1;
 
 }
 
-# 146
+# 182
 void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length)
 {
 uint8_t byte_ctr;
 
 PORTDbits.RD2=0;
 SPI_RW(reg);
-for(byte_ctr=0; byte_ctr<length; byte_ctr++)
 
+
+for(byte_ctr=0; byte_ctr<length; byte_ctr++)
 SPI_RW(*pBuf++);
 PORTDbits.RD2=1;
 
 }
 
-# 164
+# 204
 void SwitchToRxMode()
 {
 uint8_t value;
@@ -2631,18 +2626,19 @@ value=SPI_Read_Reg(0x07);
 SPI_Write_Reg(0x20|0x07,value);
 
 
+
 PORTCbits.RC2=0;
 
 value=SPI_Read_Reg(0x00);
 
-
 value=value|0x01;
 SPI_Write_Reg(0x20 | 0x00, value);
+
 
 PORTCbits.RC2=1;
 }
 
-# 190
+# 235
 void SwitchToTxMode()
 {
 uint8_t value;
@@ -2655,10 +2651,11 @@ value=value&0xfe;
 SPI_Write_Reg(0x20 | 0x00, value);
 
 
+
 PORTCbits.RC2=1;
 }
 
-# 217
+# 260
 void SwitchCFG(char _cfg)
 {
 uint8_t Tmp;
@@ -2673,13 +2670,13 @@ SPI_Write_Reg(0x50,0x53);
 }
 }
 
-# 237
+# 283
 void SetChannelNum(uint8_t ch)
 {
 SPI_Write_Reg((uint8_t)(0x20|5),(uint8_t)(ch));
 }
 
-# 251
+# 299
 void RFM70_Initialize()
 {
 uint8_t i,j;
@@ -2694,7 +2691,7 @@ for(i=0;i<20;i++)
 SPI_Write_Reg((0x20|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
 }
 
-# 275
+# 323
 for(j=0;j<5;j++)
 {
 WriteArr[j]=RX0_Address[j];
@@ -2718,14 +2715,16 @@ SPI_Write_Buf((0x20|16),&(WriteArr[0]),5);
 
 i=SPI_Read_Reg(29);
 if(i==0)
+
 SPI_Write_Reg(0x50,0x73);
 
-# 305
+# 354
 for(i=22;i>=21;i--)
 {
 SPI_Write_Reg((0x20|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
 
 }
+
 
 
 SwitchCFG(1);
@@ -2764,8 +2763,9 @@ SPI_Write_Buf((0x20|4),&(WriteArr[0]),4);
 WriteArr[0]=WriteArr[0]&0xf9;
 SPI_Write_Buf((0x20|4),&(WriteArr[0]),4);
 
-# 353
 _delay( 50 * ( 8000000L / 4000));
+
+
 
 
 SwitchCFG(0);
@@ -2808,14 +2808,13 @@ else
 return(1);
 }
 
-
-
-
+# 453
 void rfm70setPowerdownMode(uint8_t value)
 {
 uint8_t reg;
 
 reg=SPI_Read_Reg(0x00);
+
 
 
 

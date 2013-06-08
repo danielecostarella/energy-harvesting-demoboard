@@ -1,6 +1,6 @@
 /*
  * File:   rfm70.h
- * Author: blackbliss
+ * Author: Daniele Costarella
  *
  * Created on 22 febbraio 2013, 20.55
  */
@@ -8,10 +8,11 @@
 #ifndef RFM70_H
 #define	RFM70_H
 
+/********************************** HEADERS **********************************/
 #include <stdint.h>
 #include <xc.h>
 
-#define MAX_PACKET_LEN          32// max value is 32
+#define MAX_PACKET_LEN          32      // max value is 32
 #define TX_PACKET_LEN           10
 
 //****************************************************************************//
@@ -60,14 +61,14 @@
 #define DYNPD           0x1C
 #define FEATURE         0x1D
 
-//interrupt status
+/* interrupt status */
 #define STATUS_RX_DR 	0x40
 #define STATUS_TX_DS 	0x20
 #define STATUS_MAX_RT 	0x10
 
 #define STATUS_TX_FULL 	0x01
 
-//FIFO_STATUS
+/* FIFO_STATUS */
 #define FIFO_STATUS_TX_REUSE 	0x40
 #define FIFO_STATUS_TX_FULL 	0x20
 #define FIFO_STATUS_TX_EMPTY 	0x10
@@ -75,29 +76,23 @@
 #define FIFO_STATUS_RX_FULL 	0x02
 #define FIFO_STATUS_RX_EMPTY 	0x01
 
-
+/********************************* FUNCTIONS *********************************/
 uint8_t SPI_Read_Reg(uint8_t reg);
 void SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
-
 void SPI_Write_Reg(uint8_t reg, uint8_t value);
-//void SPI_Write_Reg_Bank0(const uint8_t reg, const uint8_t value);
-//void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
 void SPI_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
 void SPI_Write_Buf_bank(uint8_t reg, uint8_t *pBuf, uint8_t length);
-
 void SwitchToTxMode(void);
 void SwitchToRxMode(void);
-
 void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
 void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
 void SwitchCFG(char _cfg);
-
 void RFM70_Initialize(void);
-
-uint8_t rfm70_data_sent(void); //deprecated
+void rfm70setPowerdownMode(uint8_t value);
+uint8_t rfm70_data_sent(void);              // obsolete
 uint8_t rfm70Interrupt(void);
 uint8_t rfm70TxDataSentErrorInterrupt(void);
 uint8_t rfm70TxDataSentInterrupt(void);
-void rfm70setPowerdownMode(uint8_t value);
+
 
 #endif	/* RFM70_H */
