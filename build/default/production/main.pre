@@ -2618,6 +2618,7 @@ asm("sleep");
 
 # 228
 timelapse_count = 0;
+value = adcReadVcap();
 while(1) {
 rfm70setPowerdownMode(1);
 
@@ -2664,7 +2665,19 @@ charge_pulse_float = 10;
 energy = 0;
 }
 
-# 279
+else if ((tx_buf[7] > (2.2*(68/248))/0.004) && (tx_buf[1] > value) && !PORTBbits.RB0) {
+PORTAbits.RA2 =0;
+tx_buf[0] = adcReadTemp();
+tx_buf[7] = adcReadVsupercap();
+jumper_stat &= 0x7F;
+tx_buf[4] = jumper_stat;
+Send_Packet(0xB0,tx_buf,10);
+PORTAbits.RA2 =1;
+charge_pulse_float = 10;
+energy = 0;
+}
+
+# 292
 }
 
 PORTCbits.RC2=0;
@@ -2735,7 +2748,7 @@ if (charge_pulse_float > 0)
 charge_pulse_float /= 1.05;
 }
 
-# 358
+# 371
 }
 else {
 T1CONbits.TMR1ON=0;
@@ -2768,7 +2781,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 399
+# 412
 uint8_t adcReadVcap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2786,7 +2799,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 425
+# 438
 uint8_t adcReadVsupercap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2805,7 +2818,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 451
+# 464
 void uartInit(void) {
 TRISCbits.TRISC7=1;
 TRISCbits.TRISC6=0;
@@ -2822,7 +2835,7 @@ TXSTAbits.TXEN=1;
 
 }
 
-# 477
+# 490
 void spiInit(void) {
 SSPCONbits.SSPEN=1;
 SSPCONbits.CKP=0;
@@ -2833,7 +2846,7 @@ SSPSTATbits.CKE=1;
 _delay( 50 * ( 8000000L / 4000));
 }
 
-# 495
+# 508
 void adcInit(void) {
 ADCON1bits.ADCS=1;
 ADCON1bits.ADREF=3;
@@ -2861,13 +2874,13 @@ putch(c = getch());
 return c;
 }
 
-# 528
+# 541
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 543
+# 556
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2879,7 +2892,7 @@ if((fifo_sta&0x20)==0)
 
 {
 
-# 559
+# 572
 PORTCbits.RC2=0;
 SPI_Write_Buf(type, pbuf, len);
 PORTCbits.RC2=1;
@@ -2903,7 +2916,7 @@ SwitchToRxMode();
 }
 }
 
-# 588
+# 601
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2947,14 +2960,14 @@ SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
 
-# 635
+# 648
 }
 }
 SPI_Write_Reg(0x20|0x07,sta);
 
 }
 
-# 648
+# 661
 void boardInit(void) {
 OSCCONbits.IRCF=2;
 
