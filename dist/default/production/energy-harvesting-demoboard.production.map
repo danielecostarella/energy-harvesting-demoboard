@@ -4,7 +4,7 @@ Linker command line:
 
 --edf=/Applications/microchip/xc8/v1.12/dat/en_msgs.txt -cs \
   -h+dist/default/production/energy-harvesting-demoboard.production.sym -z \
-  -Q16LF707 -ol.obj \
+  -Q16F707 -ol.obj \
   -Mdist/default/production/energy-harvesting-demoboard.production.map -E1 \
   -ver=XC8 -ACONST=00h-0FFhx32 -ACODE=00h-07FFhx4 -ASTRCODE=00h-01FFFh \
   -AENTRY=00h-0FFhx32 -ASTRING=00h-0FFhx32 -ACOMMON=070h-07Fh \
@@ -15,20 +15,20 @@ Linker command line:
   -preset_vec=00h,intentry=04h,init,end_init -ppowerup=CODE -pfunctab=CODE \
   -ACONFIG=02007h-02008h -pconfig=CONFIG -DCONFIG=2 -AIDLOC=02000h-02003h \
   -pidloc=IDLOC -DIDLOC=2 -DCODE=2 -DSTRCODE=2 -DSTRING=2 -DCONST=2 \
-  -DENTRY=2 -k /tmp/cgtBkGrgs.obj \
+  -DENTRY=2 -k /tmp/cgtlYzP9B.obj \
   dist/default/production/energy-harvesting-demoboard.production.obj 
 
 Object code version is 3.10
 
-Machine type is 16LF707
+Machine type is 16F707
 
 
 
                 Name                               Link     Load   Length Selector   Space Scale
-/tmp/cgtBkGrgs.obj
+/tmp/cgtlYzP9B.obj
                 end_init                             12       12        3        8       0
                 reset_vec                             0        0        3        0       0
-                config                             2007     2007        1     400E       0
+                config                             2007     2007        2     400E       0
 dist/default/production/energy-harvesting-demoboard.production.obj
                 intentry                              4        4        E        8       0
                 text703                             C0B      C0B       6A     1816       0
@@ -158,7 +158,7 @@ TOTAL           Name                               Link     Load   Length     Sp
         CLASS   SFR3           
 
         CLASS   CONFIG         
-                config                             2007     2007        1         0
+                config                             2007     2007        2         0
 
         CLASS   IDLOC          
 
@@ -205,7 +205,7 @@ SEGMENTS        Name                           Load    Length   Top    Selector 
                 text700                        000DD4  0000A6  000E7A      1BA8       0  CODE        2
                 text681                        000E7A  0000BE  000F38      1CF4       0  CODE        2
                 text698                        000F38  0000C8  001000      1E70       0  CODE        2
-                config                         002007  000001  002008      400E       0  CONFIG      2
+                config                         002007  000002  002009      400E       0  CONFIG      2
 
 
 UNUSED ADDRESS RANGES
@@ -219,7 +219,6 @@ UNUSED ADDRESS RANGES
                          0800-08BB             BC
                          1000-1FFF            800
         COMMON           007D-007D              1           1
-        CONFIG           2008-2008              1           2
         CONST            0003-0003              1           2
                          0800-08BB             BC
                          1000-1FFF            100
@@ -340,6 +339,7 @@ __CFG_FOSC$INTOSC                       (abs)        0000
 __CFG_MCLRE$ON                          (abs)        0000
 __CFG_PLLEN$ON                          (abs)        0000
 __CFG_PWRTE$OFF                         (abs)        0000
+__CFG_VCAPEN$RA0                        (abs)        0000
 __CFG_WDTE$OFF                          (abs)        0000
 __Habs1                                 abs1         0000
 __Hbank0                                bank0        0000
@@ -354,7 +354,7 @@ __Hcinit                                cinit        0000
 __Hclrtext                              clrtext      0000
 __Hcode                                 code         0000
 __Hcommon                               common       0000
-__Hconfig                               config       2008
+__Hconfig                               config       2009
 __HcstackBANK0                          cstackBANK0  0000
 __HcstackCOMMON                         cstackCOMMON 0000
 __HdataBANK0                            dataBANK0    0000
@@ -415,7 +415,7 @@ __Lsfr2                                 sfr2         0000
 __Lsfr3                                 sfr3         0000
 __Lstrings                              strings      0000
 __Ltext                                 text         0000
-__S0                                    (abs)        2008
+__S0                                    (abs)        2009
 __S1                                    (abs)        00C0
 ___awdiv                                text696      0CE3
 ___awdiv@counter                        cstackBANK0  002B
@@ -625,7 +625,7 @@ FUNCTION INFORMATION:
 
  *************** function _main *****************
  Defined at:
-		line 170 in file "main.c"
+		line 187 in file "main.c"
  Parameters:    Size  Location     Type
   argc            2   31[BANK0 ] int 
   argv            2   33[BANK0 ] PTR PTR unsigned char 
@@ -706,7 +706,7 @@ Total ram usage:       21 bytes
 
  *************** function _adcReadVsupercap *****************
  Defined at:
-		line 438 in file "main.c"
+		line 455 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -768,7 +768,7 @@ Total ram usage:        3 bytes
 
  *************** function _adcInit *****************
  Defined at:
-		line 508 in file "main.c"
+		line 525 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -798,7 +798,7 @@ Total ram usage:        0 bytes
 
  *************** function _uartInit *****************
  Defined at:
-		line 464 in file "main.c"
+		line 481 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -828,7 +828,7 @@ Total ram usage:        0 bytes
 
  *************** function _spiInit *****************
  Defined at:
-		line 490 in file "main.c"
+		line 507 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -858,7 +858,7 @@ Total ram usage:        2 bytes
 
  *************** function _boardInit *****************
  Defined at:
-		line 661 in file "main.c"
+		line 678 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -888,7 +888,7 @@ Total ram usage:        0 bytes
 
  *************** function _adcReadTemp *****************
  Defined at:
-		line 385 in file "main.c"
+		line 402 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -918,7 +918,7 @@ Total ram usage:        3 bytes
 
  *************** function _Send_Packet *****************
  Defined at:
-		line 557 in file "main.c"
+		line 574 in file "main.c"
  Parameters:    Size  Location     Type
   type            1    wreg     unsigned char 
   pbuf            1    8[BANK0 ] PTR unsigned char 
@@ -958,7 +958,7 @@ Total ram usage:        6 bytes
 
  *************** function _sleep *****************
  Defined at:
-		line 318 in file "main.c"
+		line 335 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -992,7 +992,7 @@ Total ram usage:        3 bytes
 
  *************** function _adcReadVcap *****************
  Defined at:
-		line 412 in file "main.c"
+		line 429 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -1589,7 +1589,7 @@ Total ram usage:        8 bytes
 
  *************** function _ISR *****************
  Defined at:
-		line 108 in file "main.c"
+		line 125 in file "main.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type

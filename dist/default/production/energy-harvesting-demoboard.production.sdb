@@ -1,8 +1,8 @@
 [p LITE_MODE AUTOSTATIC PIC14 PICREGULAR PICMID ]
 [d version 1.1 ]
 [d edition pro ]
-[d chip 16LF707 ]
-"713 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
+[d chip 16F707 ]
+"713 /Applications/microchip/xc8/v1.12/include/pic16f707.h
 [s S23 . 1 `uc 1 RB0 1 0 :1:0 
 `uc 1 RB1 1 0 :1:1 
 `uc 1 RB2 1 0 :1:2 
@@ -37,7 +37,7 @@
 `uc 1 T3CKI 1 0 :1:5 
 ]
 [u S56 . 1 `S23 1 . 1 0 `S32 1 . 1 0 `S39 1 . 1 0 `S48 1 . 1 0 `S53 1 . 1 0 ]
-"74 main.c
+"91 main.c
 [s S121 . 1 `uc 1 RD0 1 0 :1:0 
 `uc 1 RD1 1 0 :1:1 
 `uc 1 RD2 1 0 :1:2 
@@ -59,7 +59,7 @@
 [s S139 . 1 `uc 1 T3G 1 0 :1:0 
 ]
 [u S141 . 1 `S121 1 . 1 0 `S130 1 . 1 0 `S139 1 . 1 0 ]
-"70
+"87
 [s S185 . 1 `uc 1 RA0 1 0 :1:0 
 `uc 1 RA1 1 0 :1:1 
 `uc 1 RA2 1 0 :1:2 
@@ -99,7 +99,7 @@
 `uc 1 TACKI 1 0 :1:4 
 ]
 [u S223 . 1 `S185 1 . 1 0 `S194 1 . 1 0 `S203 1 . 1 0 `S212 1 . 1 0 `S220 1 . 1 0 ]
-"205 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
+"205 /Applications/microchip/xc8/v1.12/include/pic16f707.h
 [s S268 . 1 `uc 1 RC0 1 0 :1:0 
 `uc 1 RC1 1 0 :1:1 
 `uc 1 RC2 1 0 :1:2 
@@ -260,7 +260,7 @@
 `uc 1 IRCF1 1 0 :1:5 
 ]
 [u S635 . 1 `S626 1 . 1 0 `S631 1 . 1 0 ]
-"2242 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
+"2242 /Applications/microchip/xc8/v1.12/include/pic16f707.h
 [s S648 . 1 `uc 1 ANSC0 1 0 :1:0 
 `uc 1 ANSC1 1 0 :1:1 
 `uc 1 ANSC2 1 0 :1:2 
@@ -388,7 +388,7 @@
 `uc 1 CPSA7 1 0 :1:2 
 ]
 [u S885 . 1 `S871 1 . 1 0 `S876 1 . 1 0 `S881 1 . 1 0 ]
-"108 main.c
+"125 main.c
 [v F2070 `(v  1 t 0 ]
 "151 /Applications/microchip/xc8/v1.12/include/pic.h
 [s S1126 . 1 `uc 1 TMR1IF 1 0 :1:0 
@@ -401,7 +401,7 @@
 `uc 1 TMR1GIF 1 0 :1:7 
 ]
 [u S1135 . 1 `S1126 1 . 1 0 ]
-"1028 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
+"1028 /Applications/microchip/xc8/v1.12/include/pic16f707.h
 [s S1147 . 1 `uc 1 RD0 1 0 :1:0 
 `uc 1 RD1 1 0 :1:1 
 `uc 1 RD2 1 0 :1:2 
@@ -536,37 +536,37 @@
 [v ___wmul `(ui  1 e 2 0 ]
 "3 /Applications/microchip/xc8/v1.12/sources/bmul.c
 [v ___bmul `(uc  1 e 1 0 ]
-"108 main.c
+"125 main.c
 [v _ISR `II(v  1 e 0 0 ]
-"170
+"187
 [v _main `(i  1 e 2 0 ]
-"318
+"335
 [v _sleep `(v  1 e 0 0 ]
-"385
+"402
 [v _adcReadTemp `(uc  1 e 1 0 ]
-"412
+"429
 [v _adcReadVcap `(uc  1 e 1 0 ]
-"438
+"455
 [v _adcReadVsupercap `(uc  1 e 1 0 ]
-"464
+"481
 [v _uartInit `(v  1 e 0 0 ]
-"490
+"507
 [v _spiInit `(v  1 e 0 0 ]
-"508
+"525
 [v _adcInit `(v  1 e 0 0 ]
-"515
+"532
 [v _putch `(v  1 e 0 0 ]
-"521
+"538
 [v _getch `(uc  1 e 1 0 ]
-"529
+"546
 [v _getche `(uc  1 e 1 0 ]
-"542
+"559
 [v _power_on_delay `(v  1 e 0 0 ]
-"557
+"574
 [v _Send_Packet `(v  1 e 0 0 ]
-"602
+"619
 [v _Receive_Packet `(v  1 e 0 0 ]
-"661
+"678
 [v _boardInit `(v  1 e 0 0 ]
 "103 rfm70.c
 [v _SPI_RW `(uc  1 e 1 0 ]
@@ -607,7 +607,7 @@
 `uc 1 RA6 1 0 :1:6 
 `uc 1 RA7 1 0 :1:7 
 ]
-"205 /Applications/microchip/xc8/v1.12/include/pic16lf707.h
+"205 /Applications/microchip/xc8/v1.12/include/pic16f707.h
 [s S194 . 1 `uc 1 AN0 1 0 :1:0 
 `uc 1 AN1 1 0 :1:1 
 `uc 1 AN2 1 0 :1:2 
@@ -963,39 +963,39 @@
 [v _TMR1IF `VEb  1 e 0 @96 ]
 "4553
 [v _TXIF `VEb  1 e 0 @100 ]
-"82 main.c
+"99 main.c
 [v _tx_buf `[10]uc  1 e 10 0 ]
-"83
+"100
 [v _rx_buf `[32]uc  1 e 32 0 ]
-"87
-[v _tmr1Counter `uc  1 e 1 0 ]
-"88
-[v _tmr1Target `uc  1 e 1 0 ]
-"89
-[v _flag `b  1 s 0 flag ]
-"90
-[v _scap_on `b  1 s 0 scap_on ]
-"91
-[v _jumper_stat `uc  1 e 1 0 ]
-"92
-[v _sleep_counter `uc  1 e 1 0 ]
-"93
-[v _sleep_count `uc  1 e 1 0 ]
-"95
-[v _value `uc  1 e 1 0 ]
-"96
-[v _timelapse_count `i  1 e 2 0 ]
-"97
-[v _charge_time `ui  1 e 2 0 ]
-"98
-[v _charge_pulse `ui  1 e 2 0 ]
-"99
-[v _charge_pulse_float `f  1 e 3 0 ]
-"101
-[v _dac_value `ui  1 e 2 0 ]
-"103
-[v _values `[2]uc  1 e 2 0 ]
 "104
+[v _tmr1Counter `uc  1 e 1 0 ]
+"105
+[v _tmr1Target `uc  1 e 1 0 ]
+"106
+[v _flag `b  1 s 0 flag ]
+"107
+[v _scap_on `b  1 s 0 scap_on ]
+"108
+[v _jumper_stat `uc  1 e 1 0 ]
+"109
+[v _sleep_counter `uc  1 e 1 0 ]
+"110
+[v _sleep_count `uc  1 e 1 0 ]
+"112
+[v _value `uc  1 e 1 0 ]
+"113
+[v _timelapse_count `i  1 e 2 0 ]
+"114
+[v _charge_time `ui  1 e 2 0 ]
+"115
+[v _charge_pulse `ui  1 e 2 0 ]
+"116
+[v _charge_pulse_float `f  1 e 3 0 ]
+"118
+[v _dac_value `ui  1 e 2 0 ]
+"120
+[v _values `[2]uc  1 e 2 0 ]
+"121
 [v _energy `ui  1 e 2 0 ]
 "31 rfm70.c
 [v _Bank1_Reg0_13 `DCC[14]ul  1 e 56 0 ]
@@ -1009,17 +1009,17 @@
 [v _RX0_Address `DCC[5]uc  1 e 5 0 ]
 "96
 [v _RX1_Address `DCC[5]uc  1 e 5 0 ]
-"170 main.c
+"187 main.c
 [v _main `(i  1 e 2 0 ]
 {
-"171
+"188
 [v main@i `l  1 a 4 39 ]
-"172
+"189
 [v main@num_sleep `uc  1 a 1 43 ]
-"170
+"187
 [v main@argc `i  1 p 2 31 ]
 [v main@argv `**uc  1 p 2 33 ]
-"315
+"332
 } 0
 "300 rfm70.c
 [v _RFM70_Initialize `(v  1 e 0 0 ]
@@ -1031,12 +1031,12 @@
 [v RFM70_Initialize@i `uc  1 a 1 28 ]
 "406
 } 0
-"438 main.c
+"455 main.c
 [v _adcReadVsupercap `(uc  1 e 1 0 ]
 {
-"439
+"456
 [v adcReadVsupercap@value `uc  1 a 1 2 ]
-"454
+"471
 } 0
 "454 rfm70.c
 [v _rfm70setPowerdownMode `(v  1 e 0 0 ]
@@ -1048,58 +1048,58 @@
 [v rfm70setPowerdownMode@value `uc  1 a 1 wreg ]
 "470
 } 0
-"508 main.c
+"525 main.c
 [v _adcInit `(v  1 e 0 0 ]
 {
-"511
+"528
 } 0
-"464
+"481
 [v _uartInit `(v  1 e 0 0 ]
 {
-"478
+"495
 } 0
-"490
+"507
 [v _spiInit `(v  1 e 0 0 ]
 {
-"498
+"515
 } 0
-"661
+"678
 [v _boardInit `(v  1 e 0 0 ]
 {
-"786
+"803
 } 0
-"385
+"402
 [v _adcReadTemp `(uc  1 e 1 0 ]
 {
-"386
+"403
 [v adcReadTemp@value `uc  1 a 1 2 ]
-"401
+"418
 } 0
-"557
+"574
 [v _Send_Packet `(v  1 e 0 0 ]
 {
 [v Send_Packet@type `uc  1 a 1 wreg ]
-"558
+"575
 [v Send_Packet@fifo_sta `uc  1 a 1 13 ]
-"557
+"574
 [v Send_Packet@type `uc  1 a 1 wreg ]
 [v Send_Packet@pbuf `*.0uc  1 p 1 8 ]
 [v Send_Packet@len `uc  1 p 1 9 ]
-"593
+"610
 } 0
-"318
+"335
 [v _sleep `(v  1 e 0 0 ]
 {
-"319
+"336
 [v sleep@new_value `uc  1 a 1 30 ]
-"382
+"399
 } 0
-"412
+"429
 [v _adcReadVcap `(uc  1 e 1 0 ]
 {
-"413
+"430
 [v adcReadVcap@value `uc  1 a 1 2 ]
-"427
+"444
 } 0
 "236 rfm70.c
 [v _SwitchToTxMode `(v  1 e 0 0 ]
@@ -1257,8 +1257,8 @@
 [v ___ftpack@sign `uc  1 p 1 4 ]
 "86
 } 0
-"108 main.c
+"125 main.c
 [v _ISR `II(v  1 e 0 0 ]
 {
-"157
+"174
 } 0

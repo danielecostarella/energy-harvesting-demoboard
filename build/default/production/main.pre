@@ -137,7 +137,7 @@ extern char * ultoa(char * buf, unsigned long val, int base);
 
 extern char * ftoa(float f, int * status);
 
-# 44 "/Applications/microchip/xc8/v1.12/include/pic16lf707.h"
+# 44 "/Applications/microchip/xc8/v1.12/include/pic16f707.h"
 extern volatile unsigned char INDF @ 0x000;
 
 asm("INDF equ 00h");
@@ -2487,7 +2487,7 @@ uint8_t rfm70TxDataSentErrorInterrupt(void);
 uint8_t rfm70TxDataSentInterrupt(void);
 
 
-# 33 "main.c"
+# 50 "main.c"
 #pragma config FOSC = INTOSC
 
 
@@ -2502,7 +2502,11 @@ uint8_t rfm70TxDataSentInterrupt(void);
 
 #pragma config PLLEN = ON
 
-# 63
+
+
+#pragma config VCAPEN=0;
+
+# 80
 void power_on_delay(void);
 void spiInit(void);
 void uartInit(void);
@@ -2553,13 +2557,13 @@ if(TMR1IF)
 {
 tmr1Counter++;
 
-TMR1H = 0x60;
 
+TMR1H = 0x10;
 TMR1L = 0x00;
 
 if(tmr1Counter == tmr1Target){
 
-# 131
+# 148
 jumper_stat = (jumper_stat & 0x80) | (PORTD>>5 & 0x07) | PORTBbits.RB0 * 64 ;
 
 
@@ -2588,12 +2592,12 @@ TMR1IF=0;
 }
 }
 
-# 170
+# 187
 int main(int argc, char** argv) {
 long int i=0;
 uint8_t num_sleep;
 
-# 178
+# 195
 boardInit();
 spiInit();
 uartInit();
@@ -2613,10 +2617,10 @@ asm("sleep");
 RFM70_Initialize();
 rfm70setPowerdownMode(0);
 
-# 208
+# 225
 asm("sleep");
 
-# 228
+# 245
 timelapse_count = 0;
 value = adcReadVcap();
 while(1) {
@@ -2677,7 +2681,7 @@ charge_pulse_float = 10;
 energy = 0;
 }
 
-# 292
+# 309
 }
 
 PORTCbits.RC2=0;
@@ -2748,12 +2752,12 @@ if (charge_pulse_float > 0)
 charge_pulse_float /= 1.05;
 }
 
-# 371
+# 388
 }
 else {
 T1CONbits.TMR1ON=0;
-TMR1H = 0x60;
 
+TMR1H = 0x10;
 TMR1L = 0x00;
 T1CONbits.TMR1ON=1;
 asm("sleep");
@@ -2781,7 +2785,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 412
+# 429
 uint8_t adcReadVcap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2799,7 +2803,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 438
+# 455
 uint8_t adcReadVsupercap(void) {
 uint8_t value;
 FVRCONbits.FVREN=1;
@@ -2818,7 +2822,7 @@ FVRCONbits.FVREN=0;
 return value;
 }
 
-# 464
+# 481
 void uartInit(void) {
 TRISCbits.TRISC7=1;
 TRISCbits.TRISC6=0;
@@ -2835,7 +2839,7 @@ TXSTAbits.TXEN=1;
 
 }
 
-# 490
+# 507
 void spiInit(void) {
 SSPCONbits.SSPEN=1;
 SSPCONbits.CKP=0;
@@ -2846,7 +2850,7 @@ SSPSTATbits.CKE=1;
 _delay( 50 * ( 8000000L / 4000));
 }
 
-# 508
+# 525
 void adcInit(void) {
 ADCON1bits.ADCS=1;
 ADCON1bits.ADREF=3;
@@ -2874,13 +2878,13 @@ putch(c = getch());
 return c;
 }
 
-# 541
+# 558
 void power_on_delay(void)
 {
 _delay( 1000 * ( 8000000L / 4000));
 }
 
-# 556
+# 573
 void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
 {
 uint8_t fifo_sta,i;
@@ -2892,7 +2896,7 @@ if((fifo_sta&0x20)==0)
 
 {
 
-# 572
+# 589
 PORTCbits.RC2=0;
 SPI_Write_Buf(type, pbuf, len);
 PORTCbits.RC2=1;
@@ -2916,7 +2920,7 @@ SwitchToRxMode();
 }
 }
 
-# 601
+# 618
 void Receive_Packet(void)
 {
 uint8_t len,rx_count,j,sta,fifo_sta,chksum;
@@ -2960,14 +2964,14 @@ SwitchToRxMode();
 
 rx_buf[len-1] = '\0';
 
-# 648
+# 665
 }
 }
 SPI_Write_Reg(0x20|0x07,sta);
 
 }
 
-# 661
+# 678
 void boardInit(void) {
 OSCCONbits.IRCF=2;
 
