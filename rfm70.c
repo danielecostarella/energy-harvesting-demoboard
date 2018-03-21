@@ -12,7 +12,7 @@
  * RFM70 radio module driver for PIC16
  *
  * For new versions of this code please visit:
- * https://github.com/blackbliss/energy-harvesting-demoboard
+ * https://github.com/danielecostarella/energy-harvesting-demoboard
  *
  * Detailed information can also be found on my master thesis [IT]
  *
