@@ -1,8 +1,9 @@
 /*
  * File:   rfm70.h
- * Author: Daniele Costarella
+ * Author: Daniele Costarella <daniele.costarella@gmail.com>
  *
- * Created on 22 febbraio 2013, 20.55
+ * Created on February 2013
+ *
  */
 
 #ifndef RFM70_H
